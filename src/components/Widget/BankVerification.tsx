@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { BankVerificationMethod } from '@/hooks/use-widget-config';
+import { Check, Lock, Building, FileText, AlertCircle } from 'lucide-react';
 
 interface BankVerificationProps {
   onNext: () => void;
@@ -24,12 +25,12 @@ const BankVerification: React.FC<BankVerificationProps> = ({
   const [isAuthorized, setIsAuthorized] = useState(false);
   
   const banks = [
-    { id: 'chase', name: 'Chase' },
-    { id: 'boa', name: 'Bank of America' },
-    { id: 'wells', name: 'Wells Fargo' },
-    { id: 'citi', name: 'Citibank' },
-    { id: 'usbank', name: 'US Bank' },
-    { id: 'capital', name: 'Capital One' },
+    { id: 'chase', name: 'Chase', logo: '🏦' },
+    { id: 'boa', name: 'Bank of America', logo: '🏦' },
+    { id: 'wells', name: 'Wells Fargo', logo: '🏦' },
+    { id: 'citi', name: 'Citibank', logo: '🏦' },
+    { id: 'usbank', name: 'US Bank', logo: '🏦' },
+    { id: 'capital', name: 'Capital One', logo: '🏦' },
   ];
   
   const handleMethodChange = (method: BankVerificationMethod) => {
@@ -79,9 +80,7 @@ const BankVerification: React.FC<BankVerificationProps> = ({
       return (
         <div className="text-center py-6 space-y-4 animate-fade-in">
           <div className="w-16 h-16 rounded-full bg-payouts-accent/20 mx-auto flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-payouts-accent">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+            <Check className="h-8 w-8 text-payouts-accent" strokeWidth={3} />
           </div>
           <h3 className="font-semibold text-lg">Verification Complete</h3>
           <p className="text-sm text-white/70">Your bank account has been successfully verified</p>
@@ -97,26 +96,28 @@ const BankVerification: React.FC<BankVerificationProps> = ({
           <h4 className="text-center font-medium">Connect to {bankName}</h4>
           <p className="text-center text-sm text-white/70">Enter your {bankName} online banking credentials</p>
           
-          <div>
+          <div className="relative">
             <input
               type="text"
               name="username"
               value={credentials.username}
               onChange={handleInputChange}
               placeholder="Username"
-              className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              className="w-full p-3 pl-10 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
             />
+            <Building className="absolute left-3 top-3.5 h-4 w-4 text-white/40" />
           </div>
           
-          <div>
+          <div className="relative">
             <input
               type="password"
               name="password"
               value={credentials.password}
               onChange={handleInputChange}
               placeholder="Password"
-              className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              className="w-full p-3 pl-10 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
             />
+            <Lock className="absolute left-3 top-3.5 h-4 w-4 text-white/40" />
           </div>
           
           <div className="flex space-x-3 pt-2">
@@ -136,9 +137,10 @@ const BankVerification: React.FC<BankVerificationProps> = ({
             </button>
           </div>
           
-          <p className="text-xs text-center text-white/60 mt-4">
-            Secure connection powered by Plaid. Your credentials are never stored.
-          </p>
+          <div className="flex items-center justify-center mt-4 gap-2 text-xs text-white/60">
+            <Lock className="h-3 w-3" />
+            <p>Secure connection powered by Plaid. Your credentials are never stored.</p>
+          </div>
         </form>
       );
     }
@@ -153,16 +155,18 @@ const BankVerification: React.FC<BankVerificationProps> = ({
             <button
               key={bank.id}
               onClick={() => handleBankSelect(bank.id)}
-              className="p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all text-center"
+              className="p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg hover:bg-white/10 transition-all text-center flex flex-col items-center gap-2"
             >
-              {bank.name}
+              <span className="text-2xl">{bank.logo}</span>
+              <span>{bank.name}</span>
             </button>
           ))}
         </div>
         
-        <p className="text-xs text-center text-white/60 mt-6">
-          Secure connection powered by Plaid. Your credentials are never stored.
-        </p>
+        <div className="flex items-center justify-center mt-6 gap-2 text-xs text-white/60">
+          <Lock className="h-3 w-3" />
+          <p>Secure connection powered by Plaid. Your credentials are never stored.</p>
+        </div>
       </div>
     );
   };
@@ -173,19 +177,17 @@ const BankVerification: React.FC<BankVerificationProps> = ({
         <h4 className="text-center font-medium">Upload Bank Statement</h4>
         <p className="text-center text-sm text-white/70">Upload a recent bank statement for verification</p>
         
-        <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+        <div className="border-2 border-dashed border-white/20 rounded-lg p-8 text-center bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all cursor-pointer">
           <div className="mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto text-white/50">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
+            <div className="w-16 h-16 rounded-full bg-white/10 mx-auto flex items-center justify-center">
+              <FileText className="h-8 w-8 text-white/70" />
+            </div>
           </div>
           <p className="text-sm text-white/70">Drag & drop files here or</p>
-          <button className="mt-2 px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all text-sm">
+          <button className="mt-2 px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all text-sm font-medium">
             Browse Files
           </button>
-          <p className="mt-2 text-xs text-white/50">Supported formats: PDF, PNG, JPG (Max 10MB)</p>
+          <p className="mt-3 text-xs text-white/50">Supported formats: PDF, PNG, JPG (Max 10MB)</p>
         </div>
       </div>
     );
@@ -197,8 +199,8 @@ const BankVerification: React.FC<BankVerificationProps> = ({
         <h4 className="text-center font-medium">Micro-Deposit Verification</h4>
         <p className="text-center text-sm text-white/70">We'll send two small deposits to your account for verification</p>
         
-        <div className="space-y-4">
-          <div>
+        <div className="space-y-4 bg-white/5 backdrop-blur-sm p-6 rounded-lg border border-white/10">
+          <div className="relative">
             <label className="text-sm text-white/80 block mb-1">Account Holder Name</label>
             <input
               type="text"
@@ -207,16 +209,19 @@ const BankVerification: React.FC<BankVerificationProps> = ({
             />
           </div>
           
-          <div>
+          <div className="relative">
             <label className="text-sm text-white/80 block mb-1">Bank Routing Number</label>
             <input
               type="text"
               placeholder="9-digit Routing Number"
               className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
             />
+            <div className="absolute right-3 top-9 text-xs text-white/40 bg-white/10 px-2 py-1 rounded">
+              9 digits
+            </div>
           </div>
           
-          <div>
+          <div className="relative">
             <label className="text-sm text-white/80 block mb-1">Account Number</label>
             <input
               type="text"
@@ -225,11 +230,14 @@ const BankVerification: React.FC<BankVerificationProps> = ({
             />
           </div>
           
-          <p className="text-xs text-white/60">
-            You'll receive two small deposits in 1-3 business days. Return here to verify these amounts.
-          </p>
+          <div className="flex items-center gap-2 bg-white/10 p-3 rounded-lg text-sm">
+            <AlertCircle className="h-4 w-4 text-payouts-accent" />
+            <p className="text-white/80">
+              You'll receive two small deposits in 1-3 business days. Return here to verify these amounts.
+            </p>
+          </div>
           
-          <button className="btn-primary w-full py-2">
+          <button className="btn-primary w-full py-3 flex items-center justify-center gap-2">
             Send Micro-Deposits
           </button>
         </div>
@@ -254,7 +262,7 @@ const BankVerification: React.FC<BankVerificationProps> = ({
               : "text-white/60 hover:text-white/80"
           )}
         >
-          plaid
+          Plaid Connect
         </button>
         <button
           onClick={() => handleMethodChange('statement')}
@@ -265,7 +273,7 @@ const BankVerification: React.FC<BankVerificationProps> = ({
               : "text-white/60 hover:text-white/80"
           )}
         >
-          statement
+          Statement Upload
         </button>
         <button
           onClick={() => handleMethodChange('microdeposit')}
@@ -276,15 +284,17 @@ const BankVerification: React.FC<BankVerificationProps> = ({
               : "text-white/60 hover:text-white/80"
           )}
         >
-          micro deposit
+          Micro-Deposits
         </button>
       </div>
       
-      {verificationMethod === 'plaid' && renderPlaidMethod()}
-      {verificationMethod === 'statement' && renderStatementMethod()}
-      {verificationMethod === 'microdeposit' && renderMicroDepositMethod()}
+      <div className="bg-white/5 backdrop-blur-sm p-5 rounded-lg border border-white/10 transition-all">
+        {verificationMethod === 'plaid' && renderPlaidMethod()}
+        {verificationMethod === 'statement' && renderStatementMethod()}
+        {verificationMethod === 'microdeposit' && renderMicroDepositMethod()}
+      </div>
       
-      <div className="mt-6">
+      <div className="mt-6 bg-white/5 backdrop-blur-sm p-4 rounded-lg border border-white/10">
         <div className="flex items-center mb-4">
           <input
             id="authorize"
@@ -298,9 +308,12 @@ const BankVerification: React.FC<BankVerificationProps> = ({
           </label>
         </div>
         
-        <p className="text-xs text-white/60 mb-4">
-          Your information is protected and will be used solely for verification purposes
-        </p>
+        <div className="flex items-center gap-2 bg-white/10 p-3 rounded-lg mb-4">
+          <Lock className="h-4 w-4 text-payouts-accent" />
+          <p className="text-xs text-white/80">
+            Your information is protected with bank-level encryption and will be used solely for verification purposes
+          </p>
+        </div>
         
         <div className="flex space-x-3">
           <button
