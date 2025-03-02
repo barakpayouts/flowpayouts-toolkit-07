@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import PayoutWidget from "@/components/Widget/PayoutWidget";
-import { RecipientType, VerificationStep, PayoutMethod, useWidgetConfig, BankVerificationMethod } from '@/hooks/use-widget-config';
+import { RecipientType, VerificationStep, PayoutMethod, useWidgetConfig } from '@/hooks/use-widget-config';
 import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -27,8 +27,7 @@ const WidgetDemo = () => {
     toggleStep, 
     togglePayoutMethod,
     setPayoutsOnlyMode,
-    resetConfig,
-    setBankVerificationMethod
+    resetConfig
   } = useWidgetConfig();
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [isPayoutsOnly, setIsPayoutsOnly] = useState(config.steps.length === 0);
@@ -71,15 +70,6 @@ const WidgetDemo = () => {
         description: "Verification steps have been restored."
       });
     }
-  };
-
-  const handleMethodChange = (method: BankVerificationMethod) => {
-    setBankVerificationMethod(method);
-    setWidgetKey(prevKey => prevKey + 1);
-    
-    toast.success(`Verification method changed to ${method}`, {
-      description: `Bank verification will now use ${method} method.`
-    });
   };
 
   const stepOptions: { value: VerificationStep; label: string; icon: React.ReactNode }[] = [

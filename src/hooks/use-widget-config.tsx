@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 
 export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
@@ -30,9 +29,6 @@ interface WidgetConfig {
   borderColor: string;
   borderRadius: number;
   buttonStyle: ButtonStyle;
-  
-  // Bank verification method
-  defaultBankVerificationMethod: BankVerificationMethod;
 }
 
 interface WidgetConfigState {
@@ -42,7 +38,6 @@ interface WidgetConfigState {
   togglePayoutMethod: (method: PayoutMethod) => void;
   updateConfig: (updates: Partial<WidgetConfig>) => void;
   setPayoutsOnlyMode: (enabled: boolean) => void;
-  setBankVerificationMethod: (method: BankVerificationMethod) => void;
   resetConfig: () => void;
 }
 
@@ -67,7 +62,6 @@ const defaultConfig: WidgetConfig = {
   borderColor: DEFAULT_BORDER_COLOR,
   borderRadius: 8,
   buttonStyle: 'rounded',
-  defaultBankVerificationMethod: 'plaid',
 };
 
 export const useWidgetConfig = create<WidgetConfigState>((set) => ({
@@ -105,11 +99,6 @@ export const useWidgetConfig = create<WidgetConfigState>((set) => ({
         ...state.config, 
         steps: enabled ? [] : defaultConfig.steps 
       }
-    })),
-  
-  setBankVerificationMethod: (method: BankVerificationMethod) =>
-    set((state) => ({
-      config: { ...state.config, defaultBankVerificationMethod: method }
     })),
   
   resetConfig: () => set({ config: defaultConfig }),
