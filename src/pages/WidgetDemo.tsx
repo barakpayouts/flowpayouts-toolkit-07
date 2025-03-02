@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +29,6 @@ const WidgetDemo = () => {
     setPayoutsOnlyMode,
     resetConfig
   } = useWidgetConfig();
-  const [showConfigOptions, setShowConfigOptions] = useState(false);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [isPayoutsOnly, setIsPayoutsOnly] = useState(config.steps.length === 0);
   // Add a key to force widget refresh
@@ -36,11 +36,11 @@ const WidgetDemo = () => {
   
   const handleConfigureWidget = () => {
     setShowWidget(true);
+    setShowConfigPanel(true);
   };
   
   const handleSelectRecipientType = (type: RecipientType) => {
     setRecipientType(type);
-    setShowConfigOptions(false);
   };
 
   const handleSaveConfiguration = () => {
@@ -72,12 +72,12 @@ const WidgetDemo = () => {
     { value: 'gift', label: 'Gift Card', icon: '🎁' },
   ];
 
-  const recipientOptions: { value: RecipientType; label: string; icon: string }[] = [
-    { value: 'vendor', label: 'Vendor', icon: '🏢' },
-    { value: 'insured', label: 'Insured', icon: '🛡️' },
-    { value: 'individual', label: 'Individual', icon: '👤' },
-    { value: 'business', label: 'Business', icon: '💼' },
-    { value: 'contractor', label: 'Contractor', icon: '🔧' },
+  const recipientOptions: { value: RecipientType; label: string; icon: string; description: string }[] = [
+    { value: 'vendor', label: 'Vendor', icon: '🏢', description: 'For supplier payments' },
+    { value: 'insured', label: 'Insured', icon: '🛡️', description: 'For insurance claims' },
+    { value: 'individual', label: 'Individual', icon: '👤', description: 'For personal payments' },
+    { value: 'business', label: 'Business', icon: '💼', description: 'For company payments' },
+    { value: 'contractor', label: 'Contractor', icon: '🔧', description: 'For freelance payments' },
   ];
 
   const colorPresets = [
@@ -212,18 +212,23 @@ const WidgetDemo = () => {
                             <ChevronDown size={16} />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-full">
+                        <DropdownMenuContent className="w-56">
                           {recipientOptions.map((recipient) => (
                             <DropdownMenuItem 
                               key={recipient.value}
                               onClick={() => handleSelectRecipientType(recipient.value)}
-                              className="cursor-pointer"
+                              className="cursor-pointer py-2 px-3"
                             >
-                              <span className="mr-2">{recipient.icon}</span>
-                              {recipient.label}
-                              {config.recipientType === recipient.value && (
-                                <Check className="ml-auto h-4 w-4" />
-                              )}
+                              <div className="flex flex-col">
+                                <div className="flex items-center">
+                                  <span className="mr-2 text-lg">{recipient.icon}</span>
+                                  <span className="font-medium">{recipient.label}</span>
+                                  {config.recipientType === recipient.value && (
+                                    <Check className="ml-auto h-4 w-4" />
+                                  )}
+                                </div>
+                                <span className="text-xs text-muted-foreground ml-7">{recipient.description}</span>
+                              </div>
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -407,64 +412,32 @@ const WidgetDemo = () => {
               )}
               
               <div className={showConfigPanel ? "col-span-1 md:col-span-2" : "col-span-1"}>
-                {showConfigOptions ? (
-                  <div className="bg-white/10 p-6 rounded-lg">
-                    <div className="text-center p-8">
-                      <h3 className="text-xl mb-4">Select Recipient Type</h3>
-                      <p className="mb-6">Choose the type of recipient for this payout flow</p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                        {recipientOptions.map((recipient) => (
-                          <Button 
-                            key={recipient.value}
-                            onClick={() => handleSelectRecipientType(recipient.value)}
-                            className="p-4 h-auto flex flex-col items-center"
-                          >
-                            <span className="text-2xl mb-2">{recipient.icon}</span>
-                            <span className="text-lg font-medium">{recipient.label}</span>
-                            <span className="text-sm text-gray-400 mt-1">
-                              {recipient.value === 'vendor' && 'For supplier payments'}
-                              {recipient.value === 'insured' && 'For insurance claims'}
-                              {recipient.value === 'individual' && 'For personal payments'}
-                              {recipient.value === 'business' && 'For company payments'}
-                              {recipient.value === 'contractor' && 'For freelance payments'}
-                            </span>
-                          </Button>
-                        ))}
+                <div className="bg-white/10 p-6 rounded-lg overflow-hidden">
+                  <div className="mb-4 p-3 bg-white/5 rounded-lg flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                      <h4 className="font-medium">Current Recipient Type: <span className="text-payouts-accent capitalize">{config.recipientType}</span></h4>
+                      <div className="text-sm mt-1">
+                        {isPayoutsOnly ? (
+                          <span className="bg-payouts-accent/20 text-payouts-accent px-2 py-1 rounded text-xs font-bold">
+                            Payouts Only Mode Enabled
+                          </span>
+                        ) : (
+                          <>
+                            <span className="text-white/70">Steps: </span>
+                            {config.steps.map((step, index) => (
+                              <span key={step} className="capitalize">
+                                {index > 0 ? ' → ' : ''}{step}
+                              </span>
+                            ))}
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="bg-white/10 p-6 rounded-lg overflow-hidden">
-                    <div className="mb-4 p-3 bg-white/5 rounded-lg flex flex-wrap justify-between items-center gap-2">
-                      <div>
-                        <h4 className="font-medium">Current Recipient Type: <span className="text-payouts-accent capitalize">{config.recipientType}</span></h4>
-                        <div className="text-sm mt-1">
-                          {isPayoutsOnly ? (
-                            <span className="bg-payouts-accent/20 text-payouts-accent px-2 py-1 rounded text-xs font-bold">
-                              Payouts Only Mode Enabled
-                            </span>
-                          ) : (
-                            <>
-                              <span className="text-white/70">Steps: </span>
-                              {config.steps.map((step, index) => (
-                                <span key={step} className="capitalize">
-                                  {index > 0 ? ' → ' : ''}{step}
-                                </span>
-                              ))}
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      <Button size="sm" variant="outline" onClick={() => setShowConfigOptions(true)}>
-                        Change Type
-                      </Button>
-                    </div>
-                    <div className="flex justify-center">
-                      <PayoutWidget key={widgetKey} />
-                    </div>
+                  <div className="flex justify-center">
+                    <PayoutWidget key={widgetKey} />
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
