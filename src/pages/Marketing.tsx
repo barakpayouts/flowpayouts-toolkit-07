@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import {
   Shield, 
   DollarSign, 
   UserCheck, 
-  Zap, a 
+  Zap 
 } from 'lucide-react';
 import PayoutWidget from '@/components/Widget/PayoutWidget';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
