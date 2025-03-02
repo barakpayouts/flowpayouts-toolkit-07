@@ -20,6 +20,8 @@ const PayoutWidget = () => {
   const [showMethodDetails, setShowMethodDetails] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState<Record<string, string>>({});
+  // New state for detailed selection options
+  const [selectedDetailOption, setSelectedDetailOption] = useState<string | null>(null);
   
   // Prepare steps based on config
   const steps = [
@@ -37,6 +39,15 @@ const PayoutWidget = () => {
     } 
     // If we're at details step
     else if (steps[currentStep] === 'details') {
+      // For methods that need a specific option to be selected
+      if ((selectedMethod === 'Digital Wallet' || selectedMethod === 'Prepaid Card' || selectedMethod === 'Gift Card') 
+          && !selectedDetailOption) {
+        toast.error("Please select an option to continue", {
+          description: `You need to select a specific ${selectedMethod.toLowerCase()} option.`
+        });
+        return;
+      }
+      
       // If we have Bank Transfer and there's a bank verification step, go to it
       if (selectedMethod === 'Bank Transfer' && steps.includes('bank')) {
         // Find the index of bank step
@@ -53,7 +64,7 @@ const PayoutWidget = () => {
           // If there are no more steps, show success
           setShowSuccess(true);
           toast.success("Payout successful!", {
-            description: `Your funds will be sent via ${selectedMethod}.`
+            description: `Your funds will be sent via ${selectedMethod}${selectedDetailOption ? ` (${selectedDetailOption})` : ''}.`
           });
         }
       }
@@ -65,19 +76,22 @@ const PayoutWidget = () => {
       // Last step completed, show success
       setShowSuccess(true);
       toast.success("Payout successful!", {
-        description: `Your funds will be sent via ${selectedMethod}.`
+        description: `Your funds will be sent via ${selectedMethod}${selectedDetailOption ? ` (${selectedDetailOption})` : ''}.`
       });
     }
   };
   
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
+    // Reset the detail option when changing method
+    setSelectedDetailOption(null);
   };
 
   const handleBackStep = () => {
     if (steps[currentStep] === 'details') {
       // Go back to payout method selection
       setSelectedMethod(null);
+      setSelectedDetailOption(null);
       setCurrentStep(steps.indexOf('payout'));
     } else if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
@@ -86,6 +100,10 @@ const PayoutWidget = () => {
 
   const handleFormChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+  
+  const handleSelectDetailOption = (option: string) => {
+    setSelectedDetailOption(option);
   };
   
   const getStepContent = () => {
@@ -320,27 +338,33 @@ const PayoutWidget = () => {
             </div>
             
             <div className="space-y-4">
-              <div className="wallet-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+              <div 
+                className={`wallet-option p-4 rounded-lg ${selectedDetailOption === 'PayPal' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
+                onClick={() => handleSelectDetailOption('PayPal')}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium">PayPal</h3>
                     <p className="text-sm opacity-70">Fast and secure payments worldwide</p>
                   </div>
-                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
-                    Select
-                  </button>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedDetailOption === 'PayPal' ? 'bg-' + config.accentColor : 'bg-white/10'}`}>
+                    {selectedDetailOption === 'PayPal' && <Check size={14} className="text-black" />}
+                  </div>
                 </div>
               </div>
               
-              <div className="wallet-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+              <div 
+                className={`wallet-option p-4 rounded-lg ${selectedDetailOption === 'Venmo' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
+                onClick={() => handleSelectDetailOption('Venmo')}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium">Venmo</h3>
                     <p className="text-sm opacity-70">Quick transfers between users</p>
                   </div>
-                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
-                    Select
-                  </button>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedDetailOption === 'Venmo' ? 'bg-' + config.accentColor : 'bg-white/10'}`}>
+                    {selectedDetailOption === 'Venmo' && <Check size={14} className="text-black" />}
+                  </div>
                 </div>
               </div>
             </div>
@@ -372,6 +396,8 @@ const PayoutWidget = () => {
                   type="text" 
                   className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
                   placeholder="XXXX XXXX XXXX XXXX"
+                  value={formData.cardNumber || ''}
+                  onChange={(e) => handleFormChange('cardNumber', e.target.value)}
                 />
               </div>
               
@@ -382,6 +408,8 @@ const PayoutWidget = () => {
                     type="text" 
                     className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
                     placeholder="MM/YY"
+                    value={formData.expiryDate || ''}
+                    onChange={(e) => handleFormChange('expiryDate', e.target.value)}
                   />
                 </div>
                 
@@ -391,6 +419,8 @@ const PayoutWidget = () => {
                     type="text" 
                     className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
                     placeholder="XXX"
+                    value={formData.cvv || ''}
+                    onChange={(e) => handleFormChange('cvv', e.target.value)}
                   />
                 </div>
               </div>
@@ -417,15 +447,18 @@ const PayoutWidget = () => {
             </div>
             
             <div className="space-y-4">
-              <div className="card-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+              <div 
+                className={`card-option p-4 rounded-lg ${selectedDetailOption === 'Visa Prepaid' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
+                onClick={() => handleSelectDetailOption('Visa Prepaid')}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium">Visa Prepaid</h3>
                     <p className="text-sm opacity-70">Use prepaid cards for flexible spending</p>
                   </div>
-                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
-                    Select
-                  </button>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedDetailOption === 'Visa Prepaid' ? 'bg-' + config.accentColor : 'bg-white/10'}`}>
+                    {selectedDetailOption === 'Visa Prepaid' && <Check size={14} className="text-black" />}
+                  </div>
                 </div>
               </div>
             </div>
@@ -451,39 +484,48 @@ const PayoutWidget = () => {
             </div>
             
             <div className="space-y-4">
-              <div className="gift-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+              <div 
+                className={`gift-option p-4 rounded-lg ${selectedDetailOption === 'Amazon' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
+                onClick={() => handleSelectDetailOption('Amazon')}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium">Amazon</h3>
                     <p className="text-sm opacity-70">Receive payments as Amazon gift cards</p>
                   </div>
-                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
-                    Select Amazon
-                  </button>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedDetailOption === 'Amazon' ? 'bg-' + config.accentColor : 'bg-white/10'}`}>
+                    {selectedDetailOption === 'Amazon' && <Check size={14} className="text-black" />}
+                  </div>
                 </div>
               </div>
               
-              <div className="gift-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+              <div 
+                className={`gift-option p-4 rounded-lg ${selectedDetailOption === 'Walmart' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
+                onClick={() => handleSelectDetailOption('Walmart')}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium">Walmart</h3>
                     <p className="text-sm opacity-70">Receive payments as Walmart gift cards</p>
                   </div>
-                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
-                    Select Walmart
-                  </button>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedDetailOption === 'Walmart' ? 'bg-' + config.accentColor : 'bg-white/10'}`}>
+                    {selectedDetailOption === 'Walmart' && <Check size={14} className="text-black" />}
+                  </div>
                 </div>
               </div>
               
-              <div className="gift-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+              <div 
+                className={`gift-option p-4 rounded-lg ${selectedDetailOption === 'Target' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
+                onClick={() => handleSelectDetailOption('Target')}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium">Target</h3>
                     <p className="text-sm opacity-70">Receive payments as Target gift cards</p>
                   </div>
-                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
-                    Select Target
-                  </button>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedDetailOption === 'Target' ? 'bg-' + config.accentColor : 'bg-white/10'}`}>
+                    {selectedDetailOption === 'Target' && <Check size={14} className="text-black" />}
+                  </div>
                 </div>
               </div>
             </div>
@@ -524,7 +566,7 @@ const PayoutWidget = () => {
             </div>
           </div>
           <h2 className="text-xl font-bold mb-2">Success!</h2>
-          <p className="mb-4">Your payout has been processed via {selectedMethod}.</p>
+          <p className="mb-4">Your payout has been processed via {selectedMethod}{selectedDetailOption ? ` (${selectedDetailOption})` : ''}.</p>
           <p className="text-sm opacity-70">You will receive a confirmation email shortly.</p>
         </div>
       </div>
