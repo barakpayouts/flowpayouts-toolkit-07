@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -59,46 +58,77 @@ const Marketing = () => {
                 </Button>
               </div>
             </div>
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 shadow-2xl">
-              <div className="bg-[#143745] rounded-lg p-6 relative overflow-hidden border border-[#21404d]">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold text-white">Smart Payout Widget</h3>
-                  <div className="h-2 w-2 rounded-full bg-[#d0e92a]"></div>
+            <div className="relative mx-auto md:ml-auto md:mr-0 max-w-[320px] md:max-w-none">
+              {/* iPhone mockup */}
+              <div className="relative mx-auto w-[280px] h-[570px] bg-black rounded-[40px] border-[10px] border-[#121212] shadow-2xl overflow-hidden">
+                {/* iPhone notch */}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120px] h-[30px] bg-black rounded-b-[20px] z-20"></div>
+                {/* Inner bezel */}
+                <div className="absolute inset-0 bg-[#143745] rounded-[30px] overflow-hidden z-10">
+                  {/* Widget inside phone */}
+                  <div className="absolute inset-3 pt-10 overflow-y-auto">
+                    <div className="relative bg-[#143745] rounded-xl p-4 shadow-lg border border-[#21404d]">
+                      <div className="flex items-center justify-between mb-5">
+                        <h3 className="text-lg font-bold text-white">Smart Payout Widget</h3>
+                        <div className="h-2 w-2 rounded-full bg-[#d0e92a]"></div>
+                      </div>
+                      <div className="space-y-3 mb-4">
+                        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
+                          <div className="flex items-center space-x-3">
+                            <Building className="h-5 w-5 text-white/70" />
+                            <span className="text-white text-sm">Bank Transfer</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-white/50" />
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
+                          <div className="flex items-center space-x-3">
+                            <CreditCard className="h-5 w-5 text-white/70" />
+                            <span className="text-white text-sm">Push to Card</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-white/50" />
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-[#d0e92a]/10 rounded-lg border border-[#d0e92a]/30">
+                          <div className="flex items-center space-x-3">
+                            <Bitcoin className="h-5 w-5 text-[#d0e92a]" />
+                            <span className="text-white text-sm">Cryptocurrency</span>
+                          </div>
+                          <ShieldCheck className="h-4 w-4 text-[#d0e92a]" />
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
+                          <div className="flex items-center space-x-3">
+                            <Wallet className="h-5 w-5 text-white/70" />
+                            <span className="text-white text-sm">Digital Wallet</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-white/50" />
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
+                          <div className="flex items-center space-x-3">
+                            <Gift className="h-5 w-5 text-white/70" />
+                            <span className="text-white text-sm">Gift Card</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-white/50" />
+                        </div>
+                      </div>
+                      <button className="w-full p-3 bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-[#0f2a35] text-sm font-medium rounded-md flex items-center justify-center">
+                        Select Payout Method
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
-                    <div className="flex items-center space-x-3">
-                      <Building className="h-5 w-5 text-white/70" />
-                      <span className="text-white">Bank Transfer</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-white/50" />
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
-                    <div className="flex items-center space-x-3">
-                      <CreditCard className="h-5 w-5 text-white/70" />
-                      <span className="text-white">Push to Card</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-white/50" />
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-[#d0e92a]/10 rounded-lg border border-[#d0e92a]/30">
-                    <div className="flex items-center space-x-3">
-                      <Bitcoin className="h-5 w-5 text-[#d0e92a]" />
-                      <span className="text-white">Cryptocurrency</span>
-                    </div>
-                    <ShieldCheck className="h-4 w-4 text-[#d0e92a]" />
-                  </div>
-                  <div className="flex items-center justify-between p-4 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
-                    <div className="flex items-center space-x-3">
-                      <Gift className="h-5 w-5 text-white/70" />
-                      <span className="text-white">Gift Card</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-white/50" />
-                  </div>
-                </div>
-                <Button className="w-full mt-6 bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-[#0f2a35] font-medium">
-                  Select Payout Method
-                </Button>
+                
+                {/* Bottom home bar */}
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-[120px] h-[5px] bg-white/20 rounded-full z-20"></div>
+                
+                {/* Side buttons */}
+                <div className="absolute top-[120px] -right-[16px] w-[3px] h-[80px] bg-[#121212] rounded-full"></div>
+                <div className="absolute top-[220px] -right-[16px] w-[3px] h-[80px] bg-[#121212] rounded-full"></div>
+                <div className="absolute top-[120px] -left-[16px] w-[3px] h-[40px] bg-[#121212] rounded-full"></div>
               </div>
+              
+              {/* Visual elements */}
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#d0e92a]/20 rounded-full blur-3xl"></div>
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#d0e92a]/20 rounded-full blur-3xl"></div>
             </div>
           </div>
         </div>
