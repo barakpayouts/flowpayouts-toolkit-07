@@ -70,6 +70,13 @@ export default {
 					muted: '#1a333e',
 					border: '#21404d',
 					accent: '#d0e92a',
+					// Adding lighter and darker accent variations
+					'accent-light': '#ddef56',
+					'accent-dark': '#b6cc20',
+					// Adding text colors for better contrast
+					'text-dark': '#0f2a35',
+					'text-light': '#f3f3f3',
+					'text-muted': '#aaadb0',
 				}
 			},
 			borderRadius: {
@@ -178,6 +185,25 @@ export default {
 						'background-position': '1000px 0',
 					},
 				},
+				'pulse-ring': {
+					'0%': {
+						'box-shadow': '0 0 0 0 rgba(208, 233, 42, 0.7)'
+					},
+					'70%': {
+						'box-shadow': '0 0 0 10px rgba(208, 233, 42, 0)'
+					},
+					'100%': {
+						'box-shadow': '0 0 0 0 rgba(208, 233, 42, 0)'
+					}
+				},
+				'float': {
+					'0%, 100%': {
+						transform: 'translateY(0)'
+					},
+					'50%': {
+						transform: 'translateY(-5px)'
+					}
+				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -191,22 +217,32 @@ export default {
 				'zoom-in': 'zoom-in 0.3s ease-out',
 				'gradient-x': 'gradient-x 10s ease infinite',
 				'shimmer': 'shimmer 2s infinite linear',
+				'pulse-ring': 'pulse-ring 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite',
+				'float': 'float 3s ease-in-out infinite',
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+				'glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
 			},
 			boxShadow: {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
 				'glass-lg': '0 10px 40px rgba(0, 0, 0, 0.2)',
 				'neobrut': '0.5rem 0.5rem 0px 0px rgba(0, 0, 0, 0.3)',
 				'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
+				'glow': '0 0 15px rgba(208, 233, 42, 0.5)',
+				'inner-glow': 'inset 0 0 10px rgba(208, 233, 42, 0.3)',
+				'accent-glow': '0 0 20px var(--accent-color, rgba(208, 233, 42, 0.6))',
 			},
 			backdropBlur: {
 				'xs': '2px',
+				'2xl': '40px',
 			},
 			transitionProperty: {
 				'height': 'height',
 				'spacing': 'margin, padding',
+				'width': 'width',
+				'transform': 'transform',
 			},
 		}
 	},
