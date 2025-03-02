@@ -163,7 +163,7 @@ const WidgetDemo = () => {
               variant="outline" 
               size="sm" 
               onClick={() => navigate('/')}
-              className="rounded-full flex items-center gap-1 text-sm"
+              className="rounded-full flex items-center gap-1 text-sm text-white border-white/20 hover:bg-white/10"
             >
               <ArrowLeft size={14} />
               Back
@@ -177,7 +177,7 @@ const WidgetDemo = () => {
             variant="outline" 
             size="sm" 
             onClick={() => navigate('/marketing')}
-            className="rounded-full flex items-center gap-1 text-sm"
+            className="rounded-full flex items-center gap-1 text-sm text-white border-white/20 hover:bg-white/10"
           >
             View Marketing Page
             <ChevronRight size={14} />
@@ -198,7 +198,8 @@ const WidgetDemo = () => {
                   <h3 className="text-xl mb-4">Widget Preview</h3>
                   <p className="text-white/70 text-lg mb-8">Configure and test the widget functionality with our intuitive setup panel.</p>
                   <Button 
-                    className="btn-primary bg-gradient-to-r from-payouts-accent to-payouts-accent/90 text-payouts-dark hover:from-payouts-accent/90 hover:to-payouts-accent px-8 py-6 rounded-xl shadow-lg text-lg font-bold flex items-center gap-2" 
+                    variant="purple"
+                    className="bg-[#9b87f5] text-white hover:bg-[#8B5CF6] px-8 py-6 rounded-xl shadow-lg text-lg font-bold flex items-center gap-2" 
                     onClick={handleConfigureWidget}
                   >
                     Configure Widget <ChevronRight size={20} />
