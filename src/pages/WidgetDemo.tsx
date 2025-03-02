@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import PayoutWidget from "@/components/Widget/PayoutWidget";
 import { RecipientType, VerificationStep, PayoutMethod, useWidgetConfig } from '@/hooks/use-widget-config';
-import { Check, ChevronDown, Palette, Save } from 'lucide-react';
+import { Check, ChevronDown, Palette, RefreshCcw, Save } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,6 +31,8 @@ const WidgetDemo = () => {
   const [showConfigOptions, setShowConfigOptions] = useState(false);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [isPayoutsOnly, setIsPayoutsOnly] = useState(config.steps.length === 0);
+  // Add a key to force widget refresh
+  const [widgetKey, setWidgetKey] = useState(0);
   
   const handleConfigureWidget = () => {
     setShowWidget(true);
@@ -43,8 +44,11 @@ const WidgetDemo = () => {
   };
 
   const handleSaveConfiguration = () => {
+    // Increment the key to force the widget to re-render
+    setWidgetKey(prevKey => prevKey + 1);
+    
     toast.success("Widget configuration saved successfully", {
-      description: "Your settings have been saved and will be applied to the widget."
+      description: "Your settings have been saved and applied to the widget."
     });
   };
 
@@ -169,14 +173,25 @@ const WidgetDemo = () => {
                 <div className="bg-black/30 p-5 rounded-lg h-fit">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold">Widget Configuration</h3>
-                    <Button 
-                      onClick={handleSaveConfiguration}
-                      className="flex items-center gap-2 bg-payouts-accent text-payouts-dark hover:bg-payouts-accent/90"
-                      size="sm"
-                    >
-                      <Save size={16} />
-                      Save Configuration
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        onClick={() => setWidgetKey(prevKey => prevKey + 1)}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-1"
+                        title="Refresh widget"
+                      >
+                        <RefreshCcw size={14} />
+                      </Button>
+                      <Button 
+                        onClick={handleSaveConfiguration}
+                        className="flex items-center gap-2 bg-payouts-accent text-payouts-dark hover:bg-payouts-accent/90"
+                        size="sm"
+                      >
+                        <Save size={16} />
+                        Save Configuration
+                      </Button>
+                    </div>
                   </div>
                   <Tabs defaultValue="steps" className="w-full">
                     <TabsList className="grid grid-cols-3 mb-4">
@@ -446,7 +461,7 @@ const WidgetDemo = () => {
                       </Button>
                     </div>
                     <div className="flex justify-center">
-                      <PayoutWidget />
+                      <PayoutWidget key={widgetKey} />
                     </div>
                   </div>
                 )}
