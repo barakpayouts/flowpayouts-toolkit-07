@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +31,6 @@ const WidgetDemo = () => {
   } = useWidgetConfig();
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [isPayoutsOnly, setIsPayoutsOnly] = useState(config.steps.length === 0);
-  // Add a key to force widget refresh
   const [widgetKey, setWidgetKey] = useState(0);
   
   const handleConfigureWidget = () => {
@@ -42,7 +40,6 @@ const WidgetDemo = () => {
   
   const handleSelectRecipientType = (type: RecipientType) => {
     setRecipientType(type);
-    // Refresh the widget immediately
     setWidgetKey(prevKey => prevKey + 1);
     
     toast.success("Recipient type updated", {
@@ -51,7 +48,6 @@ const WidgetDemo = () => {
   };
 
   const handleSaveConfiguration = () => {
-    // Increment the key to force the widget to re-render
     setWidgetKey(prevKey => prevKey + 1);
     
     toast.success("Widget configuration saved", {
@@ -63,7 +59,6 @@ const WidgetDemo = () => {
     setIsPayoutsOnly(checked);
     setPayoutsOnlyMode(checked);
     
-    // Refresh the widget immediately
     setWidgetKey(prevKey => prevKey + 1);
     
     if (checked) {
@@ -152,7 +147,6 @@ const WidgetDemo = () => {
       borderColor: preset.borderColor,
     });
     
-    // Refresh the widget immediately
     setWidgetKey(prevKey => prevKey + 1);
     
     toast.success(`${preset.name} theme applied`, {
@@ -202,7 +196,7 @@ const WidgetDemo = () => {
               <div className="bg-white/10 p-8 rounded-2xl shadow-inner backdrop-blur-sm">
                 <div className="text-center p-8">
                   <h3 className="text-xl mb-4">Widget Preview</h3>
-                  <p className="text-white/70 mb-8">Configure and test the widget functionality with our intuitive setup panel.</p>
+                  <p className="text-white/70 text-lg mb-8">Configure and test the widget functionality with our intuitive setup panel.</p>
                   <Button 
                     className="btn-primary bg-gradient-to-r from-payouts-accent to-payouts-accent/90 text-payouts-dark hover:from-payouts-accent/90 hover:to-payouts-accent px-8 py-6 rounded-xl shadow-lg text-lg font-bold flex items-center gap-2" 
                     onClick={handleConfigureWidget}
@@ -330,7 +324,6 @@ const WidgetDemo = () => {
                                   checked={config.steps.includes(step.value)}
                                   onCheckedChange={() => {
                                     toggleStep(step.value);
-                                    // Refresh immediately
                                     setWidgetKey(prevKey => prevKey + 1);
                                   }}
                                   disabled={isPayoutsOnly}
@@ -357,7 +350,6 @@ const WidgetDemo = () => {
                               checked={config.showProgressBar}
                               onCheckedChange={(checked) => {
                                 updateConfig({ showProgressBar: !!checked });
-                                // Refresh immediately
                                 setWidgetKey(prevKey => prevKey + 1);
                               }}
                               disabled={isPayoutsOnly}
@@ -377,7 +369,6 @@ const WidgetDemo = () => {
                               checked={config.showStepNumbers}
                               onCheckedChange={(checked) => {
                                 updateConfig({ showStepNumbers: !!checked });
-                                // Refresh immediately
                                 setWidgetKey(prevKey => prevKey + 1);
                               }}
                               disabled={isPayoutsOnly}
@@ -407,7 +398,6 @@ const WidgetDemo = () => {
                                 checked={config.payoutMethods.includes(method.value)}
                                 onCheckedChange={() => {
                                   togglePayoutMethod(method.value);
-                                  // Refresh immediately
                                   setWidgetKey(prevKey => prevKey + 1);
                                 }}
                                 className="data-[state=checked]:bg-payouts-accent data-[state=checked]:border-payouts-accent"
@@ -470,7 +460,6 @@ const WidgetDemo = () => {
                             step={1}
                             onValueChange={(value) => {
                               updateConfig({ borderRadius: value[0] });
-                              // Refresh immediately
                               setWidgetKey(prevKey => prevKey + 1);
                             }}
                             className="py-2"
@@ -484,15 +473,14 @@ const WidgetDemo = () => {
                               <Button
                                 key={style}
                                 variant={config.buttonStyle === style ? 'default' : 'outline'}
-                                className={
+                                className={`${
                                   style === 'rounded' ? 'rounded-md' :
                                   style === 'square' ? 'rounded-none' : 'rounded-full'
-                                }
+                                } ${config.buttonStyle === style ? 'bg-payouts-accent text-payouts-dark' : ''}`}
                                 onClick={() => {
                                   updateConfig({ 
                                     buttonStyle: style as 'rounded' | 'square' | 'pill' 
                                   });
-                                  // Refresh immediately
                                   setWidgetKey(prevKey => prevKey + 1);
                                 }}
                               >
@@ -508,7 +496,6 @@ const WidgetDemo = () => {
                           variant="outline" 
                           onClick={() => {
                             resetConfig();
-                            // Refresh immediately
                             setWidgetKey(prevKey => prevKey + 1);
                             toast.success("Reset to defaults", {
                               description: "All configuration options have been reset."

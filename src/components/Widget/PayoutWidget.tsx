@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import GlassMorphism from '../ui/GlassMorphism';
-import { useWidgetConfig, VerificationStep } from '@/hooks/use-widget-config';
+import React, { useState } from 'react';
+import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
 import BankVerification from './BankVerification';
 import TaxForm from './TaxForm';
@@ -11,378 +10,153 @@ import DigitalWallet from './PayoutMethods/DigitalWallet';
 import PushToCard from './PayoutMethods/PushToCard';
 import PrepaidCard from './PayoutMethods/PrepaidCard';
 import GiftCard from './PayoutMethods/GiftCard';
-import { cn } from '@/lib/utils';
+import { Check, ChevronRight } from 'lucide-react';
+import { toast } from "sonner";
 
-interface PayoutWidgetProps {
-  className?: string;
-  defaultStep?: VerificationStep;
-  onComplete?: () => void;
-}
-
-const PayoutWidget: React.FC<PayoutWidgetProps> = ({
-  className,
-  defaultStep = 'profile',
-  onComplete
-}) => {
-  const { config, getCssVariables } = useWidgetConfig();
-  const [currentStep, setCurrentStep] = useState<VerificationStep>(defaultStep);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [selectedPayoutMethod, setSelectedPayoutMethod] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
+const PayoutWidget = () => {
+  const { config } = useWidgetConfig();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   
-  // Determine if we're in payouts-only mode (no verification steps)
-  const isPayoutsOnlyMode = config.steps.length === 0;
+  // Prepare steps based on config
+  const steps = [
+    ...(config.steps.includes('profile') ? ['profile'] : []),
+    ...(config.steps.includes('bank') ? ['bank'] : []),
+    ...(config.steps.includes('tax') ? ['tax'] : []),
+    'payout', // Always include payout step
+  ];
   
-  // Set initial step index
-  useEffect(() => {
-    if (isPayoutsOnlyMode) {
-      setCurrentStepIndex(0);
-      setCurrentStep('bank'); // Use 'bank' as a placeholder for payouts selection
-    } else {
-      const stepIndex = config.steps.indexOf(currentStep);
-      setCurrentStepIndex(stepIndex >= 0 ? stepIndex : 0);
-    }
-  }, [currentStep, config.steps, isPayoutsOnlyMode]);
-  
-  // Set current step based on steps configuration
-  useEffect(() => {
-    if (!isPayoutsOnlyMode && config.steps.length > 0 && !config.steps.includes(currentStep)) {
-      setCurrentStep(config.steps[0]);
-    }
-  }, [config.steps, currentStep, isPayoutsOnlyMode]);
-  
-  const handleNext = () => {
-    if (isPayoutsOnlyMode) {
-      handleSubmit();
-      return;
-    }
-    
-    const nextIndex = currentStepIndex + 1;
-    if (nextIndex < config.steps.length) {
-      setCurrentStep(config.steps[nextIndex]);
-      setCurrentStepIndex(nextIndex);
-    } else {
-      handleSubmit();
+  const handleNextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else if (selectedMethod && currentStep === steps.length - 1) {
+      // Handle payout completion
+      setShowSuccess(true);
+      toast.success("Payout successful!", {
+        description: `Your funds will be sent via ${selectedMethod}.`
+      });
     }
   };
   
-  const handleBack = () => {
-    if (isPayoutsOnlyMode) {
-      if (selectedPayoutMethod) {
-        setSelectedPayoutMethod(null);
-      }
-      return;
-    }
-    
-    const prevIndex = currentStepIndex - 1;
-    if (prevIndex >= 0) {
-      setCurrentStep(config.steps[prevIndex]);
-      setCurrentStepIndex(prevIndex);
-    }
+  const handleSelectPayoutMethod = (method: string) => {
+    setSelectedMethod(method);
   };
   
-  const handleSubmit = () => {
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsCompleted(true);
-      
-      // Call onComplete callback if provided
-      if (onComplete) {
-        onComplete();
-      }
-    }, 1500);
-  };
-  
-  const getStepTitle = () => {
-    if (isPayoutsOnlyMode) {
-      return selectedPayoutMethod ? 'Payment Details' : 'Payment Method';
-    }
-    
-    switch (currentStep) {
+  const getStepContent = () => {
+    const step = steps[currentStep];
+    switch (step) {
       case 'profile':
-        return 'Profile Information';
+        return <ProfileInfo onComplete={handleNextStep} />;
       case 'bank':
-        return selectedPayoutMethod ? 'Payment Details' : 'Payment Method';
+        return <BankVerification onComplete={handleNextStep} />;
       case 'tax':
-        return 'Tax Information';
-      default:
-        return 'Verification';
-    }
-  };
-  
-  const renderStepContent = () => {
-    // For payouts-only mode, always show payment method selection
-    if (isPayoutsOnlyMode) {
-      return renderPayoutMethodSelection();
-    }
-    
-    switch (currentStep) {
-      case 'profile':
-        return (
-          <ProfileInfo 
-            onNext={handleNext} 
-            onComplete={handleSubmit}
-            isLastStep={config.steps.length === 1} 
-          />
-        );
-      case 'bank':
-        if (selectedPayoutMethod === 'bank') {
-          return (
-            <BankVerification 
-              onNext={handleNext} 
-              onBack={handleBack}
-              isLastStep={currentStepIndex === config.steps.length - 1} 
-            />
-          );
-        } else {
-          return renderPayoutMethodSelection();
-        }
-      case 'tax':
-        return (
-          <TaxForm 
-            onNext={handleNext} 
-            onBack={handleBack}
-            isLastStep={currentStepIndex === config.steps.length - 1} 
-          />
-        );
+        return <TaxForm onComplete={handleNextStep} />;
+      case 'payout':
+        return renderPayoutMethods();
       default:
         return null;
     }
   };
   
-  const renderPayoutMethodSelection = () => {
-    // Render appropriate component based on selected method
-    switch (selectedPayoutMethod) {
-      case 'bank':
-        return <BankTransfer onNext={handleNext} onBack={() => setSelectedPayoutMethod(null)} />;
-      case 'crypto':
-        return <Cryptocurrency onNext={handleNext} onBack={() => setSelectedPayoutMethod(null)} />;
-      case 'digital':
-        return <DigitalWallet onNext={handleNext} onBack={() => setSelectedPayoutMethod(null)} />;
-      case 'card':
-        return <PushToCard onNext={handleNext} onBack={() => setSelectedPayoutMethod(null)} />;
-      case 'prepaid':
-        return <PrepaidCard onNext={handleNext} onBack={() => setSelectedPayoutMethod(null)} />;
-      case 'gift':
-        return <GiftCard onNext={handleNext} onBack={() => setSelectedPayoutMethod(null)} />;
-      default:
-        // Show payout method selection
-        return (
-          <div className="space-y-6 py-4">
-            <h3 className="text-xl font-semibold text-center">Select Payment Method</h3>
-            <p className="text-center text-sm text-white/80">Choose your preferred payment method</p>
-            
-            <div className="grid grid-cols-1 gap-3 mt-6">
-              {config.payoutMethods.includes('bank') && (
-                <button
-                  onClick={() => setSelectedPayoutMethod('bank')}
-                  className="flex items-center p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-all"
-                >
-                  <div className="w-10 h-10 rounded-full bg-payouts-accent/20 flex items-center justify-center mr-3">
-                    <span className="text-payouts-accent">🏦</span>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-medium">Bank Transfer</h4>
-                    <p className="text-sm text-white/70">Direct deposit to your bank account</p>
-                  </div>
-                </button>
-              )}
-              
-              {config.payoutMethods.includes('crypto') && (
-                <button
-                  onClick={() => setSelectedPayoutMethod('crypto')}
-                  className="flex items-center p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-all"
-                >
-                  <div className="w-10 h-10 rounded-full bg-payouts-accent/20 flex items-center justify-center mr-3">
-                    <span className="text-payouts-accent">₿</span>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-medium">Cryptocurrency</h4>
-                    <p className="text-sm text-white/70">Bitcoin, Ethereum, and more</p>
-                  </div>
-                </button>
-              )}
-              
-              {config.payoutMethods.includes('digital') && (
-                <button
-                  onClick={() => setSelectedPayoutMethod('digital')}
-                  className="flex items-center p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-all"
-                >
-                  <div className="w-10 h-10 rounded-full bg-payouts-accent/20 flex items-center justify-center mr-3">
-                    <span className="text-payouts-accent">💳</span>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-medium">Digital Wallet</h4>
-                    <p className="text-sm text-white/70">PayPal, Venmo, and more</p>
-                  </div>
-                </button>
-              )}
-              
-              {config.payoutMethods.includes('card') && (
-                <button
-                  onClick={() => setSelectedPayoutMethod('card')}
-                  className="flex items-center p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-all"
-                >
-                  <div className="w-10 h-10 rounded-full bg-payouts-accent/20 flex items-center justify-center mr-3">
-                    <span className="text-payouts-accent">💲</span>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-medium">Push to Card</h4>
-                    <p className="text-sm text-white/70">Instant card transfer</p>
-                  </div>
-                </button>
-              )}
-              
-              {config.payoutMethods.includes('prepaid') && (
-                <button
-                  onClick={() => setSelectedPayoutMethod('prepaid')}
-                  className="flex items-center p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-all"
-                >
-                  <div className="w-10 h-10 rounded-full bg-payouts-accent/20 flex items-center justify-center mr-3">
-                    <span className="text-payouts-accent">💰</span>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-medium">Prepaid Card</h4>
-                    <p className="text-sm text-white/70">Virtual or physical prepaid card</p>
-                  </div>
-                </button>
-              )}
-              
-              {config.payoutMethods.includes('gift') && (
-                <button
-                  onClick={() => setSelectedPayoutMethod('gift')}
-                  className="flex items-center p-4 border border-white/10 rounded-lg hover:bg-white/5 transition-all"
-                >
-                  <div className="w-10 h-10 rounded-full bg-payouts-accent/20 flex items-center justify-center mr-3">
-                    <span className="text-payouts-accent">🎁</span>
-                  </div>
-                  <div className="text-left">
-                    <h4 className="font-medium">Gift Card</h4>
-                    <p className="text-sm text-white/70">Amazon, Walmart, and more</p>
-                  </div>
-                </button>
-              )}
+  const renderPayoutMethods = () => {
+    const payoutComponents: Record<string, React.ReactNode> = {
+      bank: <BankTransfer onSelect={() => handleSelectPayoutMethod('Bank Transfer')} />,
+      crypto: <Cryptocurrency onSelect={() => handleSelectPayoutMethod('Cryptocurrency')} />,
+      digital: <DigitalWallet onSelect={() => handleSelectPayoutMethod('Digital Wallet')} />,
+      card: <PushToCard onSelect={() => handleSelectPayoutMethod('Card Payment')} />,
+      prepaid: <PrepaidCard onSelect={() => handleSelectPayoutMethod('Prepaid Card')} />,
+      gift: <GiftCard onSelect={() => handleSelectPayoutMethod('Gift Card')} />,
+    };
+    
+    return (
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Select Payout Method</h2>
+        <p className="text-sm mb-4">Choose how you'd like to receive your funds</p>
+        <div className="grid grid-cols-1 gap-3 mt-4">
+          {config.payoutMethods.map((method) => (
+            <div key={method}>
+              {payoutComponents[method]}
             </div>
-            
-            {currentStepIndex > 0 && (
-              <div className="flex justify-center mt-6">
-                <button 
-                  onClick={handleBack}
-                  className="btn-secondary py-2 px-4"
-                >
-                  Back
-                </button>
-              </div>
-            )}
-          </div>
-        );
-    }
-  };
-  
-  const renderCompletionScreen = () => (
-    <div className="py-10 text-center space-y-6 animate-fade-in">
-      <div className="w-20 h-20 rounded-full bg-payouts-accent/20 mx-auto flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-payouts-accent">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-      </div>
-      <h3 className="text-2xl font-bold">Verification Complete!</h3>
-      <p className="text-white/70">
-        {isPayoutsOnlyMode
-          ? "Your payment method has been successfully saved. You're all set to receive your payment."
-          : config.recipientType === 'insured' 
-          ? "Your claim information has been successfully saved. You're all set to receive your insurance payment."
-          : config.recipientType === 'vendor'
-          ? "Your vendor information has been successfully saved. You're all set to receive payments."
-          : config.recipientType === 'contractor'
-          ? "Your contractor information has been successfully saved. You're all set to receive payments."
-          : config.recipientType === 'business'
-          ? "Your business information has been successfully saved. You're all set to receive payments."
-          : "Your information has been successfully saved. You're all set to receive payments."
-        }
-      </p>
-      <button 
-        className="btn-primary py-2 px-6 mx-auto mt-6"
-        onClick={() => window.location.reload()}
-      >
-        Done
-      </button>
-    </div>
-  );
-  
-  const renderProgressBar = () => {
-    if (!config.showProgressBar || isPayoutsOnlyMode) return null;
-    
-    return (
-      <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-        <div 
-          className="h-full bg-payouts-accent transition-all duration-500 ease-out"
-          style={{ 
-            width: `${((currentStepIndex + 1) / config.steps.length) * 100}%` 
-          }}
-        />
-      </div>
-    );
-  };
-  
-  const renderStepIndicators = () => {
-    if (!config.showStepNumbers || config.steps.length <= 1 || isPayoutsOnlyMode) return null;
-    
-    return (
-      <div className="flex justify-center space-x-4 mb-6">
-        {config.steps.map((step, index) => (
-          <div 
-            key={step}
-            className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center text-sm transition-all",
-              index < currentStepIndex ? "bg-payouts-accent text-payouts-dark" : 
-              index === currentStepIndex ? "border-2 border-payouts-accent text-white" : 
-              "bg-white/10 text-white/50"
-            )}
-          >
-            {index + 1}
-          </div>
-        ))}
-      </div>
-    );
-  };
-  
-  return (
-    <GlassMorphism 
-      className={cn(
-        "w-full max-w-md overflow-hidden transition-all duration-300",
-        className
-      )}
-      hoverEffect={false}
-    >
-      <div style={getCssVariables()}>
-        <div className="p-6">
-          {renderProgressBar()}
-          
-          <div className="flex justify-between items-center mb-4 mt-4">
-            <h2 className="text-xl font-bold">{isCompleted ? 'Complete' : getStepTitle()}</h2>
-            
-            {!isCompleted && !isPayoutsOnlyMode && (
-              <div className="px-2 py-1 rounded-full bg-payouts-accent/20 text-payouts-accent text-xs font-medium capitalize">
-                {config.recipientType}
-              </div>
-            )}
-          </div>
-          
-          {renderStepIndicators()}
-          
-          {isCompleted ? renderCompletionScreen() : renderStepContent()}
-          
-          <div className="text-center mt-6 text-xs text-white/60">
-            Your information is securely transmitted and protected.
-          </div>
+          ))}
         </div>
       </div>
-    </GlassMorphism>
+    );
+  };
+  
+  // Generate dynamic CSS variables based on the configuration
+  const widgetStyle = {
+    '--primary-bg': config.primaryColor,
+    '--accent': config.accentColor,
+    '--bg-color': config.backgroundColor,
+    '--text-color': config.textColor,
+    '--border-color': config.borderColor,
+    '--border-radius': `${config.borderRadius}px`,
+    '--button-radius': config.buttonStyle === 'rounded' ? '6px' : 
+                       config.buttonStyle === 'pill' ? '9999px' : '0px',
+  } as React.CSSProperties;
+  
+  if (showSuccess) {
+    return (
+      <div 
+        className="widget-container p-6 rounded-xl max-w-md w-full mx-auto"
+        style={widgetStyle}
+      >
+        <div className="success-view text-center p-8">
+          <div className="success-icon mb-4 mx-auto">
+            <div className="bg-green-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+              <Check className="w-8 h-8" />
+            </div>
+          </div>
+          <h2 className="text-xl font-bold mb-2">Success!</h2>
+          <p className="mb-4">Your payout has been processed via {selectedMethod}.</p>
+          <p className="text-sm opacity-70">You will receive a confirmation email shortly.</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div 
+      className="widget-container p-6 rounded-xl max-w-md w-full mx-auto"
+      style={widgetStyle}
+    >
+      {config.showProgressBar && steps.length > 1 && (
+        <div className="progress-bar-container mb-6">
+          <div className="flex justify-between mb-2">
+            {steps.map((_, index) => (
+              <div 
+                key={index}
+                className={`step-indicator ${index <= currentStep ? 'active' : ''}`}
+              >
+                {config.showStepNumbers && (
+                  <span className="step-number">{index + 1}</span>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="progress-track">
+            <div 
+              className="progress-fill" 
+              style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+      )}
+      
+      <div className="step-content">
+        {getStepContent()}
+      </div>
+      
+      {steps[currentStep] === 'payout' && selectedMethod && (
+        <button 
+          className="confirm-button"
+          onClick={handleNextStep}
+        >
+          Confirm {selectedMethod} <ChevronRight className="ml-1 h-4 w-4" />
+        </button>
+      )}
+    </div>
   );
 };
 

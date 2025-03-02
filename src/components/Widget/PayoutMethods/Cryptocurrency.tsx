@@ -1,91 +1,55 @@
 
 import React, { useState } from 'react';
+import { Bitcoin, Check } from 'lucide-react';
+import { useWidgetConfig } from '@/hooks/use-widget-config';
 
 interface CryptocurrencyProps {
-  onNext: () => void;
-  onBack: () => void;
+  onSelect: () => void;
 }
 
-const Cryptocurrency: React.FC<CryptocurrencyProps> = ({ onNext, onBack }) => {
-  const [formData, setFormData] = useState({
-    network: '',
-    walletAddress: ''
-  });
+const Cryptocurrency: React.FC<CryptocurrencyProps> = ({ onSelect }) => {
+  const [selected, setSelected] = useState(false);
+  const { config } = useWidgetConfig();
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onNext();
-  };
-  
-  const isFormComplete = () => {
-    return formData.network && formData.walletAddress;
+  const handleSelect = () => {
+    setSelected(true);
+    onSelect();
   };
   
   return (
-    <div className="py-4 space-y-5 animate-fade-in">
-      <div className="text-center">
-        <h3 className="text-xl font-semibold">Cryptocurrency</h3>
-        <p className="text-sm text-white/80 mt-1">Enter your cryptocurrency wallet details</p>
+    <div 
+      className={`payout-method-card ${selected ? 'selected' : ''}`}
+      onClick={handleSelect}
+      style={{
+        borderRadius: `${config.borderRadius}px`,
+      }}
+    >
+      <div className="flex items-center">
+        <div className="method-icon">
+          <Bitcoin size={20} />
+        </div>
+        <div className="flex-1">
+          <h3 className="font-medium">Cryptocurrency</h3>
+          <p className="text-sm opacity-70">Instant transfer</p>
+        </div>
+        {selected && (
+          <div 
+            className="selected-indicator"
+            style={{ 
+              backgroundColor: config.accentColor,
+              color: config.primaryColor,
+              borderRadius: '50%',
+              width: '24px',
+              height: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Check size={16} />
+          </div>
+        )}
       </div>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="text-sm text-white/80 block mb-2">Blockchain Network</label>
-          <select
-            name="network"
-            value={formData.network}
-            onChange={handleInputChange}
-            className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
-          >
-            <option value="" disabled>Select network</option>
-            <option value="bitcoin">Bitcoin</option>
-            <option value="ethereum">Ethereum</option>
-            <option value="polygon">Polygon</option>
-            <option value="solana">Solana</option>
-          </select>
-        </div>
-        
-        <div>
-          <label className="text-sm text-white/80 block mb-2">Wallet Address</label>
-          <input
-            type="text"
-            name="walletAddress"
-            value={formData.walletAddress}
-            onChange={handleInputChange}
-            placeholder="Enter your wallet address"
-            className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
-          />
-        </div>
-        
-        <div className="flex space-x-3 pt-2">
-          <button
-            type="button"
-            onClick={onBack}
-            className="btn-secondary flex-1 py-2"
-          >
-            Back
-          </button>
-          <button
-            type="submit"
-            className="btn-primary flex-1 py-2"
-            disabled={!isFormComplete()}
-          >
-            Save Crypto Payout Details
-          </button>
-        </div>
-        
-        <p className="text-xs text-center text-white/60">
-          Your information is securely transmitted and protected. Need help? Contact our support team.
-        </p>
-      </form>
     </div>
   );
 };
