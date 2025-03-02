@@ -42,16 +42,42 @@ const PayoutWidget = () => {
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
   };
+
+  const handleBackStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
   
   const getStepContent = () => {
     const step = steps[currentStep];
+    const isLastStep = currentStep === steps.length - 1;
+    
     switch (step) {
       case 'profile':
-        return <ProfileInfo onComplete={handleNextStep} />;
+        return (
+          <ProfileInfo 
+            onNext={handleNextStep} 
+            onBack={handleBackStep}
+            isLastStep={isLastStep} 
+          />
+        );
       case 'bank':
-        return <BankVerification onComplete={handleNextStep} />;
+        return (
+          <BankVerification 
+            onNext={handleNextStep} 
+            onBack={handleBackStep}
+            isLastStep={isLastStep} 
+          />
+        );
       case 'tax':
-        return <TaxForm onComplete={handleNextStep} />;
+        return (
+          <TaxForm 
+            onNext={handleNextStep} 
+            onBack={handleBackStep}
+            isLastStep={isLastStep} 
+          />
+        );
       case 'payout':
         return renderPayoutMethods();
       default:

@@ -5,6 +5,8 @@ export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | '
 export type VerificationStep = 'profile' | 'bank' | 'tax';
 export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 'gift';
 export type ButtonStyle = 'rounded' | 'square' | 'pill';
+export type BankVerificationMethod = 'plaid' | 'statement' | 'microdeposit';
+export type TaxFormType = 'w9' | 'w8';
 
 interface WidgetConfig {
   // Recipient type

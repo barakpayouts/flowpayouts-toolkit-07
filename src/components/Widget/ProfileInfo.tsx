@@ -1,15 +1,14 @@
-
 import React, { useState } from 'react';
 
 interface ProfileInfoProps {
   onNext: () => void;
-  onComplete: () => void;
+  onBack: () => void;
   isLastStep: boolean;
 }
 
 const ProfileInfo: React.FC<ProfileInfoProps> = ({ 
   onNext,
-  onComplete,
+  onBack,
   isLastStep 
 }) => {
   const [formData, setFormData] = useState({
@@ -32,7 +31,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       [name]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -87,7 +85,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     
     if (validateForm()) {
       if (isLastStep) {
-        onComplete();
+        onNext();
       } else {
         onNext();
       }
