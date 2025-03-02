@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { TaxFormType } from '@/hooks/use-widget-config';
+import { toast } from "sonner";
 
 interface TaxFormProps {
   onNext: () => void;
@@ -24,6 +25,7 @@ const TaxForm: React.FC<TaxFormProps> = ({
     policyType: 'standard'
   });
   const [isCertified, setIsCertified] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -39,7 +41,20 @@ const TaxForm: React.FC<TaxFormProps> = ({
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onNext();
+    
+    if (!formData.name || !formData.ssn || !isCertified) {
+      toast.error("Please complete all required fields and certify the information");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    // Simulate API submission
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success("Tax information submitted successfully");
+      onNext(); // Navigate to the next step
+    }, 1000);
   };
   
   return (
@@ -130,12 +145,14 @@ const TaxForm: React.FC<TaxFormProps> = ({
         <div>
           <label className="text-sm text-white/80 block mb-2">
             Name (as shown on your income tax return)
+            <span className="text-red-500 ml-1">*</span>
           </label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleInputChange}
+            required
             className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
           />
         </div>
@@ -143,12 +160,14 @@ const TaxForm: React.FC<TaxFormProps> = ({
         <div>
           <label className="text-sm text-white/80 block mb-2">
             Social Security Number
+            <span className="text-red-500 ml-1">*</span>
           </label>
           <input
             type="text"
             name="ssn"
             value={formData.ssn}
             onChange={handleInputChange}
+            required
             className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
           />
         </div>
@@ -163,6 +182,7 @@ const TaxForm: React.FC<TaxFormProps> = ({
           />
           <label htmlFor="certify" className="ml-2 text-sm text-white/80">
             I certify that all information provided is true and accurate
+            <span className="text-red-500 ml-1">*</span>
           </label>
         </div>
         
@@ -175,15 +195,24 @@ const TaxForm: React.FC<TaxFormProps> = ({
             type="button"
             onClick={onBack}
             className="btn-secondary flex-1 py-2"
+            disabled={isSubmitting}
           >
             Back
           </button>
           <button
             type="submit"
             className="btn-primary flex-1 py-2"
-            disabled={!isCertified || !formData.name || !formData.ssn}
+            disabled={isSubmitting || !isCertified || !formData.name || !formData.ssn}
           >
-            {isLastStep ? 'Submit Tax Information' : 'Next'}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </span>
+            ) : isLastStep ? 'Submit Tax Information' : 'Next'}
           </button>
         </div>
       </form>
