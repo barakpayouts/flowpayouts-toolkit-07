@@ -188,8 +188,74 @@
     @apply relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-shimmer 
            before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent;
   }
+  
+  /* Marketing page specific components */
+  .glassmorphism-intense {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  
+  .feature-card {
+    @apply p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10
+           transition-all duration-300 hover:bg-white/10 hover:-translate-y-1;
+  }
+  
+  .wavy-border {
+    @apply relative;
+  }
+  
+  .wavy-border::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='5' viewBox='0 0 100 5' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 2.5C5 2.5 5 0.5 10 0.5C15 0.5 15 2.5 20 2.5C25 2.5 25 0.5 30 0.5C35 0.5 35 2.5 40 2.5C45 2.5 45 0.5 50 0.5C55 0.5 55 2.5 60 2.5C65 2.5 65 0.5 70 0.5C75 0.5 75 2.5 80 2.5C85 2.5 85 0.5 90 0.5C95 0.5 95 2.5 100 2.5' stroke='rgba(208, 233, 42, 0.5)' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-size: 100px 5px;
+  }
+  
+  .section-pattern {
+    @apply relative z-10 overflow-hidden;
+  }
+  
+  .section-pattern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d0e92a' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    z-index: -1;
+    opacity: 0.5;
+  }
+  
+  .highlight-underline {
+    @apply relative inline-block;
+  }
+  
+  .highlight-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: rgba(208, 233, 42, 0.5);
+    border-radius: 2px;
+  }
+  
+  .gradient-mask-b {
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  }
+  
+  .gradient-mask-t {
+    mask-image: linear-gradient(to top, black 50%, transparent 100%);
+  }
 }
 
 /* Import Inter font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-

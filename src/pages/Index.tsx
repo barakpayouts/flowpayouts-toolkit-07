@@ -1,26 +1,34 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
-const Index = () => {
-  const navigate = useNavigate();
-
-  const handleGetStarted = () => {
-    navigate('/widget');
-  };
-
+export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-payouts-dark text-white p-4">
-      <div className="text-center max-w-2xl">
-        <h1 className="text-gradient mb-6">Welcome to Payouts.com Widget</h1>
-        <p className="text-xl text-white/80 mb-8">
-          White-labeled Global Payouts for Your Software Platform
-        </p>
-        <Button className="btn-primary" onClick={handleGetStarted}>Get Started</Button>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-payouts-dark to-payouts-medium p-8 text-white text-center">
+      <h1 className="text-4xl md:text-5xl font-bold mb-6">Smart Payout Widget</h1>
+      <p className="text-lg md:text-xl text-white/80 max-w-2xl mb-8">
+        A customizable widget to streamline payouts for financial services, insurance platforms, and marketplaces.
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl w-full">
+        <Link to="/marketing">
+          <Button className="w-full py-6 text-lg bg-payouts-accent text-payouts-dark hover:bg-payouts-accent/90">
+            View Marketing Page
+          </Button>
+        </Link>
+        
+        <Link to="/widget">
+          <Button variant="outline" className="w-full py-6 text-lg border-2 border-white/20 hover:bg-white/10">
+            Try Widget Demo <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
       </div>
+      
+      <p className="mt-12 text-white/60 max-w-xl">
+        Explore our payout solutions designed to help businesses send money to anyone, anywhere, with their preferred payment method.
+      </p>
     </div>
   );
-};
-
-export default Index;
+}

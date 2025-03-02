@@ -178,6 +178,16 @@ const WidgetDemo = () => {
               Smart Payout Widget
             </h1>
           </div>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate('/marketing')}
+            className="rounded-full flex items-center gap-1 text-sm"
+          >
+            View Marketing Page
+            <ChevronRight size={14} />
+          </Button>
         </div>
         
         {!showWidget ? (
