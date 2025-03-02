@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 
 export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
@@ -6,6 +7,12 @@ export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 
 export type ButtonStyle = 'rounded' | 'square' | 'pill';
 export type BankVerificationMethod = 'plaid' | 'statement' | 'microdeposit';
 export type TaxFormType = 'w9' | 'w8';
+
+// Add this interface for the payout method components
+export interface PayoutMethodProps {
+  onSelect: () => void;
+  isSelected?: boolean;
+}
 
 interface WidgetConfig {
   // Recipient type

@@ -3,7 +3,7 @@ import React from 'react';
 import { BankVerificationMethod } from '@/hooks/use-widget-config';
 import { cn } from '@/lib/utils';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
-import { Wallet2, FileText, BarChart, LucideIcon } from 'lucide-react';
+import { Wallet2, FileText, BarChart, Radio } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface VerificationMethodTabsProps {

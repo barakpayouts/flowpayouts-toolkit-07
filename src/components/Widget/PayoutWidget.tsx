@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
@@ -9,7 +10,7 @@ import DigitalWallet from './PayoutMethods/DigitalWallet';
 import PushToCard from './PayoutMethods/PushToCard';
 import PrepaidCard from './PayoutMethods/PrepaidCard';
 import GiftCard from './PayoutMethods/GiftCard';
-import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Check, ChevronRight, ArrowLeft, Radio } from 'lucide-react';
 import { toast } from "sonner";
 
 const PayoutWidget = () => {
@@ -133,19 +134,20 @@ const PayoutWidget = () => {
   };
   
   const renderPayoutMethods = () => {
+    // Updated method mappings with radio button indicators
     const payoutComponents: Record<string, React.ReactNode> = {
-      bank: <BankTransfer onSelect={() => handleSelectPayoutMethod('Bank Transfer')} />,
-      crypto: <Cryptocurrency onSelect={() => handleSelectPayoutMethod('Cryptocurrency')} />,
-      digital: <DigitalWallet onSelect={() => handleSelectPayoutMethod('Digital Wallet')} />,
-      card: <PushToCard onSelect={() => handleSelectPayoutMethod('Card Payment')} />,
-      prepaid: <PrepaidCard onSelect={() => handleSelectPayoutMethod('Prepaid Card')} />,
-      gift: <GiftCard onSelect={() => handleSelectPayoutMethod('Gift Card')} />,
+      bank: <BankTransfer onSelect={() => handleSelectPayoutMethod('Bank Transfer')} isSelected={selectedMethod === 'Bank Transfer'} />,
+      crypto: <Cryptocurrency onSelect={() => handleSelectPayoutMethod('Cryptocurrency')} isSelected={selectedMethod === 'Cryptocurrency'} />,
+      digital: <DigitalWallet onSelect={() => handleSelectPayoutMethod('Digital Wallet')} isSelected={selectedMethod === 'Digital Wallet'} />,
+      card: <PushToCard onSelect={() => handleSelectPayoutMethod('Card Payment')} isSelected={selectedMethod === 'Card Payment'} />,
+      prepaid: <PrepaidCard onSelect={() => handleSelectPayoutMethod('Prepaid Card')} isSelected={selectedMethod === 'Prepaid Card'} />,
+      gift: <GiftCard onSelect={() => handleSelectPayoutMethod('Gift Card')} isSelected={selectedMethod === 'Gift Card'} />,
     };
     
     return (
       <div>
         <h2 className="text-xl font-semibold mb-4">Select Payout Method</h2>
-        <p className="text-sm mb-4 opacity-70">Choose how you'd like to receive your funds</p>
+        <p className="text-sm mb-4 opacity-70">Choose how you'd like to receive your funds (select one)</p>
         <div className="grid grid-cols-1 gap-3 mt-4">
           {config.payoutMethods.map((method) => (
             <div key={method}>
