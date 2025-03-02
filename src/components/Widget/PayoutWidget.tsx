@@ -10,8 +10,10 @@ import DigitalWallet from './PayoutMethods/DigitalWallet';
 import PushToCard from './PayoutMethods/PushToCard';
 import PrepaidCard from './PayoutMethods/PrepaidCard';
 import GiftCard from './PayoutMethods/GiftCard';
-import { Check, ChevronRight, ArrowLeft, Radio } from 'lucide-react';
+import { Check, ChevronRight, ArrowLeft, Radio, DollarSign, Clock, FileText, Calendar, CreditCard, RefreshCw, LogOut } from 'lucide-react';
 import { toast } from "sonner";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
 const PayoutWidget = () => {
   const { config } = useWidgetConfig();
@@ -22,6 +24,59 @@ const PayoutWidget = () => {
   const [formData, setFormData] = useState<Record<string, string>>({});
   // New state for detailed selection options
   const [selectedDetailOption, setSelectedDetailOption] = useState<string | null>(null);
+  // New state to track if the user has completed onboarding
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  // State for demo/simulation purposes
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // Demo payout data
+  const payouts = [
+    { 
+      id: 'p1', 
+      amount: '$1,250.00', 
+      date: 'May 15, 2023', 
+      status: 'Completed', 
+      method: 'Bank Transfer',
+      invoice: 'INV-2023-05-01',
+      description: 'April commission payment'
+    },
+    { 
+      id: 'p2', 
+      amount: '$890.75', 
+      date: 'Jun 12, 2023', 
+      status: 'Completed', 
+      method: 'Bank Transfer',
+      invoice: 'INV-2023-06-01',
+      description: 'May commission payment'
+    },
+    { 
+      id: 'p3', 
+      amount: '$1,475.50', 
+      date: 'Jul 15, 2023', 
+      status: 'Completed', 
+      method: 'Digital Wallet (PayPal)',
+      invoice: 'INV-2023-07-01',
+      description: 'June commission payment'
+    },
+    { 
+      id: 'p4', 
+      amount: '$2,100.00', 
+      date: 'Aug 15, 2023', 
+      status: 'Pending', 
+      method: 'Digital Wallet (PayPal)',
+      invoice: 'INV-2023-08-01',
+      description: 'July commission payment'
+    },
+    { 
+      id: 'p5', 
+      amount: '$1,890.25', 
+      date: 'Sep 15, 2023', 
+      status: 'Awaiting Approval', 
+      method: 'Digital Wallet (PayPal)',
+      invoice: 'INV-2023-09-01',
+      description: 'August commission payment'
+    },
+  ];
   
   // Prepare steps based on config
   const steps = [
@@ -63,6 +118,7 @@ const PayoutWidget = () => {
         } else {
           // If there are no more steps, show success
           setShowSuccess(true);
+          setOnboardingCompleted(true);
           toast.success("Payout successful!", {
             description: `Your funds will be sent via ${selectedMethod}${selectedDetailOption ? ` (${selectedDetailOption})` : ''}.`
           });
@@ -75,6 +131,7 @@ const PayoutWidget = () => {
     } else {
       // Last step completed, show success
       setShowSuccess(true);
+      setOnboardingCompleted(true);
       toast.success("Payout successful!", {
         description: `Your funds will be sent via ${selectedMethod}${selectedDetailOption ? ` (${selectedDetailOption})` : ''}.`
       });
@@ -104,6 +161,47 @@ const PayoutWidget = () => {
   
   const handleSelectDetailOption = (option: string) => {
     setSelectedDetailOption(option);
+  };
+  
+  const handleStartOnboarding = () => {
+    setCurrentStep(0);
+    setOnboardingCompleted(false);
+    setShowSuccess(false);
+    setIsLoggedIn(true);
+  };
+  
+  const handleLogin = () => {
+    // Simulate login
+    setIsLoggedIn(true);
+    setOnboardingCompleted(true); // Assuming user has completed onboarding before
+    setSelectedMethod('Digital Wallet');
+    setSelectedDetailOption('PayPal');
+    toast.success("Welcome back!", {
+      description: "You've been logged in successfully."
+    });
+  };
+  
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setOnboardingCompleted(false);
+    toast.info("You've been logged out", {
+      description: "See you again soon!"
+    });
+  };
+  
+  const handleChangePayoutMethod = () => {
+    setCurrentStep(steps.indexOf('payout'));
+    setOnboardingCompleted(false);
+    setShowSuccess(false);
+  };
+  
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Completed': return 'text-green-500';
+      case 'Pending': return 'text-yellow-500';
+      case 'Awaiting Approval': return 'text-blue-500';
+      default: return 'text-gray-500';
+    }
   };
   
   const getStepContent = () => {
@@ -541,6 +639,215 @@ const PayoutWidget = () => {
     }
   };
   
+  const renderDashboard = () => {
+    return (
+      <div className="dashboard-container">
+        <div className="dashboard-header mb-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Your Payouts Dashboard</h2>
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-1 text-sm opacity-70 hover:opacity-100 transition-all hover:text-red-400"
+            >
+              <LogOut size={16} />
+              <span>Logout</span>
+            </button>
+          </div>
+          <p className="text-sm opacity-70 mt-1">
+            Manage your payouts and payment methods
+          </p>
+        </div>
+        
+        <div className="current-method-card p-4 rounded-lg bg-white/5 border border-white/10 mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm opacity-70">Current Payout Method</h3>
+              <p className="font-medium text-base mt-1">{selectedMethod}{selectedDetailOption ? ` (${selectedDetailOption})` : ''}</p>
+            </div>
+            <button 
+              onClick={handleChangePayoutMethod}
+              className="flex items-center gap-1 text-sm bg-white/10 hover:bg-white/20 transition-colors px-3 py-1.5 rounded-md"
+            >
+              <RefreshCw size={14} />
+              <span>Change</span>
+            </button>
+          </div>
+        </div>
+        
+        <div className="dashboard-tabs mb-6">
+          <Tabs defaultValue="payouts" className="w-full">
+            <TabsList className="w-full grid grid-cols-3 mb-4 bg-white/5 border-b border-white/10 rounded-none p-0">
+              <TabsTrigger 
+                value="payouts" 
+                className={cn(
+                  "data-[state=active]:bg-transparent data-[state=active]:border-b-2",
+                  "data-[state=active]:border-b-[" + config.accentColor + "]",
+                  "data-[state=active]:shadow-none rounded-none py-3"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <DollarSign size={16} />
+                  <span>Payouts</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="pending" 
+                className={cn(
+                  "data-[state=active]:bg-transparent data-[state=active]:border-b-2",
+                  "data-[state=active]:border-b-[" + config.accentColor + "]",
+                  "data-[state=active]:shadow-none rounded-none py-3"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <Clock size={16} />
+                  <span>Pending</span>
+                </div>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="invoices" 
+                className={cn(
+                  "data-[state=active]:bg-transparent data-[state=active]:border-b-2",
+                  "data-[state=active]:border-b-[" + config.accentColor + "]",
+                  "data-[state=active]:shadow-none rounded-none py-3"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <FileText size={16} />
+                  <span>Invoices</span>
+                </div>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="payouts" className="mt-0">
+              <div className="payouts-list space-y-3">
+                {payouts.filter(p => p.status === 'Completed').map(payout => (
+                  <div key={payout.id} className="payout-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{payout.amount}</p>
+                        <p className="text-sm opacity-70">{payout.description}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Calendar size={14} className="opacity-60" />
+                          <span className="text-xs opacity-70">{payout.date}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className={`text-sm font-medium ${getStatusColor(payout.status)}`}>
+                          {payout.status}
+                        </span>
+                        <div className="flex items-center gap-1 mt-1">
+                          <CreditCard size={14} className="opacity-60" />
+                          <span className="text-xs opacity-70">{payout.method}</span>
+                        </div>
+                        <div className="text-xs opacity-70 mt-1">
+                          Invoice: {payout.invoice}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="pending" className="mt-0">
+              <div className="pending-list space-y-3">
+                {payouts.filter(p => p.status !== 'Completed').map(payout => (
+                  <div key={payout.id} className="payout-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{payout.amount}</p>
+                        <p className="text-sm opacity-70">{payout.description}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Calendar size={14} className="opacity-60" />
+                          <span className="text-xs opacity-70">{payout.date}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className={`text-sm font-medium ${getStatusColor(payout.status)}`}>
+                          {payout.status}
+                        </span>
+                        <div className="flex items-center gap-1 mt-1">
+                          <CreditCard size={14} className="opacity-60" />
+                          <span className="text-xs opacity-70">{payout.method}</span>
+                        </div>
+                        <div className="text-xs opacity-70 mt-1">
+                          Invoice: {payout.invoice}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="invoices" className="mt-0">
+              <div className="invoices-list space-y-3">
+                {payouts.map(payout => (
+                  <div key={payout.id} className="invoice-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium">{payout.invoice}</p>
+                        <p className="text-sm opacity-70">{payout.description}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Calendar size={14} className="opacity-60" />
+                          <span className="text-xs opacity-70">{payout.date}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="font-medium">{payout.amount}</span>
+                        <span className={`text-sm ${getStatusColor(payout.status)}`}>
+                          {payout.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    );
+  };
+  
+  const renderLoginScreen = () => {
+    return (
+      <div className="login-container text-center">
+        <h2 className="text-xl font-semibold mb-6">Welcome to Payouts</h2>
+        <p className="text-sm opacity-70 mb-8">Login or create a new account to manage your payouts</p>
+        
+        <div className="flex flex-col gap-4">
+          <button
+            onClick={handleLogin}
+            className="py-3 px-4 rounded-lg font-medium bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            Login (Simulation)
+          </button>
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-payouts-dark px-2 text-white/60">or</span>
+            </div>
+          </div>
+          
+          <button
+            onClick={handleStartOnboarding}
+            className="py-3 px-4 rounded-lg font-medium"
+            style={{
+              backgroundColor: config.accentColor,
+              color: config.primaryColor,
+            }}
+          >
+            Create Account
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
   // Generate dynamic CSS variables based on the configuration
   const widgetStyle = {
     '--primary-bg': config.primaryColor,
@@ -552,6 +859,17 @@ const PayoutWidget = () => {
     '--button-radius': config.buttonStyle === 'rounded' ? '6px' : 
                        config.buttonStyle === 'pill' ? '9999px' : '0px',
   } as React.CSSProperties;
+  
+  if (onboardingCompleted) {
+    return (
+      <div 
+        className="widget-container p-6 rounded-xl max-w-md w-full mx-auto shadow-lg"
+        style={widgetStyle}
+      >
+        {renderDashboard()}
+      </div>
+    );
+  }
   
   if (showSuccess) {
     return (
@@ -568,7 +886,30 @@ const PayoutWidget = () => {
           <h2 className="text-xl font-bold mb-2">Success!</h2>
           <p className="mb-4">Your payout has been processed via {selectedMethod}{selectedDetailOption ? ` (${selectedDetailOption})` : ''}.</p>
           <p className="text-sm opacity-70">You will receive a confirmation email shortly.</p>
+          
+          <button
+            onClick={() => setOnboardingCompleted(true)}
+            className="mt-6 py-3 px-6 rounded-lg font-medium"
+            style={{
+              backgroundColor: config.accentColor,
+              color: config.primaryColor,
+              borderRadius: `var(--button-radius)`,
+            }}
+          >
+            Go to Dashboard
+          </button>
         </div>
+      </div>
+    );
+  }
+  
+  if (!isLoggedIn) {
+    return (
+      <div 
+        className="widget-container p-6 rounded-xl max-w-md w-full mx-auto shadow-lg"
+        style={widgetStyle}
+      >
+        {renderLoginScreen()}
       </div>
     );
   }
