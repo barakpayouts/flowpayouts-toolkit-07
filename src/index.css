@@ -13,7 +13,7 @@
     --popover: 196 66% 14%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 24 100% 58%;
+    --primary: 71 100% 58%;
     --primary-foreground: 196 66% 14%;
 
     --secondary: 196 66% 20%;
@@ -22,7 +22,7 @@
     --muted: 196 30% 25%;
     --muted-foreground: 0 0% 90%;
 
-    --accent: 24 100% 58%;
+    --accent: 71 100% 58%;
     --accent-foreground: 196 66% 14%;
 
     --destructive: 0 84.2% 60.2%;
@@ -30,7 +30,7 @@
 
     --border: 196 40% 25%;
     --input: 196 40% 25%;
-    --ring: 24 100% 58%;
+    --ring: 71 100% 58%;
 
     --radius: 0.5rem;
   }
@@ -98,22 +98,22 @@
   }
   
   .btn-primary {
-    @apply bg-[#F97316] text-white font-semibold px-6 py-3 rounded-md 
+    @apply bg-payouts-accent text-payouts-dark font-semibold px-6 py-3 rounded-md 
            transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
   }
   
   .btn-secondary {
-    @apply bg-transparent border-2 border-[#F97316] text-white font-semibold 
-           px-6 py-3 rounded-md transition-all duration-200 hover:bg-[#F97316]/10 
+    @apply bg-transparent border-2 border-payouts-accent text-white font-semibold 
+           px-6 py-3 rounded-md transition-all duration-200 hover:bg-payouts-accent/10 
            hover:-translate-y-0.5;
   }
   
   .section-divider {
-    @apply h-1 w-24 bg-[#F97316] rounded my-8 mx-auto;
+    @apply h-1 w-24 bg-payouts-accent rounded my-8 mx-auto;
   }
   
   .highlight-box {
-    @apply border-l-4 border-[#F97316] bg-white/5 p-4;
+    @apply border-l-4 border-payouts-accent bg-white/5 p-4;
   }
   
   .text-gradient {
@@ -255,7 +255,7 @@
     mask-image: linear-gradient(to top, black 50%, transparent 100%);
   }
   
-  /* Widget styling with improved contrast */
+  /* Widget styling */
   .widget-container {
     background-color: var(--bg-color, #143745);
     color: var(--text-color, #ffffff);
@@ -268,14 +268,14 @@
 
   .progress-track {
     height: 6px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 3px;
     overflow: hidden;
   }
 
   .progress-fill {
     height: 100%;
-    background-color: var(--accent, #F97316);
+    background-color: var(--accent, #d0e92a);
     transition: width 0.3s ease;
   }
 
@@ -291,7 +291,7 @@
   }
 
   .step-indicator.active {
-    background-color: var(--accent, #F97316);
+    background-color: var(--accent, #d0e92a);
     color: var(--primary-bg, #0f2a35);
   }
 
@@ -315,12 +315,12 @@
   }
 
   .payout-method-card.selected {
-    border-color: var(--accent, #F97316);
+    border-color: var(--accent, #d0e92a);
     background-color: rgba(255, 255, 255, 0.1);
   }
 
   .confirm-button {
-    background-color: var(--accent, #F97316);
+    background-color: var(--accent, #d0e92a);
     color: var(--primary-bg, #0f2a35);
     border-radius: var(--button-radius, 6px);
     padding: 12px 24px;
@@ -351,7 +351,7 @@
   }
 
   .method-icon svg {
-    color: var(--accent, #F97316);
+    color: var(--accent, #d0e92a);
   }
 
   /* Success page styling */
