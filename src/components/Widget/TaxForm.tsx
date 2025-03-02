@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { TaxFormType } from '@/hooks/use-widget-config';
+import { TaxFormType, useWidgetConfig } from '@/hooks/use-widget-config';
 import { toast } from "sonner";
 
 interface TaxFormProps {
@@ -15,14 +15,19 @@ const TaxForm: React.FC<TaxFormProps> = ({
   onBack,
   isLastStep
 }) => {
+  const { config } = useWidgetConfig();
   const [formType, setFormType] = useState<TaxFormType>('w9');
   const [formData, setFormData] = useState({
     name: '',
     ssn: '',
+    tin: '',
+    companyName: '',
     purpose: '',
     beneficiary: '',
     relation: '',
-    policyType: 'standard'
+    policyType: 'standard',
+    vendorType: 'service',
+    contractorAgreement: false
   });
   const [isCertified, setIsCertified] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,6 +40,14 @@ const TaxForm: React.FC<TaxFormProps> = ({
     }));
   };
   
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked
+    }));
+  };
+  
   const handleFormTypeChange = (type: TaxFormType) => {
     setFormType(type);
   };
@@ -42,7 +55,10 @@ const TaxForm: React.FC<TaxFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.ssn || !isCertified) {
+    const requiredFields = getRequiredFields();
+    const missingRequired = requiredFields.some(field => !formData[field as keyof typeof formData]);
+    
+    if (missingRequired || !isCertified) {
       toast.error("Please complete all required fields and certify the information");
       return;
     }
@@ -57,11 +73,215 @@ const TaxForm: React.FC<TaxFormProps> = ({
     }, 1000);
   };
   
+  // Get required fields based on recipient type
+  const getRequiredFields = () => {
+    const commonFields = ['name'];
+    
+    switch (config.recipientType) {
+      case 'vendor':
+        return [...commonFields, 'tin', 'companyName', 'vendorType'];
+      case 'insured':
+        return [...commonFields, 'ssn', 'purpose', 'beneficiary', 'relation', 'policyType'];
+      case 'contractor':
+        return [...commonFields, 'ssn', 'contractorAgreement'];
+      case 'business':
+        return [...commonFields, 'tin', 'companyName'];
+      case 'individual':
+      default:
+        return [...commonFields, 'ssn'];
+    }
+  };
+  
+  // Render form fields based on recipient type
+  const renderRecipientTypeFields = () => {
+    switch (config.recipientType) {
+      case 'vendor':
+        return (
+          <>
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Company Name
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Tax Identification Number (TIN)
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                name="tin"
+                value={formData.tin}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Vendor Type
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <select
+                name="vendorType"
+                value={formData.vendorType}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              >
+                <option value="service">Service Provider</option>
+                <option value="goods">Goods Supplier</option>
+                <option value="both">Both Services and Goods</option>
+              </select>
+            </div>
+          </>
+        );
+        
+      case 'insured':
+        return (
+          <>
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Purpose of Insurance
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                name="purpose"
+                value={formData.purpose}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Beneficiary Name
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                name="beneficiary"
+                value={formData.beneficiary}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Beneficiary Relation
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                name="relation"
+                value={formData.relation}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Policy Type
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <select
+                name="policyType"
+                value={formData.policyType}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              >
+                <option value="standard">Standard</option>
+                <option value="premium">Premium</option>
+                <option value="basic">Basic</option>
+              </select>
+            </div>
+          </>
+        );
+        
+      case 'contractor':
+        return (
+          <div className="flex items-start mt-6">
+            <input
+              id="contractorAgreement"
+              name="contractorAgreement"
+              type="checkbox"
+              checked={formData.contractorAgreement}
+              onChange={handleCheckboxChange}
+              className="w-4 h-4 mt-1 rounded border-white/20 text-payouts-accent focus:ring-payouts-accent"
+            />
+            <label htmlFor="contractorAgreement" className="ml-2 text-sm text-white/80">
+              I confirm that I am an independent contractor and not an employee
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+          </div>
+        );
+        
+      case 'business':
+        return (
+          <>
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Company Name
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-white/80 block mb-2">
+                Tax Identification Number (TIN)
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                name="tin"
+                value={formData.tin}
+                onChange={handleInputChange}
+                required
+                className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+              />
+            </div>
+          </>
+        );
+        
+      case 'individual':
+      default:
+        return null;
+    }
+  };
+  
   return (
     <div className="py-4">
       <div className="mb-6 text-center">
         <h3 className="text-xl font-semibold">Tax Information</h3>
-        <p className="text-sm text-white/80 mt-1">Complete your tax information</p>
+        <p className="text-sm text-white/80 mt-1">
+          Complete your tax information for {config.recipientType} payments
+        </p>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -95,52 +315,8 @@ const TaxForm: React.FC<TaxFormProps> = ({
           </div>
         </div>
         
-        <div>
-          <label className="text-sm text-white/80 block mb-2">Purpose of Insurance</label>
-          <input
-            type="text"
-            name="purpose"
-            value={formData.purpose}
-            onChange={handleInputChange}
-            className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
-          />
-        </div>
-        
-        <div>
-          <label className="text-sm text-white/80 block mb-2">Beneficiary Name</label>
-          <input
-            type="text"
-            name="beneficiary"
-            value={formData.beneficiary}
-            onChange={handleInputChange}
-            className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
-          />
-        </div>
-        
-        <div>
-          <label className="text-sm text-white/80 block mb-2">Beneficiary Relation</label>
-          <input
-            type="text"
-            name="relation"
-            value={formData.relation}
-            onChange={handleInputChange}
-            className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
-          />
-        </div>
-        
-        <div>
-          <label className="text-sm text-white/80 block mb-2">Policy Type</label>
-          <select
-            name="policyType"
-            value={formData.policyType}
-            onChange={handleInputChange}
-            className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
-          >
-            <option value="standard">Standard</option>
-            <option value="premium">Premium</option>
-            <option value="basic">Basic</option>
-          </select>
-        </div>
+        {/* Recipient-specific fields */}
+        {renderRecipientTypeFields()}
         
         <div>
           <label className="text-sm text-white/80 block mb-2">
@@ -157,20 +333,23 @@ const TaxForm: React.FC<TaxFormProps> = ({
           />
         </div>
         
-        <div>
-          <label className="text-sm text-white/80 block mb-2">
-            Social Security Number
-            <span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            type="text"
-            name="ssn"
-            value={formData.ssn}
-            onChange={handleInputChange}
-            required
-            className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
-          />
-        </div>
+        {/* Only show SSN field for individual and insured */}
+        {(config.recipientType === 'individual' || config.recipientType === 'insured' || config.recipientType === 'contractor') && (
+          <div>
+            <label className="text-sm text-white/80 block mb-2">
+              Social Security Number
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+            <input
+              type="text"
+              name="ssn"
+              value={formData.ssn}
+              onChange={handleInputChange}
+              required
+              className="w-full p-3 bg-white/5 border border-white/10 rounded-lg focus:ring-1 focus:ring-payouts-accent focus:outline-none transition-all"
+            />
+          </div>
+        )}
         
         <div className="flex items-start mt-6">
           <input
@@ -202,7 +381,7 @@ const TaxForm: React.FC<TaxFormProps> = ({
           <button
             type="submit"
             className="btn-primary flex-1 py-2"
-            disabled={isSubmitting || !isCertified || !formData.name || !formData.ssn}
+            disabled={isSubmitting || !isCertified || !formData.name || (config.recipientType === 'individual' && !formData.ssn)}
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center">

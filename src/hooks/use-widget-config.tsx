@@ -5,11 +5,13 @@ export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 
 export type VerificationStep = 'profile' | 'bank' | 'tax';
 export type BankVerificationMethod = 'plaid' | 'statement' | 'microdeposit';
 export type TaxFormType = 'w9' | 'w8';
+export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
 
 export interface WidgetConfig {
   // Functionality Options
   steps: VerificationStep[];
   payoutMethods: PayoutMethod[];
+  recipientType: RecipientType;
   
   // Brand Customization
   primaryColor: string;
@@ -37,6 +39,7 @@ const defaultConfig: WidgetConfig = {
   // Functionality Options
   steps: ['profile', 'bank', 'tax'],
   payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift'],
+  recipientType: 'individual',
   
   // Brand Customization (Default: Payouts.com)
   primaryColor: '#0f2a35',
@@ -114,6 +117,34 @@ export const useWidgetConfig = (initialConfig?: Partial<WidgetConfig>) => {
     });
   }, []);
   
+  // Set recipient type
+  const setRecipientType = useCallback((type: RecipientType) => {
+    setConfig(prev => {
+      // Adjust steps based on recipient type
+      let updatedSteps = [...prev.steps];
+      
+      if (type === 'vendor' || type === 'business' || type === 'contractor') {
+        // These types require tax information
+        if (!updatedSteps.includes('tax')) {
+          updatedSteps.push('tax');
+        }
+      }
+      
+      return {
+        ...prev,
+        recipientType: type,
+        steps: updatedSteps.sort((a, b) => {
+          const order: Record<VerificationStep, number> = {
+            profile: 0,
+            bank: 1,
+            tax: 2
+          };
+          return order[a] - order[b];
+        })
+      };
+    });
+  }, []);
+  
   // Generate CSS variables for the widget based on current config
   const getCssVariables = useCallback(() => {
     return {
@@ -154,6 +185,7 @@ export const useWidgetConfig = (initialConfig?: Partial<WidgetConfig>) => {
     updateConfig,
     toggleStep,
     togglePayoutMethod,
+    setRecipientType,
     getCssVariables,
     resetConfig
   };

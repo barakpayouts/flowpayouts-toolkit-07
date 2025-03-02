@@ -77,6 +77,19 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
     }, 1500);
   };
   
+  const getStepTitle = () => {
+    switch (currentStep) {
+      case 'profile':
+        return 'Profile Information';
+      case 'bank':
+        return selectedPayoutMethod ? 'Payment Details' : 'Payment Method';
+      case 'tax':
+        return 'Tax Information';
+      default:
+        return 'Verification';
+    }
+  };
+  
   const renderStepContent = () => {
     switch (currentStep) {
       case 'profile':
@@ -250,7 +263,16 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
       </div>
       <h3 className="text-2xl font-bold">Verification Complete!</h3>
       <p className="text-white/70">
-        Your information has been successfully saved. You're all set to receive payments.
+        {config.recipientType === 'insured' 
+          ? "Your claim information has been successfully saved. You're all set to receive your insurance payment."
+          : config.recipientType === 'vendor'
+          ? "Your vendor information has been successfully saved. You're all set to receive payments."
+          : config.recipientType === 'contractor'
+          ? "Your contractor information has been successfully saved. You're all set to receive payments."
+          : config.recipientType === 'business'
+          ? "Your business information has been successfully saved. You're all set to receive payments."
+          : "Your information has been successfully saved. You're all set to receive payments."
+        }
       </p>
       <button 
         className="btn-primary py-2 px-6 mx-auto mt-6"
@@ -277,7 +299,7 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
   };
   
   const renderStepIndicators = () => {
-    if (!config.showStepNumbers) return null;
+    if (!config.showStepNumbers || config.steps.length <= 1) return null;
     
     return (
       <div className="flex justify-center space-x-4 mb-6">
@@ -310,8 +332,14 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
         <div className="p-6">
           {renderProgressBar()}
           
-          <div className="flex justify-between items-center mb-6 mt-4">
-            <h2 className="text-xl font-bold">Complete Your Verification</h2>
+          <div className="flex justify-between items-center mb-4 mt-4">
+            <h2 className="text-xl font-bold">{isCompleted ? 'Verification Complete' : getStepTitle()}</h2>
+            
+            {!isCompleted && (
+              <div className="px-2 py-1 rounded-full bg-payouts-accent/20 text-payouts-accent text-xs font-medium capitalize">
+                {config.recipientType}
+              </div>
+            )}
           </div>
           
           {renderStepIndicators()}
