@@ -1,0 +1,28 @@
+
+/* Add subtle hover effects to tabs */
+.tab-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.tab-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent, #d0e92a);
+  transition: width 0.3s ease;
+}
+
+.tab-button:hover::after,
+.tab-button.active::after {
+  width: 100%;
+}
+
+.tab-button.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--accent, #d0e92a);
+}

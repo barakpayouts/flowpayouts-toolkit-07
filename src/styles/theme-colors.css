@@ -1,0 +1,25 @@
+
+/* Payouts.com branding colors */
+.bg-payouts-dark {
+  background-color: #0f2a35;
+}
+
+.bg-payouts-primary {
+  background-color: #143745;
+}
+
+.bg-payouts-accent {
+  background-color: #d0e92a;
+}
+
+.text-payouts-dark {
+  color: #0f2a35;
+}
+
+.text-payouts-accent {
+  color: #d0e92a;
+}
+
+.border-payouts-accent {
+  border-color: #d0e92a;
+}
