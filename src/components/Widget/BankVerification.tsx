@@ -50,7 +50,7 @@ const BankVerification: React.FC<BankVerificationProps> = ({
   return (
     <VerificationLayout
       title="Bank Account Verification"
-      description="Choose a method to verify your bank account"
+      description="Verify your bank account for transfers"
       onBack={onBack}
       onNext={handleContinue}
       isLastStep={isLastStep}

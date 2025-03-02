@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
@@ -23,14 +22,31 @@ const PayoutWidget = () => {
   // Prepare steps based on config
   const steps = [
     ...(config.steps.includes('profile') ? ['profile'] : []),
+    'payout', // Move payout before bank and tax
     ...(config.steps.includes('bank') ? ['bank'] : []),
     ...(config.steps.includes('tax') ? ['tax'] : []),
-    'payout', // Always include payout step
   ];
   
   const handleNextStep = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      // If we're at payout step and selected bank transfer, go to bank verification
+      // Otherwise, skip bank verification if it's the next step
+      if (steps[currentStep] === 'payout' && selectedMethod === 'Bank Transfer' && steps[currentStep + 1] === 'bank') {
+        setCurrentStep(currentStep + 1);
+      } else if (steps[currentStep] === 'payout' && selectedMethod !== 'Bank Transfer' && steps[currentStep + 1] === 'bank') {
+        // Skip bank verification if not bank transfer
+        if (currentStep + 2 < steps.length) {
+          setCurrentStep(currentStep + 2);
+        } else {
+          // If there are no more steps, show success
+          setShowSuccess(true);
+          toast.success("Payout successful!", {
+            description: `Your funds will be sent via ${selectedMethod}.`
+          });
+        }
+      } else {
+        setCurrentStep(currentStep + 1);
+      }
     } else if (selectedMethod && currentStep === steps.length - 1 && !showMethodDetails) {
       // Show method details form
       setShowMethodDetails(true);
@@ -70,13 +86,20 @@ const PayoutWidget = () => {
           />
         );
       case 'bank':
-        return (
-          <BankVerification 
-            onNext={handleNextStep} 
-            onBack={handleBackStep}
-            isLastStep={isLastStep} 
-          />
-        );
+        // Only render bank verification if bank transfer was selected
+        if (selectedMethod === 'Bank Transfer') {
+          return (
+            <BankVerification 
+              onNext={handleNextStep} 
+              onBack={handleBackStep}
+              isLastStep={isLastStep} 
+            />
+          );
+        } else {
+          // Skip this step automatically
+          handleNextStep();
+          return null;
+        }
       case 'tax':
         return (
           <TaxForm 
@@ -538,4 +561,3 @@ const PayoutWidget = () => {
 };
 
 export default PayoutWidget;
-
