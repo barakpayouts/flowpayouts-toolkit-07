@@ -90,9 +90,9 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         <div className="flex gap-3">
           <Button
             onClick={onBack}
-            variant="glass"
+            variant="dark"
             size="default"
-            className="flex-1"
+            className="flex-1 text-white"
           >
             Back
           </Button>
