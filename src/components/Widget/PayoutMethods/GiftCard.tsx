@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Gift } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 
 interface GiftCardProps {
@@ -26,7 +26,7 @@ const GiftCard: React.FC<GiftCardProps> = ({ onSelect }) => {
     >
       <div className="flex items-center">
         <div className="method-icon">
-          <span className="text-lg">🎁</span>
+          <Gift size={18} className="text-payouts-accent" />
         </div>
         <div className="flex-1">
           <h3 className="font-medium">Gift Card</h3>

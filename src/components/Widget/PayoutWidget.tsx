@@ -98,7 +98,7 @@ const PayoutWidget = () => {
     return (
       <div>
         <h2 className="text-xl font-semibold mb-4">Select Payout Method</h2>
-        <p className="text-sm mb-4">Choose how you'd like to receive your funds</p>
+        <p className="text-sm mb-4 opacity-70">Choose how you'd like to receive your funds</p>
         <div className="grid grid-cols-1 gap-3 mt-4">
           {config.payoutMethods.map((method) => (
             <div key={method}>
@@ -144,7 +144,7 @@ const PayoutWidget = () => {
   
   return (
     <div 
-      className="widget-container p-6 rounded-xl max-w-md w-full mx-auto"
+      className="widget-container p-6 rounded-xl max-w-md w-full mx-auto shadow-lg"
       style={widgetStyle}
     >
       {config.showProgressBar && steps.length > 1 && (
@@ -164,7 +164,10 @@ const PayoutWidget = () => {
           <div className="progress-track">
             <div 
               className="progress-fill" 
-              style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+              style={{ 
+                width: `${(currentStep / (steps.length - 1)) * 100}%`,
+                borderRadius: '3px'
+              }}
             ></div>
           </div>
         </div>
@@ -178,6 +181,9 @@ const PayoutWidget = () => {
         <button 
           className="confirm-button"
           onClick={handleNextStep}
+          style={{
+            borderRadius: `var(--button-radius)`,
+          }}
         >
           Confirm {selectedMethod} <ChevronRight className="ml-1 h-4 w-4" />
         </button>
