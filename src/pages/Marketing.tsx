@@ -40,21 +40,21 @@ const Marketing = () => {
           <div className="animate-fade-in">
             <div className="mb-4 text-center">
               <h3 className="text-sm font-bold text-[#0f2a35] mb-1">Payment Methods</h3>
-              <p className="text-xs text-[#0f2a35]/70">Choose your preferred option</p>
+              <p className="text-xs text-[#0f2a35]/80">Choose your preferred option</p>
             </div>
             <div className="space-y-2">
               {['Bank Transfer', 'Digital Wallet', 'Cryptocurrency', 'Prepaid Card'].map((method, index) => (
-                <div key={index} className={`p-3 rounded-lg border ${index === 0 ? 'border-[#d0e92a] bg-[#d0e92a]/10' : 'border-gray-200 bg-white'} flex items-center justify-between`}>
+                <div key={index} className={`p-3 rounded-lg border ${index === 0 ? 'border-[#8B5CF6] bg-[#8B5CF6]/20' : 'border-gray-300 bg-white'} flex items-center justify-between`}>
                   <div className="flex items-center gap-2">
-                    <span className="w-8 h-8 rounded-full bg-[#0f2a35]/10 flex items-center justify-center">
-                      {index === 0 ? <Wallet size={16} /> : 
+                    <span className={`w-8 h-8 rounded-full ${index === 0 ? 'bg-[#8B5CF6]/30' : 'bg-[#0f2a35]/10'} flex items-center justify-center`}>
+                      {index === 0 ? <Wallet size={16} className="text-[#8B5CF6]" /> : 
                        index === 1 ? <CreditCard size={16} /> : 
                        index === 2 ? <CpuIcon size={16} /> : 
                        <Calendar size={16} />}
                     </span>
-                    <span className="text-xs font-semibold">{method}</span>
+                    <span className="text-xs font-semibold text-[#1A1F2C]">{method}</span>
                   </div>
-                  {index === 0 && <Check size={16} className="text-[#d0e92a]" />}
+                  {index === 0 && <Check size={16} className="text-[#8B5CF6]" />}
                 </div>
               ))}
             </div>
@@ -65,20 +65,20 @@ const Marketing = () => {
           <div className="animate-fade-in">
             <div className="mb-4 text-center">
               <h3 className="text-sm font-bold text-[#0f2a35] mb-1">Profile Information</h3>
-              <p className="text-xs text-[#0f2a35]/70">We need a few details</p>
+              <p className="text-xs text-[#0f2a35]/80">We need a few details</p>
             </div>
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs text-[#0f2a35]/70">Full Name</label>
-                <input type="text" value="Jane Doe" className="text-xs p-2 rounded-md border border-gray-200 w-full" readOnly />
+                <label className="text-xs text-[#0f2a35]/80 font-medium">Full Name</label>
+                <input type="text" value="Jane Doe" className="text-xs p-2 rounded-md border border-gray-300 w-full bg-white text-[#1A1F2C]" readOnly />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-[#0f2a35]/70">Email Address</label>
-                <input type="email" value="jane.doe@example.com" className="text-xs p-2 rounded-md border border-gray-200 w-full" readOnly />
+                <label className="text-xs text-[#0f2a35]/80 font-medium">Email Address</label>
+                <input type="email" value="jane.doe@example.com" className="text-xs p-2 rounded-md border border-gray-300 w-full bg-white text-[#1A1F2C]" readOnly />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-[#0f2a35]/70">Phone Number</label>
-                <input type="tel" value="(555) 123-4567" className="text-xs p-2 rounded-md border border-gray-200 w-full" readOnly />
+                <label className="text-xs text-[#0f2a35]/80 font-medium">Phone Number</label>
+                <input type="tel" value="(555) 123-4567" className="text-xs p-2 rounded-md border border-gray-300 w-full bg-white text-[#1A1F2C]" readOnly />
               </div>
             </div>
           </div>
@@ -88,12 +88,12 @@ const Marketing = () => {
           <div className="animate-fade-in">
             <div className="mb-4 text-center">
               <h3 className="text-sm font-bold text-[#0f2a35] mb-1">Bank Verification</h3>
-              <p className="text-xs text-[#0f2a35]/70">Connect your account securely</p>
+              <p className="text-xs text-[#0f2a35]/80">Connect your account securely</p>
             </div>
             <div className="space-y-3">
-              <div className="flex mb-3 border-b border-gray-200">
+              <div className="flex mb-3 border-b border-gray-300">
                 {['Plaid', 'Statement', 'Manual'].map((method, i) => (
-                  <button key={i} className={`flex-1 text-xs py-2 px-1 ${i === 0 ? 'border-b-2 border-[#d0e92a] font-medium' : 'text-gray-500'}`}>
+                  <button key={i} className={`flex-1 text-xs py-2 px-1 ${i === 0 ? 'border-b-2 border-[#0EA5E9] font-medium text-[#0EA5E9]' : 'text-gray-600'}`}>
                     {method}
                   </button>
                 ))}
@@ -101,15 +101,15 @@ const Marketing = () => {
               
               <div className="grid grid-cols-2 gap-2">
                 {['Chase', 'Wells Fargo', 'Bank of America', 'Citibank'].map((bank, index) => (
-                  <div key={index} className="p-2 rounded-lg border border-gray-200 bg-white text-center">
-                    <Building size={16} className="mx-auto mb-1" />
-                    <span className="text-xs font-medium">{bank}</span>
+                  <div key={index} className={`p-2 rounded-lg border ${index === 0 ? 'border-[#0EA5E9] bg-[#0EA5E9]/10' : 'border-gray-300'} bg-white text-center`}>
+                    <Building size={16} className={`mx-auto mb-1 ${index === 0 ? 'text-[#0EA5E9]' : 'text-[#403E43]'}`} />
+                    <span className="text-xs font-medium text-[#1A1F2C]">{bank}</span>
                   </div>
                 ))}
               </div>
               
-              <div className="flex items-center justify-center mt-2 gap-1 text-xs text-gray-500">
-                <Shield size={12} />
+              <div className="flex items-center justify-center mt-2 gap-1 text-xs text-[#403E43]">
+                <Shield size={12} className="text-[#0EA5E9]" />
                 <span>Your credentials are secure</span>
               </div>
             </div>
@@ -120,20 +120,20 @@ const Marketing = () => {
           <div className="animate-fade-in">
             <div className="mb-4 text-center">
               <h3 className="text-sm font-bold text-[#0f2a35] mb-1">Tax Information</h3>
-              <p className="text-xs text-[#0f2a35]/70">Required for compliance</p>
+              <p className="text-xs text-[#0f2a35]/80">Required for compliance</p>
             </div>
-            <div className="p-3 border border-gray-200 rounded-lg bg-white mb-3">
+            <div className="p-3 border border-gray-300 rounded-lg bg-white mb-3">
               <div className="flex justify-between mb-2">
-                <span className="text-xs font-medium">W-9 Form</span>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">Recommended</span>
+                <span className="text-xs font-medium text-[#1A1F2C]">W-9 Form</span>
+                <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-medium">Recommended</span>
               </div>
-              <p className="text-xs text-gray-600">For U.S. individuals and businesses</p>
+              <p className="text-xs text-[#403E43]">For U.S. individuals and businesses</p>
             </div>
-            <div className="p-3 border border-gray-200 rounded-lg bg-white">
+            <div className="p-3 border border-gray-300 rounded-lg bg-white">
               <div className="flex justify-between mb-2">
-                <span className="text-xs font-medium">W-8BEN Form</span>
+                <span className="text-xs font-medium text-[#1A1F2C]">W-8BEN Form</span>
               </div>
-              <p className="text-xs text-gray-600">For non-U.S. individuals</p>
+              <p className="text-xs text-[#403E43]">For non-U.S. individuals</p>
             </div>
           </div>
         );
@@ -144,15 +144,15 @@ const Marketing = () => {
               <CheckCircle2 className="h-8 w-8 text-green-600" />
             </div>
             <h3 className="text-sm font-bold text-[#0f2a35] mb-1">Verification Complete</h3>
-            <p className="text-xs text-[#0f2a35]/70 mb-4">Your payment is on its way</p>
-            <div className="p-3 rounded-lg bg-[#d0e92a]/10 border border-[#d0e92a]">
+            <p className="text-xs text-[#0f2a35]/80 mb-4">Your payment is on its way</p>
+            <div className="p-3 rounded-lg bg-[#F97316]/10 border border-[#F97316]">
               <div className="flex justify-between mb-1">
-                <span className="text-xs font-medium">Amount</span>
-                <span className="text-xs font-bold">$1,250.00</span>
+                <span className="text-xs font-medium text-[#1A1F2C]">Amount</span>
+                <span className="text-xs font-bold text-[#1A1F2C]">$1,250.00</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-xs font-medium">Estimated delivery</span>
-                <span className="text-xs">1-2 business days</span>
+                <span className="text-xs font-medium text-[#1A1F2C]">Estimated delivery</span>
+                <span className="text-xs text-[#403E43]">1-2 business days</span>
               </div>
             </div>
           </div>
@@ -195,7 +195,7 @@ const Marketing = () => {
             
             <div className="flex flex-wrap gap-3 pt-2">
               <Button onClick={() => navigate('/widget-demo')} 
-                className="bg-gradient-to-r from-payouts-accent to-payouts-accent/90 text-payouts-dark hover:from-payouts-accent/90 hover:to-payouts-accent rounded-full pl-5 pr-4">
+                className="bg-gradient-to-r from-[#F97316] to-[#F97316]/90 text-white hover:from-[#F97316]/90 hover:to-[#F97316] rounded-full pl-5 pr-4">
                 Get Started <ChevronRight size={16} />
               </Button>
               
@@ -222,14 +222,14 @@ const Marketing = () => {
           
           <div className="flex justify-center">
             <div className="relative">
-              {/* iPhone mockup */}
+              {/* iPhone mockup - improved contrast */}
               <div className="w-[250px] h-[500px] bg-white rounded-[40px] shadow-2xl p-3 relative overflow-hidden">
                 {/* iPhone notch */}
                 <div className="absolute top-0 left-0 right-0 h-6 bg-white z-10 flex justify-center">
                   <div className="w-[120px] h-[30px] bg-black rounded-b-3xl"></div>
                 </div>
                 
-                {/* Screen content */}
+                {/* Screen content with improved contrast */}
                 <div className="h-full bg-gray-50 rounded-[32px] pt-8 px-4 pb-4 overflow-hidden flex flex-col">
                   {/* Status bar */}
                   <div className="flex justify-between text-xs font-medium text-[#0f2a35] mb-4">
@@ -244,7 +244,7 @@ const Marketing = () => {
                   <div className="h-full flex flex-col">
                     <div className="flex items-center justify-between mb-3">
                       <div className="w-8 h-8 rounded-full bg-[#0f2a35] flex items-center justify-center">
-                        <Landmark size={14} className="text-[#d0e92a]" />
+                        <Landmark size={14} className="text-[#F97316]" />
                       </div>
                       <div className="flex items-center">
                         <span className="text-xs text-[#0f2a35] font-bold">Step {currentScreen + 1} of {screens.length}</span>
@@ -271,7 +271,7 @@ const Marketing = () => {
                 {screens.map((_, index) => (
                   <div 
                     key={index} 
-                    className={`w-2 h-2 rounded-full ${currentScreen === index ? 'bg-payouts-accent' : 'bg-white/30'}`}
+                    className={`w-2 h-2 rounded-full ${currentScreen === index ? 'bg-[#F97316]' : 'bg-white/30'}`}
                   ></div>
                 ))}
               </div>

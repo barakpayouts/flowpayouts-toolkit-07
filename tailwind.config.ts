@@ -63,13 +63,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Payouts.com brand colors
+				// Payouts.com brand colors - updated for better contrast
 				payouts: {
 					dark: '#0f2a35',
 					medium: '#143745',
 					muted: '#1a333e',
 					border: '#21404d',
-					accent: '#d0e92a',
+					accent: '#F97316', // Changed to bright orange
 				}
 			},
 			borderRadius: {
