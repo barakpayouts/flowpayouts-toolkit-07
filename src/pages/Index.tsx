@@ -14,7 +14,7 @@ export default function Home() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl w-full">
         <Link to="/marketing">
-          <Button className="w-full py-6 text-lg bg-payouts-accent text-payouts-dark hover:bg-payouts-accent/90">
+          <Button className="w-full py-6 text-lg bg-payouts-accent text-payouts-dark font-semibold hover:bg-payouts-accent/90">
             View Marketing Page
           </Button>
         </Link>
@@ -22,7 +22,11 @@ export default function Home() {
         <Link to="/widget">
           <Button 
             variant="purple" 
-            className="w-full py-6 text-lg font-semibold"
+            className="w-full py-6 text-lg font-semibold text-white"
+            style={{
+              backgroundColor: "#8B5CF6",
+              boxShadow: "0 4px 12px rgba(139, 92, 246, 0.3)"
+            }}
           >
             Try Widget Demo <ArrowRight className="ml-2 h-5 w-5" />
           </Button>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Lock } from 'lucide-react';
@@ -92,7 +91,11 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
             onClick={onBack}
             variant="dark"
             size="default"
-            className="flex-1 text-white"
+            className="flex-1 text-white/90 font-medium"
+            style={{
+              backgroundColor: "rgba(26, 31, 44, 0.9)",
+              border: "1px solid rgba(255, 255, 255, 0.1)"
+            }}
           >
             Back
           </Button>

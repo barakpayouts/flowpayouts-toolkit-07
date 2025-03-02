@@ -71,12 +71,12 @@ const MicroDepositVerification: React.FC = () => {
         </div>
         
         <Button
-          variant="glow"
+          variant="purple"
           size="default"
-          className="w-full"
+          className="w-full font-semibold"
           style={{
             background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
-            color: config.primaryColor,
+            color: "#0f2a35", // Ensure text is dark for better contrast
             boxShadow: `0 4px 15px ${config.accentColor}40`,
           }}
         >
