@@ -90,7 +90,8 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         <div className="flex gap-3">
           <Button
             onClick={onBack}
-            className="flex-1 text-white font-medium bg-[#1A1F2C] border border-white/10 hover:bg-[#1A1F2C]/90"
+            variant="dark"
+            className="flex-1 text-white font-medium"
           >
             Back
           </Button>

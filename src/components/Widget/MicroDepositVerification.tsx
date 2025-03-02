@@ -71,7 +71,8 @@ const MicroDepositVerification: React.FC = () => {
         </div>
         
         <Button
-          className="w-full font-semibold bg-gradient-to-r text-gray-900 hover:text-gray-900"
+          variant="purple"
+          className="w-full font-semibold"
           style={{
             background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
             boxShadow: `0 4px 15px ${config.accentColor}40`,

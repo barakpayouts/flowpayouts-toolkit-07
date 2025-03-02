@@ -63,7 +63,7 @@
 }
 
 .btn-secondary {
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(30, 30, 50, 0.8);
   color: var(--text-color, #ffffff);
   border-radius: var(--button-radius, 6px);
   font-weight: 500;
@@ -72,7 +72,7 @@
 }
 
 .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.18);
+  background-color: rgba(40, 40, 60, 0.9);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -83,4 +83,48 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+/* New button styles with high contrast */
+.btn-blue {
+  background-color: #0EA5E9;
+  color: white;
+  border-radius: var(--button-radius, 6px);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-purple {
+  background-color: #9b87f5;
+  color: #1A1F2C;
+  border-radius: var(--button-radius, 6px);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-orange {
+  background-color: #F97316;
+  color: white;
+  border-radius: var(--button-radius, 6px);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-dark {
+  background-color: #1A1F2C;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--button-radius, 6px);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-blue:hover, .btn-purple:hover, .btn-orange:hover, .btn-dark:hover {
+  transform: translateY(-1px);
+  filter: brightness(110%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }

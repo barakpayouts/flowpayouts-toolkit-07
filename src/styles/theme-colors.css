@@ -23,3 +23,29 @@
 .border-payouts-accent {
   border-color: #d0e92a;
 }
+
+/* New payouts accent light variant */
+.bg-payouts-accent-light {
+  background-color: #e0f34a;
+}
+
+.text-payouts-accent-light {
+  color: #e0f34a;
+}
+
+/* High contrast button colors */
+.bg-button-blue {
+  background-color: #0EA5E9;
+}
+
+.bg-button-purple {
+  background-color: #9b87f5;
+}
+
+.bg-button-orange {
+  background-color: #F97316;
+}
+
+.bg-button-dark {
+  background-color: #1A1F2C;
+}
