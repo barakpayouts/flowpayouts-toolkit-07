@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -222,14 +223,19 @@ const WidgetDemo = () => {
                           />
                           <label 
                             htmlFor="payouts-only"
-                            className="text-sm font-medium leading-none"
+                            className="text-sm font-medium leading-none flex items-center gap-2"
                           >
-                            Payouts Only Mode (No Verification)
+                            <span className="bg-payouts-accent/20 text-payouts-accent px-2 py-1 rounded text-xs font-bold">Payouts Only Mode</span>
+                            <span className="text-white/70">(Skip all verification steps)</span>
                           </label>
                         </div>
                         
-                        <h3 className="text-lg font-medium">Verification Steps</h3>
-                        <p className="text-sm text-muted-foreground">Select which steps to include</p>
+                        <h3 className={`text-lg font-medium ${isPayoutsOnly ? 'opacity-50' : ''}`}>Verification Steps</h3>
+                        <p className={`text-sm text-muted-foreground ${isPayoutsOnly ? 'opacity-50' : ''}`}>
+                          {isPayoutsOnly 
+                            ? "Verification steps are disabled in Payouts Only mode" 
+                            : "Select which steps to include"}
+                        </p>
                         
                         <div className="space-y-2">
                           {stepOptions.map((step) => (
@@ -419,12 +425,20 @@ const WidgetDemo = () => {
                       <div>
                         <h4 className="font-medium">Current Recipient Type: <span className="text-payouts-accent capitalize">{config.recipientType}</span></h4>
                         <div className="text-sm mt-1">
-                          <span className="text-white/70">Steps: </span>
-                          {config.steps.map((step, index) => (
-                            <span key={step} className="capitalize">
-                              {index > 0 ? ' → ' : ''}{step}
+                          {isPayoutsOnly ? (
+                            <span className="bg-payouts-accent/20 text-payouts-accent px-2 py-1 rounded text-xs font-bold">
+                              Payouts Only Mode Enabled
                             </span>
-                          ))}
+                          ) : (
+                            <>
+                              <span className="text-white/70">Steps: </span>
+                              {config.steps.map((step, index) => (
+                                <span key={step} className="capitalize">
+                                  {index > 0 ? ' → ' : ''}{step}
+                                </span>
+                              ))}
+                            </>
+                          )}
                         </div>
                       </div>
                       <Button size="sm" variant="outline" onClick={() => setShowConfigOptions(true)}>
