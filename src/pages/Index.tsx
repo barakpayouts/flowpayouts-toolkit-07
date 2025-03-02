@@ -20,7 +20,7 @@ export default function Home() {
         </Link>
         
         <Link to="/widget">
-          <Button variant="outline" className="w-full py-6 text-lg border-2 border-white/20 hover:bg-white/10">
+          <Button variant="outline" className="w-full py-6 text-lg border-2 border-white/20 hover:bg-white/10 text-white">
             Try Widget Demo <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
