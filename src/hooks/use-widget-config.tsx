@@ -100,6 +100,14 @@ export const useWidgetConfig = (initialConfig?: Partial<WidgetConfig>) => {
     });
   }, []);
   
+  // Set to payouts-only mode (empty steps array)
+  const setPayoutsOnlyMode = useCallback((enabled: boolean) => {
+    setConfig(prev => ({
+      ...prev,
+      steps: enabled ? [] : defaultConfig.steps
+    }));
+  }, []);
+  
   // Toggle a payout method's inclusion
   const togglePayoutMethod = useCallback((method: PayoutMethod) => {
     setConfig(prev => {
@@ -120,6 +128,14 @@ export const useWidgetConfig = (initialConfig?: Partial<WidgetConfig>) => {
   // Set recipient type
   const setRecipientType = useCallback((type: RecipientType) => {
     setConfig(prev => {
+      // If in payouts-only mode, don't adjust steps
+      if (prev.steps.length === 0) {
+        return {
+          ...prev,
+          recipientType: type
+        };
+      }
+      
       // Adjust steps based on recipient type
       let updatedSteps = [...prev.steps];
       
@@ -186,6 +202,7 @@ export const useWidgetConfig = (initialConfig?: Partial<WidgetConfig>) => {
     toggleStep,
     togglePayoutMethod,
     setRecipientType,
+    setPayoutsOnlyMode,
     getCssVariables,
     resetConfig
   };

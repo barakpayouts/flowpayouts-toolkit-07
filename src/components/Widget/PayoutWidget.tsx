@@ -31,20 +31,33 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   
+  // Determine if we're in payouts-only mode (no verification steps)
+  const isPayoutsOnlyMode = config.steps.length === 0;
+  
   // Set initial step index
   useEffect(() => {
-    const stepIndex = config.steps.indexOf(currentStep);
-    setCurrentStepIndex(stepIndex >= 0 ? stepIndex : 0);
-  }, [currentStep, config.steps]);
+    if (isPayoutsOnlyMode) {
+      setCurrentStepIndex(0);
+      setCurrentStep('bank'); // Use 'bank' as a placeholder for payouts selection
+    } else {
+      const stepIndex = config.steps.indexOf(currentStep);
+      setCurrentStepIndex(stepIndex >= 0 ? stepIndex : 0);
+    }
+  }, [currentStep, config.steps, isPayoutsOnlyMode]);
   
   // Set current step based on steps configuration
   useEffect(() => {
-    if (config.steps.length > 0 && !config.steps.includes(currentStep)) {
+    if (!isPayoutsOnlyMode && config.steps.length > 0 && !config.steps.includes(currentStep)) {
       setCurrentStep(config.steps[0]);
     }
-  }, [config.steps, currentStep]);
+  }, [config.steps, currentStep, isPayoutsOnlyMode]);
   
   const handleNext = () => {
+    if (isPayoutsOnlyMode) {
+      handleSubmit();
+      return;
+    }
+    
     const nextIndex = currentStepIndex + 1;
     if (nextIndex < config.steps.length) {
       setCurrentStep(config.steps[nextIndex]);
@@ -55,6 +68,13 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
   };
   
   const handleBack = () => {
+    if (isPayoutsOnlyMode) {
+      if (selectedPayoutMethod) {
+        setSelectedPayoutMethod(null);
+      }
+      return;
+    }
+    
     const prevIndex = currentStepIndex - 1;
     if (prevIndex >= 0) {
       setCurrentStep(config.steps[prevIndex]);
@@ -78,6 +98,10 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
   };
   
   const getStepTitle = () => {
+    if (isPayoutsOnlyMode) {
+      return selectedPayoutMethod ? 'Payment Details' : 'Payment Method';
+    }
+    
     switch (currentStep) {
       case 'profile':
         return 'Profile Information';
@@ -91,6 +115,11 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
   };
   
   const renderStepContent = () => {
+    // For payouts-only mode, always show payment method selection
+    if (isPayoutsOnlyMode) {
+      return renderPayoutMethodSelection();
+    }
+    
     switch (currentStep) {
       case 'profile':
         return (
@@ -263,7 +292,9 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
       </div>
       <h3 className="text-2xl font-bold">Verification Complete!</h3>
       <p className="text-white/70">
-        {config.recipientType === 'insured' 
+        {isPayoutsOnlyMode
+          ? "Your payment method has been successfully saved. You're all set to receive your payment."
+          : config.recipientType === 'insured' 
           ? "Your claim information has been successfully saved. You're all set to receive your insurance payment."
           : config.recipientType === 'vendor'
           ? "Your vendor information has been successfully saved. You're all set to receive payments."
@@ -284,7 +315,7 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
   );
   
   const renderProgressBar = () => {
-    if (!config.showProgressBar) return null;
+    if (!config.showProgressBar || isPayoutsOnlyMode) return null;
     
     return (
       <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
@@ -299,7 +330,7 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
   };
   
   const renderStepIndicators = () => {
-    if (!config.showStepNumbers || config.steps.length <= 1) return null;
+    if (!config.showStepNumbers || config.steps.length <= 1 || isPayoutsOnlyMode) return null;
     
     return (
       <div className="flex justify-center space-x-4 mb-6">
@@ -333,9 +364,9 @@ const PayoutWidget: React.FC<PayoutWidgetProps> = ({
           {renderProgressBar()}
           
           <div className="flex justify-between items-center mb-4 mt-4">
-            <h2 className="text-xl font-bold">{isCompleted ? 'Verification Complete' : getStepTitle()}</h2>
+            <h2 className="text-xl font-bold">{isCompleted ? 'Complete' : getStepTitle()}</h2>
             
-            {!isCompleted && (
+            {!isCompleted && !isPayoutsOnlyMode && (
               <div className="px-2 py-1 rounded-full bg-payouts-accent/20 text-payouts-accent text-xs font-medium capitalize">
                 {config.recipientType}
               </div>
