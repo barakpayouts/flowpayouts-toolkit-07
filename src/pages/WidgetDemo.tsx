@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { PayoutWidget } from "@/components/Widget/PayoutWidget";
+import PayoutWidget from "@/components/Widget/PayoutWidget";
 
 const WidgetDemo = () => {
   const navigate = useNavigate();
