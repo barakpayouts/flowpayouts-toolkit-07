@@ -1,14 +1,14 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import PayoutWidget from "@/components/Widget/PayoutWidget";
 import { RecipientType, VerificationStep, PayoutMethod, useWidgetConfig } from '@/hooks/use-widget-config';
-import { Check, ChevronDown, Palette } from 'lucide-react';
+import { Check, ChevronDown, Palette, Save } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,11 +24,13 @@ const WidgetDemo = () => {
     config, 
     setRecipientType, 
     toggleStep, 
-    togglePayoutMethod, 
+    togglePayoutMethod,
+    setPayoutsOnlyMode,
     resetConfig
   } = useWidgetConfig();
   const [showConfigOptions, setShowConfigOptions] = useState(false);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
+  const [isPayoutsOnly, setIsPayoutsOnly] = useState(config.steps.length === 0);
   
   const handleConfigureWidget = () => {
     setShowWidget(true);
@@ -37,6 +39,17 @@ const WidgetDemo = () => {
   const handleSelectRecipientType = (type: RecipientType) => {
     setRecipientType(type);
     setShowConfigOptions(false);
+  };
+
+  const handleSaveConfiguration = () => {
+    toast.success("Widget configuration saved successfully", {
+      description: "Your settings have been saved and will be applied to the widget."
+    });
+  };
+
+  const handleTogglePayoutsOnly = (checked: boolean) => {
+    setIsPayoutsOnly(checked);
+    setPayoutsOnlyMode(checked);
   };
 
   const stepOptions: { value: VerificationStep; label: string }[] = [
@@ -153,6 +166,17 @@ const WidgetDemo = () => {
             <div className={`grid ${showConfigPanel ? 'grid-cols-1 md:grid-cols-3 gap-6' : 'grid-cols-1'}`}>
               {showConfigPanel && (
                 <div className="bg-black/30 p-5 rounded-lg h-fit">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Widget Configuration</h3>
+                    <Button 
+                      onClick={handleSaveConfiguration}
+                      className="flex items-center gap-2 bg-payouts-accent text-payouts-dark hover:bg-payouts-accent/90"
+                      size="sm"
+                    >
+                      <Save size={16} />
+                      Save Configuration
+                    </Button>
+                  </div>
                   <Tabs defaultValue="steps" className="w-full">
                     <TabsList className="grid grid-cols-3 mb-4">
                       <TabsTrigger value="steps">Steps</TabsTrigger>
@@ -190,6 +214,20 @@ const WidgetDemo = () => {
                       </DropdownMenu>
                       
                       <div className="space-y-2 pt-2">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Checkbox 
+                            id="payouts-only" 
+                            checked={isPayoutsOnly}
+                            onCheckedChange={handleTogglePayoutsOnly}
+                          />
+                          <label 
+                            htmlFor="payouts-only"
+                            className="text-sm font-medium leading-none"
+                          >
+                            Payouts Only Mode (No Verification)
+                          </label>
+                        </div>
+                        
                         <h3 className="text-lg font-medium">Verification Steps</h3>
                         <p className="text-sm text-muted-foreground">Select which steps to include</p>
                         
@@ -200,10 +238,11 @@ const WidgetDemo = () => {
                                 id={`step-${step.value}`} 
                                 checked={config.steps.includes(step.value)}
                                 onCheckedChange={() => toggleStep(step.value)}
+                                disabled={isPayoutsOnly}
                               />
                               <label 
                                 htmlFor={`step-${step.value}`}
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed ${isPayoutsOnly ? 'opacity-50' : ''}`}
                               >
                                 {step.label}
                               </label>
@@ -217,10 +256,11 @@ const WidgetDemo = () => {
                             checked={config.showProgressBar}
                             onCheckedChange={(checked) => 
                               updateConfig({ showProgressBar: !!checked })}
+                            disabled={isPayoutsOnly}
                           />
                           <label 
                             htmlFor="show-progress"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed ${isPayoutsOnly ? 'opacity-50' : ''}`}
                           >
                             Show Progress Bar
                           </label>
@@ -232,10 +272,11 @@ const WidgetDemo = () => {
                             checked={config.showStepNumbers}
                             onCheckedChange={(checked) => 
                               updateConfig({ showStepNumbers: !!checked })}
+                            disabled={isPayoutsOnly}
                           />
                           <label 
                             htmlFor="show-steps"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed ${isPayoutsOnly ? 'opacity-50' : ''}`}
                           >
                             Show Step Numbers
                           </label>
@@ -257,7 +298,7 @@ const WidgetDemo = () => {
                             />
                             <label 
                               htmlFor={`method-${method.value}`}
-                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed flex items-center gap-2"
                             >
                               <span>{method.icon}</span> {method.label}
                             </label>
