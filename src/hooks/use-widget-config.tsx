@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 
 export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
@@ -53,7 +52,7 @@ const DEFAULT_BORDER_COLOR = '#21404d';
 const defaultConfig: WidgetConfig = {
   recipientType: 'vendor',
   steps: ['profile', 'bank', 'tax'],
-  payoutMethods: ['bank', 'crypto', 'digital', 'card'],
+  payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift'],
   showProgressBar: true,
   showStepNumbers: true,
   primaryColor: DEFAULT_PRIMARY_COLOR,
