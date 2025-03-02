@@ -1,10 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { PayoutWidget } from "@/components/Widget/PayoutWidget";
 
 const WidgetDemo = () => {
   const navigate = useNavigate();
+  const [showWidget, setShowWidget] = useState(false);
+  
+  const handleConfigureWidget = () => {
+    setShowWidget(true);
+  };
   
   return (
     <div className="min-h-screen bg-payouts-dark text-white p-4">
@@ -17,13 +23,20 @@ const WidgetDemo = () => {
         <div className="glass-card p-8 mb-8">
           <h2 className="text-2xl mb-4">Smart Payout Widget</h2>
           <p className="mb-6">This is a demonstration of our payout widget. In a real implementation, this would be the embedded widget where users can select their payout method.</p>
-          <div className="bg-white/10 p-6 rounded-lg">
-            <div className="text-center p-8">
-              <h3 className="text-xl mb-4">Widget Placeholder</h3>
-              <p>The actual widget functionality would appear here.</p>
-              <Button className="btn-primary mt-6">Configure Widget</Button>
+          
+          {showWidget ? (
+            <div className="bg-white/10 p-6 rounded-lg overflow-hidden">
+              <PayoutWidget />
             </div>
-          </div>
+          ) : (
+            <div className="bg-white/10 p-6 rounded-lg">
+              <div className="text-center p-8">
+                <h3 className="text-xl mb-4">Widget Placeholder</h3>
+                <p>The actual widget functionality would appear here.</p>
+                <Button className="btn-primary mt-6" onClick={handleConfigureWidget}>Configure Widget</Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
