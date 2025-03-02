@@ -473,17 +473,15 @@ const WidgetDemo = () => {
                               <Button
                                 key={style}
                                 variant={config.buttonStyle === style ? 'default' : 'outline'}
-                                className={`${config.buttonStyle === style ? 'bg-payouts-accent text-payouts-dark' : ''}`}
-                                buttonStyle={style as 'rounded' | 'square' | 'pill'}
+                                className={`${
+                                  style === 'rounded' ? 'rounded-md' :
+                                  style === 'square' ? 'rounded-none' : 'rounded-full'
+                                } ${config.buttonStyle === style ? 'bg-payouts-accent text-payouts-dark' : ''}`}
                                 onClick={() => {
                                   updateConfig({ 
                                     buttonStyle: style as 'rounded' | 'square' | 'pill' 
                                   });
                                   setWidgetKey(prevKey => prevKey + 1);
-                                  
-                                  toast.success(`Button style updated to ${style}`, {
-                                    description: `Applied ${style} style to buttons.`
-                                  });
                                 }}
                               >
                                 {style.charAt(0).toUpperCase() + style.slice(1)}

@@ -49,19 +49,6 @@ const PayoutWidget = () => {
     }
   };
   
-  // Function to get button styling based on config
-  const getButtonStyle = () => {
-    switch(config.buttonStyle) {
-      case 'square':
-        return '0px';
-      case 'pill':
-        return '9999px';
-      case 'rounded':
-      default:
-        return '6px';
-    }
-  };
-  
   const getStepContent = () => {
     const step = steps[currentStep];
     const isLastStep = currentStep === steps.length - 1;
@@ -131,7 +118,8 @@ const PayoutWidget = () => {
     '--text-color': config.textColor,
     '--border-color': config.borderColor,
     '--border-radius': `${config.borderRadius}px`,
-    '--button-radius': getButtonStyle(),
+    '--button-radius': config.buttonStyle === 'rounded' ? '6px' : 
+                       config.buttonStyle === 'pill' ? '9999px' : '0px',
   } as React.CSSProperties;
   
   if (showSuccess) {
