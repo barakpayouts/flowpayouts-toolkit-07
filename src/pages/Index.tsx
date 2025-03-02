@@ -13,18 +13,18 @@ export default function Home() {
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-xl w-full">
-        <Link to="/marketing">
-          <Button className="w-full py-6 text-lg bg-payouts-accent text-payouts-dark font-semibold hover:bg-payouts-accent/90">
+        <Link to="/marketing" className="block w-full">
+          <Button 
+            className="w-full py-6 text-lg bg-payouts-accent text-payouts-dark font-semibold hover:bg-payouts-accent/90"
+          >
             View Marketing Page
           </Button>
         </Link>
         
-        <Link to="/widget">
+        <Link to="/widget" className="block w-full">
           <Button 
-            variant="purple" 
-            className="w-full py-6 text-lg font-semibold text-white"
+            className="w-full py-6 text-lg font-semibold text-gray-900 bg-[#8B5CF6] hover:text-white"
             style={{
-              backgroundColor: "#8B5CF6",
               boxShadow: "0 4px 12px rgba(139, 92, 246, 0.3)"
             }}
           >

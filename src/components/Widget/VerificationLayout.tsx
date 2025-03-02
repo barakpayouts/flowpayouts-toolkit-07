@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Lock } from 'lucide-react';
@@ -89,26 +90,16 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         <div className="flex gap-3">
           <Button
             onClick={onBack}
-            variant="dark"
-            size="default"
-            className="flex-1 text-white/90 font-medium"
-            style={{
-              backgroundColor: "rgba(26, 31, 44, 0.9)",
-              border: "1px solid rgba(255, 255, 255, 0.1)"
-            }}
+            className="flex-1 text-white font-medium bg-[#1A1F2C] border border-white/10 hover:bg-[#1A1F2C]/90"
           >
             Back
           </Button>
           <Button
             onClick={onNext}
-            variant="purple"
-            size="default"
             disabled={disableNext}
-            className="flex-1 text-white"
+            className="flex-1 text-gray-900 font-semibold hover:text-gray-900"
             style={{
               background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
-              color: "#0f2a35", // Ensure text is dark for better contrast against light backgrounds
-              fontWeight: "600",
               boxShadow: `0 4px 15px ${config.accentColor}40`,
             }}
           >
