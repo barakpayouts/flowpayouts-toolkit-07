@@ -10,13 +10,14 @@ import DigitalWallet from './PayoutMethods/DigitalWallet';
 import PushToCard from './PayoutMethods/PushToCard';
 import PrepaidCard from './PayoutMethods/PrepaidCard';
 import GiftCard from './PayoutMethods/GiftCard';
-import { Check, ChevronRight } from 'lucide-react';
+import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 
 const PayoutWidget = () => {
   const { config } = useWidgetConfig();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [showMethodDetails, setShowMethodDetails] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   
   // Prepare steps based on config
@@ -30,8 +31,11 @@ const PayoutWidget = () => {
   const handleNextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else if (selectedMethod && currentStep === steps.length - 1) {
-      // Handle payout completion
+    } else if (selectedMethod && currentStep === steps.length - 1 && !showMethodDetails) {
+      // Show method details form
+      setShowMethodDetails(true);
+    } else if (selectedMethod && showMethodDetails) {
+      // Handle payout completion after details are submitted
       setShowSuccess(true);
       toast.success("Payout successful!", {
         description: `Your funds will be sent via ${selectedMethod}.`
@@ -44,7 +48,10 @@ const PayoutWidget = () => {
   };
 
   const handleBackStep = () => {
-    if (currentStep > 0) {
+    if (showMethodDetails) {
+      setShowMethodDetails(false);
+      setSelectedMethod(null);
+    } else if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
@@ -79,7 +86,11 @@ const PayoutWidget = () => {
           />
         );
       case 'payout':
-        return renderPayoutMethods();
+        if (showMethodDetails && selectedMethod) {
+          return renderPayoutMethodDetails();
+        } else {
+          return renderPayoutMethods();
+        }
       default:
         return null;
     }
@@ -108,6 +119,324 @@ const PayoutWidget = () => {
         </div>
       </div>
     );
+  };
+  
+  const renderPayoutMethodDetails = () => {
+    // Render the appropriate form based on the selected method
+    switch (selectedMethod) {
+      case 'Bank Transfer':
+        return (
+          <div className="payout-details-form">
+            <div className="flex items-center justify-between mb-6">
+              <button 
+                onClick={handleBackStep}
+                className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+              >
+                <ArrowLeft size={16} />
+                Back to methods
+              </button>
+              <h2 className="text-xl font-semibold">Bank Transfer Details</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">Account Holder Name</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
+                  placeholder="Enter full name"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">Bank Name</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
+                  placeholder="Enter bank name"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">Account Number/IBAN</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
+                  placeholder="Enter account number or IBAN"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">SWIFT/BIC Code</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
+                  placeholder="Enter SWIFT or BIC code"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">Currency</label>
+                <select className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer">
+                  <option value="">Select currency</option>
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">Country</label>
+                <select className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer">
+                  <option value="">Select country</option>
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada</option>
+                  <option value="AU">Australia</option>
+                </select>
+              </div>
+            </div>
+            
+            <p className="text-xs opacity-70 mt-6 text-center">
+              Your information is securely transmitted and protected. Need help? Contact our support team.
+            </p>
+          </div>
+        );
+        
+      case 'Cryptocurrency':
+        return (
+          <div className="payout-details-form">
+            <div className="flex items-center justify-between mb-6">
+              <button 
+                onClick={handleBackStep}
+                className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+              >
+                <ArrowLeft size={16} />
+                Back to methods
+              </button>
+              <h2 className="text-xl font-semibold">Cryptocurrency Details</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">Blockchain Network</label>
+                <select className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer">
+                  <option value="">Select network</option>
+                  <option value="BTC">Bitcoin</option>
+                  <option value="ETH">Ethereum</option>
+                  <option value="POLY">Polygon</option>
+                  <option value="SOL">Solana</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">Wallet Address</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
+                  placeholder="Enter your wallet address"
+                />
+              </div>
+            </div>
+            
+            <p className="text-xs opacity-70 mt-6 text-center">
+              Your information is securely transmitted and protected. Need help? Contact our support team.
+            </p>
+          </div>
+        );
+        
+      case 'Digital Wallet':
+        return (
+          <div className="payout-details-form">
+            <div className="flex items-center justify-between mb-6">
+              <button 
+                onClick={handleBackStep}
+                className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+              >
+                <ArrowLeft size={16} />
+                Back to methods
+              </button>
+              <h2 className="text-xl font-semibold">Digital Wallet</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="wallet-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">PayPal</h3>
+                    <p className="text-sm opacity-70">Fast and secure payments worldwide</p>
+                  </div>
+                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
+                    Select
+                  </button>
+                </div>
+              </div>
+              
+              <div className="wallet-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Venmo</h3>
+                    <p className="text-sm opacity-70">Quick transfers between users</p>
+                  </div>
+                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
+                    Select
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-xs opacity-70 mt-6 text-center">
+              Your digital wallet preference will be securely saved. Need help? Contact our support team.
+            </p>
+          </div>
+        );
+        
+      case 'Card Payment':
+        return (
+          <div className="payout-details-form">
+            <div className="flex items-center justify-between mb-6">
+              <button 
+                onClick={handleBackStep}
+                className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+              >
+                <ArrowLeft size={16} />
+                Back to methods
+              </button>
+              <h2 className="text-xl font-semibold">Card Details</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="form-group">
+                <label className="block text-sm font-medium mb-1">Card Number</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
+                  placeholder="XXXX XXXX XXXX XXXX"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="form-group">
+                  <label className="block text-sm font-medium mb-1">Expiry Date</label>
+                  <input 
+                    type="text" 
+                    className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
+                    placeholder="MM/YY"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label className="block text-sm font-medium mb-1">CVV</label>
+                  <input 
+                    type="text" 
+                    className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
+                    placeholder="XXX"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-xs opacity-70 mt-6 text-center">
+              Your information is securely transmitted and protected. Need help? Contact our support team.
+            </p>
+          </div>
+        );
+        
+      case 'Prepaid Card':
+        return (
+          <div className="payout-details-form">
+            <div className="flex items-center justify-between mb-6">
+              <button 
+                onClick={handleBackStep}
+                className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+              >
+                <ArrowLeft size={16} />
+                Back to methods
+              </button>
+              <h2 className="text-xl font-semibold">Prepaid Card</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="card-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Visa Prepaid</h3>
+                    <p className="text-sm opacity-70">Use prepaid cards for flexible spending</p>
+                  </div>
+                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
+                    Select
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-xs opacity-70 mt-6 text-center">
+              Your information is securely transmitted and protected. Need help? Contact our support team.
+            </p>
+          </div>
+        );
+        
+      case 'Gift Card':
+        return (
+          <div className="payout-details-form">
+            <div className="flex items-center justify-between mb-6">
+              <button 
+                onClick={handleBackStep}
+                className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+              >
+                <ArrowLeft size={16} />
+                Back to methods
+              </button>
+              <h2 className="text-xl font-semibold">Gift Card</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="gift-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Amazon</h3>
+                    <p className="text-sm opacity-70">Receive payments as Amazon gift cards</p>
+                  </div>
+                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
+                    Select Amazon
+                  </button>
+                </div>
+              </div>
+              
+              <div className="gift-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Walmart</h3>
+                    <p className="text-sm opacity-70">Receive payments as Walmart gift cards</p>
+                  </div>
+                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
+                    Select Walmart
+                  </button>
+                </div>
+              </div>
+              
+              <div className="gift-option p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Target</h3>
+                    <p className="text-sm opacity-70">Receive payments as Target gift cards</p>
+                  </div>
+                  <button className="px-4 py-1 rounded-full text-xs font-medium bg-white/10 hover:bg-white/20">
+                    Select Target
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-xs opacity-70 mt-6 text-center">
+              Your gift card preference will be securely saved. Need help? Contact our support team.
+            </p>
+          </div>
+        );
+        
+      default:
+        return null;
+    }
   };
   
   // Generate dynamic CSS variables based on the configuration
@@ -177,15 +506,31 @@ const PayoutWidget = () => {
         {getStepContent()}
       </div>
       
-      {steps[currentStep] === 'payout' && selectedMethod && (
+      {steps[currentStep] === 'payout' && selectedMethod && showMethodDetails && (
         <button 
-          className="confirm-button"
+          className="confirm-button mt-6 w-full py-3 font-medium flex items-center justify-center"
           onClick={handleNextStep}
           style={{
             borderRadius: `var(--button-radius)`,
+            backgroundColor: config.accentColor,
+            color: config.primaryColor,
           }}
         >
-          Confirm {selectedMethod} <ChevronRight className="ml-1 h-4 w-4" />
+          {`Save ${selectedMethod} Details`} <ChevronRight className="ml-1 h-4 w-4" />
+        </button>
+      )}
+      
+      {steps[currentStep] === 'payout' && selectedMethod && !showMethodDetails && (
+        <button 
+          className="confirm-button mt-6 w-full py-3 font-medium flex items-center justify-center"
+          onClick={handleNextStep}
+          style={{
+            borderRadius: `var(--button-radius)`,
+            backgroundColor: config.accentColor,
+            color: config.primaryColor,
+          }}
+        >
+          {`Continue with ${selectedMethod}`} <ChevronRight className="ml-1 h-4 w-4" />
         </button>
       )}
     </div>
@@ -193,3 +538,4 @@ const PayoutWidget = () => {
 };
 
 export default PayoutWidget;
+
