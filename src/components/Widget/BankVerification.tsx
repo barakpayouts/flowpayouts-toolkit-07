@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { BankVerificationMethod, useWidgetConfig } from '@/hooks/use-widget-config';
@@ -268,10 +267,10 @@ const BankVerification: React.FC<BankVerificationProps> = ({
                     value={credentials.username}
                     onChange={handleInputChange}
                     placeholder="Enter your username"
-                    className="w-full p-3 pl-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent focus:outline-none transition-all"
+                    className="w-full p-3 pl-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent transition-all"
                     style={{ 
                       borderRadius: `${config.borderRadius}px`,
-                      focusRing: config.accentColor 
+                      boxShadow: `0 0 0 0 ${config.accentColor}`,
                     }}
                   />
                   <Building className="absolute left-3 top-3.5 h-5 w-5 text-white/40" />
@@ -287,10 +286,10 @@ const BankVerification: React.FC<BankVerificationProps> = ({
                     value={credentials.password}
                     onChange={handleInputChange}
                     placeholder="Enter your password"
-                    className="w-full p-3 pl-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent focus:outline-none transition-all"
+                    className="w-full p-3 pl-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent transition-all"
                     style={{ 
                       borderRadius: `${config.borderRadius}px`,
-                      focusRing: config.accentColor 
+                      boxShadow: `0 0 0 0 ${config.accentColor}`,
                     }}
                   />
                   <Lock className="absolute left-3 top-3.5 h-5 w-5 text-white/40" />
@@ -459,10 +458,10 @@ const BankVerification: React.FC<BankVerificationProps> = ({
             <input
               type="text"
               placeholder="Full Name"
-              className="w-full p-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent focus:outline-none transition-all"
+              className="w-full p-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent transition-all"
               style={{ 
                 borderRadius: `${config.borderRadius}px`,
-                focusRing: config.accentColor 
+                boxShadow: `0 0 0 0 ${config.accentColor}`,
               }}
             />
           </div>
@@ -473,10 +472,10 @@ const BankVerification: React.FC<BankVerificationProps> = ({
               <input
                 type="text"
                 placeholder="9-digit Routing Number"
-                className="w-full p-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent focus:outline-none transition-all"
+                className="w-full p-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent transition-all"
                 style={{ 
                   borderRadius: `${config.borderRadius}px`,
-                  focusRing: config.accentColor 
+                  boxShadow: `0 0 0 0 ${config.accentColor}`,
                 }}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/40 bg-white/10 px-2 py-1 rounded-md">
@@ -490,10 +489,10 @@ const BankVerification: React.FC<BankVerificationProps> = ({
             <input
               type="text"
               placeholder="Account Number"
-              className="w-full p-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent focus:outline-none transition-all"
+              className="w-full p-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent transition-all"
               style={{ 
                 borderRadius: `${config.borderRadius}px`,
-                focusRing: config.accentColor 
+                boxShadow: `0 0 0 0 ${config.accentColor}`,
               }}
             />
           </div>
