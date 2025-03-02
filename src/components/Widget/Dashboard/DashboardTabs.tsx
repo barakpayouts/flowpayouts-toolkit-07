@@ -1,12 +1,22 @@
 
 import React from 'react';
-import { DollarSign, Clock, FileText, Upload } from 'lucide-react';
+import { DollarSign, Clock, FileText, Upload, Calendar } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { usePayoutWidget, PayoutRecord, InvoiceData } from '@/contexts/PayoutWidgetContext';
 import PayoutList from './PayoutList';
 import { cn } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
+
+// Function to determine status color based on payment status
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'Completed': return 'text-green-500';
+    case 'Pending': return 'text-yellow-500';
+    case 'Awaiting Approval': return 'text-blue-500';
+    default: return 'text-gray-500';
+  }
+};
 
 const DashboardTabs: React.FC = () => {
   const { config } = useWidgetConfig();
