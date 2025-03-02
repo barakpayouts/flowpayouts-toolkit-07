@@ -98,13 +98,14 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
           </Button>
           <Button
             onClick={onNext}
-            variant="glow"
+            variant="purple"
             size="default"
             disabled={disableNext}
-            className="flex-1"
+            className="flex-1 text-white"
             style={{
               background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
-              color: config.primaryColor,
+              color: "#0f2a35", // Ensure text is dark for better contrast against light backgrounds
+              fontWeight: "600",
               boxShadow: `0 4px 15px ${config.accentColor}40`,
             }}
           >
