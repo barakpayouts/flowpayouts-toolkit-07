@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,11 @@ import {
   Briefcase,
   Sliders,
   Lock,
-  BarChart
+  BarChart,
+  Phone,
+  Mail,
+  Wallet,
+  Landmark
 } from 'lucide-react';
 
 const Marketing = () => {
@@ -158,7 +161,7 @@ const Marketing = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
             <div className="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-sm border border-slate-100">
               <Building className="h-8 w-8 text-slate-700 mb-3" />
               <span className="text-center font-medium">Bank Transfer</span>
@@ -174,6 +177,22 @@ const Marketing = () => {
             <div className="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-sm border border-slate-100">
               <Gift className="h-8 w-8 text-slate-700 mb-3" />
               <span className="text-center font-medium">Gift Cards</span>
+            </div>
+            <div className="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-sm border border-slate-100">
+              <Wallet className="h-8 w-8 text-slate-700 mb-3" />
+              <span className="text-center font-medium">Digital Wallets</span>
+            </div>
+            <div className="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-sm border border-slate-100">
+              <Phone className="h-8 w-8 text-slate-700 mb-3" />
+              <span className="text-center font-medium">Mobile Money</span>
+            </div>
+            <div className="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-sm border border-slate-100">
+              <Mail className="h-8 w-8 text-slate-700 mb-3" />
+              <span className="text-center font-medium">Email Transfers</span>
+            </div>
+            <div className="bg-white rounded-xl p-6 flex flex-col items-center justify-center shadow-sm border border-slate-100">
+              <Landmark className="h-8 w-8 text-slate-700 mb-3" />
+              <span className="text-center font-medium">Wire Transfers</span>
             </div>
           </div>
         </div>
