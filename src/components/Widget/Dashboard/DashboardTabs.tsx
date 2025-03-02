@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
-import { DollarSign, Clock, FileText, Upload, Calendar, X, Download } from 'lucide-react';
+import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { usePayoutWidget, PayoutRecord, InvoiceData } from '@/contexts/PayoutWidgetContext';
-import PayoutList from './PayoutList';
 import { cn } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
@@ -23,7 +21,7 @@ const getStatusColor = (status: string) => {
 
 const DashboardTabs: React.FC = () => {
   const { config } = useWidgetConfig();
-  const { payouts, invoices } = usePayoutWidget();
+  const { payouts } = usePayoutWidget();
   const [selectedInvoice, setSelectedInvoice] = useState<PayoutRecord | null>(null);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [fileUploadName, setFileUploadName] = useState<string | null>(null);
