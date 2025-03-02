@@ -1,15 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, CreditCard } from 'lucide-react';
-import { useWidgetConfig } from '@/hooks/use-widget-config';
+import { useWidgetConfig, PayoutMethodProps } from '@/hooks/use-widget-config';
 
-interface PushToCardProps {
-  onSelect: () => void;
-}
-
-const PushToCard: React.FC<PushToCardProps> = ({ onSelect }) => {
-  const [selected, setSelected] = useState(false);
+const PushToCard: React.FC<PayoutMethodProps> = ({ onSelect, isSelected = false }) => {
+  const [selected, setSelected] = useState(isSelected);
   const { config } = useWidgetConfig();
+  
+  useEffect(() => {
+    setSelected(isSelected);
+  }, [isSelected]);
   
   const handleSelect = () => {
     setSelected(true);

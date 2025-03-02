@@ -1,15 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bitcoin, Check } from 'lucide-react';
-import { useWidgetConfig } from '@/hooks/use-widget-config';
+import { useWidgetConfig, PayoutMethodProps } from '@/hooks/use-widget-config';
 
-interface CryptocurrencyProps {
-  onSelect: () => void;
-}
-
-const Cryptocurrency: React.FC<CryptocurrencyProps> = ({ onSelect }) => {
-  const [selected, setSelected] = useState(false);
+const Cryptocurrency: React.FC<PayoutMethodProps> = ({ onSelect, isSelected = false }) => {
+  const [selected, setSelected] = useState(isSelected);
   const { config } = useWidgetConfig();
+  
+  useEffect(() => {
+    setSelected(isSelected);
+  }, [isSelected]);
   
   const handleSelect = () => {
     setSelected(true);

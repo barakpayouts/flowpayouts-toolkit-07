@@ -1,15 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, Gift } from 'lucide-react';
-import { useWidgetConfig } from '@/hooks/use-widget-config';
+import { useWidgetConfig, PayoutMethodProps } from '@/hooks/use-widget-config';
 
-interface GiftCardProps {
-  onSelect: () => void;
-}
-
-const GiftCard: React.FC<GiftCardProps> = ({ onSelect }) => {
-  const [selected, setSelected] = useState(false);
+const GiftCard: React.FC<PayoutMethodProps> = ({ onSelect, isSelected = false }) => {
+  const [selected, setSelected] = useState(isSelected);
   const { config } = useWidgetConfig();
+  
+  useEffect(() => {
+    setSelected(isSelected);
+  }, [isSelected]);
   
   const handleSelect = () => {
     setSelected(true);

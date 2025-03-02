@@ -1,16 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Wallet, CheckCircle2, ArrowRight } from 'lucide-react';
-import { useWidgetConfig } from '@/hooks/use-widget-config';
+import { useWidgetConfig, PayoutMethodProps } from '@/hooks/use-widget-config';
 import { motion } from 'framer-motion';
 
-interface DigitalWalletProps {
-  onSelect: () => void;
-}
-
-const DigitalWallet: React.FC<DigitalWalletProps> = ({ onSelect }) => {
-  const [selected, setSelected] = useState(false);
+const DigitalWallet: React.FC<PayoutMethodProps> = ({ onSelect, isSelected = false }) => {
+  const [selected, setSelected] = useState(isSelected);
   const { config } = useWidgetConfig();
+  
+  useEffect(() => {
+    setSelected(isSelected);
+  }, [isSelected]);
   
   const handleSelect = () => {
     setSelected(true);
