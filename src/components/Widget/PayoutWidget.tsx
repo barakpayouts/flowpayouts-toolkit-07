@@ -18,25 +18,36 @@ const PayoutWidget = () => {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [showMethodDetails, setShowMethodDetails] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [formData, setFormData] = useState<Record<string, string>>({});
   
   // Prepare steps based on config
   const steps = [
     ...(config.steps.includes('profile') ? ['profile'] : []),
-    'payout', // Move payout before bank and tax
+    'payout', // Select payout method
+    'details', // Enter details for selected method
     ...(config.steps.includes('bank') ? ['bank'] : []),
     ...(config.steps.includes('tax') ? ['tax'] : []),
   ];
   
   const handleNextStep = () => {
-    if (currentStep < steps.length - 1) {
-      // If we're at payout step and selected bank transfer, go to bank verification
-      // Otherwise, skip bank verification if it's the next step
-      if (steps[currentStep] === 'payout' && selectedMethod === 'Bank Transfer' && steps[currentStep + 1] === 'bank') {
-        setCurrentStep(currentStep + 1);
-      } else if (steps[currentStep] === 'payout' && selectedMethod !== 'Bank Transfer' && steps[currentStep + 1] === 'bank') {
-        // Skip bank verification if not bank transfer
-        if (currentStep + 2 < steps.length) {
-          setCurrentStep(currentStep + 2);
+    // If we're at payout step and have selected a method, go to details step
+    if (steps[currentStep] === 'payout' && selectedMethod) {
+      setCurrentStep(currentStep + 1);
+    } 
+    // If we're at details step
+    else if (steps[currentStep] === 'details') {
+      // If we have Bank Transfer and there's a bank verification step, go to it
+      if (selectedMethod === 'Bank Transfer' && steps.includes('bank')) {
+        // Find the index of bank step
+        const bankStepIndex = steps.indexOf('bank');
+        setCurrentStep(bankStepIndex);
+      } 
+      // Otherwise skip to the next step after details (could be tax or end)
+      else {
+        // If we're at details and there's a next step (not bank), go to it
+        const nextStepIndex = currentStep + 1;
+        if (nextStepIndex < steps.length) {
+          setCurrentStep(nextStepIndex);
         } else {
           // If there are no more steps, show success
           setShowSuccess(true);
@@ -44,14 +55,13 @@ const PayoutWidget = () => {
             description: `Your funds will be sent via ${selectedMethod}.`
           });
         }
-      } else {
-        setCurrentStep(currentStep + 1);
       }
-    } else if (selectedMethod && currentStep === steps.length - 1 && !showMethodDetails) {
-      // Show method details form
-      setShowMethodDetails(true);
-    } else if (selectedMethod && showMethodDetails) {
-      // Handle payout completion after details are submitted
+    }
+    // For other steps (profile, bank, tax), just go to the next step
+    else if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      // Last step completed, show success
       setShowSuccess(true);
       toast.success("Payout successful!", {
         description: `Your funds will be sent via ${selectedMethod}.`
@@ -64,12 +74,17 @@ const PayoutWidget = () => {
   };
 
   const handleBackStep = () => {
-    if (showMethodDetails) {
-      setShowMethodDetails(false);
+    if (steps[currentStep] === 'details') {
+      // Go back to payout method selection
       setSelectedMethod(null);
+      setCurrentStep(steps.indexOf('payout'));
     } else if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const handleFormChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
   
   const getStepContent = () => {
@@ -109,11 +124,9 @@ const PayoutWidget = () => {
           />
         );
       case 'payout':
-        if (showMethodDetails && selectedMethod) {
-          return renderPayoutMethodDetails();
-        } else {
-          return renderPayoutMethods();
-        }
+        return renderPayoutMethods();
+      case 'details':
+        return renderPayoutMethodDetails();
       default:
         return null;
     }
@@ -168,6 +181,8 @@ const PayoutWidget = () => {
                   type="text" 
                   className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
                   placeholder="Enter full name"
+                  value={formData.accountName || ''}
+                  onChange={(e) => handleFormChange('accountName', e.target.value)}
                 />
               </div>
               
@@ -177,6 +192,8 @@ const PayoutWidget = () => {
                   type="text" 
                   className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
                   placeholder="Enter bank name"
+                  value={formData.bankName || ''}
+                  onChange={(e) => handleFormChange('bankName', e.target.value)}
                 />
               </div>
               
@@ -186,6 +203,8 @@ const PayoutWidget = () => {
                   type="text" 
                   className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
                   placeholder="Enter account number or IBAN"
+                  value={formData.accountNumber || ''}
+                  onChange={(e) => handleFormChange('accountNumber', e.target.value)}
                 />
               </div>
               
@@ -195,12 +214,18 @@ const PayoutWidget = () => {
                   type="text" 
                   className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
                   placeholder="Enter SWIFT or BIC code"
+                  value={formData.swiftCode || ''}
+                  onChange={(e) => handleFormChange('swiftCode', e.target.value)}
                 />
               </div>
               
               <div className="form-group">
                 <label className="block text-sm font-medium mb-1">Currency</label>
-                <select className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer">
+                <select 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer"
+                  value={formData.currency || ''}
+                  onChange={(e) => handleFormChange('currency', e.target.value)}
+                >
                   <option value="">Select currency</option>
                   <option value="USD">USD - US Dollar</option>
                   <option value="EUR">EUR - Euro</option>
@@ -210,7 +235,11 @@ const PayoutWidget = () => {
               
               <div className="form-group">
                 <label className="block text-sm font-medium mb-1">Country</label>
-                <select className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer">
+                <select 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer"
+                  value={formData.country || ''}
+                  onChange={(e) => handleFormChange('country', e.target.value)}
+                >
                   <option value="">Select country</option>
                   <option value="US">United States</option>
                   <option value="UK">United Kingdom</option>
@@ -243,7 +272,11 @@ const PayoutWidget = () => {
             <div className="space-y-4">
               <div className="form-group">
                 <label className="block text-sm font-medium mb-1">Blockchain Network</label>
-                <select className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer">
+                <select 
+                  className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer"
+                  value={formData.network || ''}
+                  onChange={(e) => handleFormChange('network', e.target.value)}
+                >
                   <option value="">Select network</option>
                   <option value="BTC">Bitcoin</option>
                   <option value="ETH">Ethereum</option>
@@ -258,6 +291,8 @@ const PayoutWidget = () => {
                   type="text" 
                   className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
                   placeholder="Enter your wallet address"
+                  value={formData.walletAddress || ''}
+                  onChange={(e) => handleFormChange('walletAddress', e.target.value)}
                 />
               </div>
             </div>
@@ -502,22 +537,31 @@ const PayoutWidget = () => {
       {config.showProgressBar && steps.length > 1 && (
         <div className="progress-bar-container mb-6">
           <div className="flex justify-between mb-2">
-            {steps.map((_, index) => (
-              <div 
-                key={index}
-                className={`step-indicator ${index <= currentStep ? 'active' : ''}`}
-              >
-                {config.showStepNumbers && (
-                  <span className="step-number">{index + 1}</span>
-                )}
-              </div>
-            ))}
+            {steps.map((step, index) => {
+              // Skip the details step in progress bar to avoid confusion
+              if (step === 'details') return null;
+              
+              // Adjust the index for comparison with currentStep
+              const displayIndex = index <= steps.indexOf('details') && currentStep > steps.indexOf('details') ? 
+                index : index - (steps.includes('details') ? 1 : 0);
+                
+              return (
+                <div 
+                  key={index}
+                  className={`step-indicator ${index <= currentStep ? 'active' : ''}`}
+                >
+                  {config.showStepNumbers && (
+                    <span className="step-number">{displayIndex + 1}</span>
+                  )}
+                </div>
+              );
+            }).filter(Boolean)}
           </div>
           <div className="progress-track">
             <div 
               className="progress-fill" 
               style={{ 
-                width: `${(currentStep / (steps.length - 1)) * 100}%`,
+                width: `${(currentStep / (steps.length - (steps.includes('details') ? 2 : 1))) * 100}%`,
                 borderRadius: '3px'
               }}
             ></div>
@@ -529,21 +573,7 @@ const PayoutWidget = () => {
         {getStepContent()}
       </div>
       
-      {steps[currentStep] === 'payout' && selectedMethod && showMethodDetails && (
-        <button 
-          className="confirm-button mt-6 w-full py-3 font-medium flex items-center justify-center"
-          onClick={handleNextStep}
-          style={{
-            borderRadius: `var(--button-radius)`,
-            backgroundColor: config.accentColor,
-            color: config.primaryColor,
-          }}
-        >
-          {`Save ${selectedMethod} Details`} <ChevronRight className="ml-1 h-4 w-4" />
-        </button>
-      )}
-      
-      {steps[currentStep] === 'payout' && selectedMethod && !showMethodDetails && (
+      {steps[currentStep] === 'payout' && selectedMethod && (
         <button 
           className="confirm-button mt-6 w-full py-3 font-medium flex items-center justify-center"
           onClick={handleNextStep}
@@ -554,6 +584,20 @@ const PayoutWidget = () => {
           }}
         >
           {`Continue with ${selectedMethod}`} <ChevronRight className="ml-1 h-4 w-4" />
+        </button>
+      )}
+      
+      {steps[currentStep] === 'details' && (
+        <button 
+          className="confirm-button mt-6 w-full py-3 font-medium flex items-center justify-center"
+          onClick={handleNextStep}
+          style={{
+            borderRadius: `var(--button-radius)`,
+            backgroundColor: config.accentColor,
+            color: config.primaryColor,
+          }}
+        >
+          {`Save ${selectedMethod} Details`} <ChevronRight className="ml-1 h-4 w-4" />
         </button>
       )}
     </div>

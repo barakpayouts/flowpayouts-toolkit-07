@@ -38,19 +38,13 @@ const BankVerification: React.FC<BankVerificationProps> = ({
   };
   
   const handleContinue = () => {
-    if (isLastStep) {
-      // Handle final submission
-      onNext();
-    } else {
-      // Proceed to next step
-      onNext();
-    }
+    onNext();
   };
   
   return (
     <VerificationLayout
       title="Bank Account Verification"
-      description="Verify your bank account for transfers"
+      description="Additional verification required for bank transfers"
       onBack={onBack}
       onNext={handleContinue}
       isLastStep={isLastStep}
@@ -58,6 +52,10 @@ const BankVerification: React.FC<BankVerificationProps> = ({
       setIsAuthorized={setIsAuthorized}
       disableNext={!verificationComplete && verificationMethod === 'plaid'}
     >
+      <div className="mb-4">
+        <p className="text-sm opacity-70">Your bank details have been saved. Please complete one of the following verification methods:</p>
+      </div>
+      
       <VerificationMethodTabs
         verificationMethod={verificationMethod}
         onMethodChange={handleMethodChange}
