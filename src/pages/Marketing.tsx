@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +31,7 @@ const Marketing = () => {
   return (
     <div className="bg-[#f8fafc] text-slate-900 min-h-screen">
       {/* Hero Section */}
-      <header className="relative overflow-hidden bg-gradient-to-br from-payouts-dark to-payouts-medium py-20">
+      <header className="relative overflow-hidden bg-[#143745] py-20">
         <div className="container mx-auto px-6 max-w-6xl relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
@@ -43,7 +44,7 @@ const Marketing = () => {
               <div className="flex flex-wrap gap-4">
                 <Button 
                   size="lg"
-                  className="bg-payouts-accent hover:bg-payouts-accent/90 text-payouts-dark font-medium"
+                  className="bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-payouts-dark font-medium"
                   onClick={() => navigate('/widget')}
                 >
                   Try Demo
@@ -59,34 +60,34 @@ const Marketing = () => {
               </div>
             </div>
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 shadow-2xl">
-              <div className="bg-payouts-medium rounded-lg p-6 relative overflow-hidden border border-payouts-border">
+              <div className="bg-[#143745] rounded-lg p-6 relative overflow-hidden border border-[#21404d]">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-bold text-white">Smart Payout Widget</h3>
-                  <div className="h-2 w-2 rounded-full bg-payouts-accent"></div>
+                  <div className="h-2 w-2 rounded-full bg-[#d0e92a]"></div>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-payouts-dark/50 rounded-lg border border-payouts-border">
+                  <div className="flex items-center justify-between p-4 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
                     <div className="flex items-center space-x-3">
                       <Building className="h-5 w-5 text-white/70" />
                       <span className="text-white">Bank Transfer</span>
                     </div>
                     <ChevronRight className="h-4 w-4 text-white/50" />
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-payouts-dark/50 rounded-lg border border-payouts-border">
+                  <div className="flex items-center justify-between p-4 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
                     <div className="flex items-center space-x-3">
                       <CreditCard className="h-5 w-5 text-white/70" />
                       <span className="text-white">Push to Card</span>
                     </div>
                     <ChevronRight className="h-4 w-4 text-white/50" />
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-payouts-accent/10 rounded-lg border border-payouts-accent/30">
+                  <div className="flex items-center justify-between p-4 bg-[#d0e92a]/10 rounded-lg border border-[#d0e92a]/30">
                     <div className="flex items-center space-x-3">
-                      <Bitcoin className="h-5 w-5 text-payouts-accent" />
+                      <Bitcoin className="h-5 w-5 text-[#d0e92a]" />
                       <span className="text-white">Cryptocurrency</span>
                     </div>
-                    <ShieldCheck className="h-4 w-4 text-payouts-accent" />
+                    <ShieldCheck className="h-4 w-4 text-[#d0e92a]" />
                   </div>
-                  <div className="flex items-center justify-between p-4 bg-payouts-dark/50 rounded-lg border border-payouts-border">
+                  <div className="flex items-center justify-between p-4 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
                     <div className="flex items-center space-x-3">
                       <Gift className="h-5 w-5 text-white/70" />
                       <span className="text-white">Gift Card</span>
@@ -94,14 +95,13 @@ const Marketing = () => {
                     <ChevronRight className="h-4 w-4 text-white/50" />
                   </div>
                 </div>
-                <Button className="w-full mt-6 bg-payouts-accent hover:bg-payouts-accent/90 text-payouts-dark font-medium">
+                <Button className="w-full mt-6 bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-[#0f2a35] font-medium">
                   Select Payout Method
                 </Button>
               </div>
             </div>
           </div>
         </div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-10"></div>
       </header>
 
       {/* Benefits Section */}
@@ -370,7 +370,7 @@ const Marketing = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-24 px-6 bg-gradient-to-br from-payouts-dark to-payouts-medium text-white">
+      <section className="py-24 px-6 bg-gradient-to-br from-[#0f2a35] to-[#143745] text-white">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to simplify your global payouts?
@@ -381,7 +381,7 @@ const Marketing = () => {
           <div className="flex flex-wrap gap-4 justify-center">
             <Button 
               size="lg"
-              className="bg-payouts-accent hover:bg-payouts-accent/90 text-payouts-dark font-medium"
+              className="bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-[#0f2a35] font-medium"
               onClick={() => navigate('/widget')}
             >
               Try Demo
@@ -397,7 +397,7 @@ const Marketing = () => {
         </div>
       </section>
 
-      <footer className="bg-payouts-dark text-white/60 py-12 px-6">
+      <footer className="bg-[#0f2a35] text-white/60 py-12 px-6">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
