@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import GlassMorphism from '@/components/ui/GlassMorphism';
@@ -21,11 +22,163 @@ import {
   Phone,
   Mail,
   Wallet,
-  Landmark
+  Landmark,
+  UserCircle,
+  FileCheck,
+  ArrowRight,
+  Check
 } from 'lucide-react';
 
 const Marketing = () => {
   const navigate = useNavigate();
+  const [currentWidgetStep, setCurrentWidgetStep] = useState(0);
+  
+  // Widget steps for animation
+  const widgetSteps = [
+    // Step 1: Payout method selection
+    <div key="payout-methods" className="relative bg-[#143745] rounded-xl p-4 shadow-lg border border-[#21404d] animate-fade-in">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-lg font-bold text-white">Smart Payout Widget</h3>
+        <div className="h-2 w-2 rounded-full bg-[#d0e92a]"></div>
+      </div>
+      <div className="space-y-3 mb-4">
+        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
+          <div className="flex items-center space-x-3">
+            <Building className="h-5 w-5 text-white/70" />
+            <span className="text-white text-sm">Bank Transfer</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-white/50" />
+        </div>
+        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
+          <div className="flex items-center space-x-3">
+            <CreditCard className="h-5 w-5 text-white/70" />
+            <span className="text-white text-sm">Push to Card</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-white/50" />
+        </div>
+        <div className="flex items-center justify-between p-3 bg-[#d0e92a]/10 rounded-lg border border-[#d0e92a]/30">
+          <div className="flex items-center space-x-3">
+            <Bitcoin className="h-5 w-5 text-[#d0e92a]" />
+            <span className="text-white text-sm">Cryptocurrency</span>
+          </div>
+          <ShieldCheck className="h-4 w-4 text-[#d0e92a]" />
+        </div>
+        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
+          <div className="flex items-center space-x-3">
+            <Wallet className="h-5 w-5 text-white/70" />
+            <span className="text-white text-sm">Digital Wallet</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-white/50" />
+        </div>
+        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
+          <div className="flex items-center space-x-3">
+            <Gift className="h-5 w-5 text-white/70" />
+            <span className="text-white text-sm">Gift Card</span>
+          </div>
+          <ChevronRight className="h-4 w-4 text-white/50" />
+        </div>
+      </div>
+      <button className="w-full p-3 bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-[#0f2a35] text-sm font-medium rounded-md flex items-center justify-center">
+        Select Payout Method
+        <ChevronRight className="h-4 w-4 ml-1" />
+      </button>
+    </div>,
+    
+    // Step 2: Profile information
+    <div key="profile" className="relative bg-[#143745] rounded-xl p-4 shadow-lg border border-[#21404d] animate-fade-in">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-lg font-bold text-white">Profile Information</h3>
+        <div className="h-2 w-2 rounded-full bg-[#d0e92a]"></div>
+      </div>
+      <div className="space-y-3 mb-4">
+        <div className="flex items-center space-x-3 p-1">
+          <UserCircle className="h-5 w-5 text-[#d0e92a]" />
+          <span className="text-white text-sm">Personal Details</span>
+        </div>
+        <div className="space-y-2 mb-3">
+          <input type="text" placeholder="Full Name" className="w-full p-2 bg-[#0f2a35]/50 text-white text-sm rounded-lg border border-[#21404d]" />
+          <input type="email" placeholder="Email Address" className="w-full p-2 bg-[#0f2a35]/50 text-white text-sm rounded-lg border border-[#21404d]" />
+          <input type="tel" placeholder="Phone Number" className="w-full p-2 bg-[#0f2a35]/50 text-white text-sm rounded-lg border border-[#21404d]" />
+        </div>
+        <div className="flex items-center space-x-3 p-1">
+          <Building className="h-5 w-5 text-[#d0e92a]" />
+          <span className="text-white text-sm">Address</span>
+        </div>
+        <div className="space-y-2">
+          <input type="text" placeholder="Street Address" className="w-full p-2 bg-[#0f2a35]/50 text-white text-sm rounded-lg border border-[#21404d]" />
+          <div className="grid grid-cols-2 gap-2">
+            <input type="text" placeholder="City" className="w-full p-2 bg-[#0f2a35]/50 text-white text-sm rounded-lg border border-[#21404d]" />
+            <input type="text" placeholder="ZIP Code" className="w-full p-2 bg-[#0f2a35]/50 text-white text-sm rounded-lg border border-[#21404d]" />
+          </div>
+        </div>
+      </div>
+      <button className="w-full p-3 bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-[#0f2a35] text-sm font-medium rounded-md flex items-center justify-center">
+        Continue
+        <ArrowRight className="h-4 w-4 ml-1" />
+      </button>
+    </div>,
+    
+    // Step 3: Tax information
+    <div key="tax" className="relative bg-[#143745] rounded-xl p-4 shadow-lg border border-[#21404d] animate-fade-in">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-lg font-bold text-white">Tax Information</h3>
+        <div className="h-2 w-2 rounded-full bg-[#d0e92a]"></div>
+      </div>
+      <div className="space-y-3 mb-4">
+        <div className="flex items-center space-x-3 p-1">
+          <FileCheck className="h-5 w-5 text-[#d0e92a]" />
+          <span className="text-white text-sm">Tax Details</span>
+        </div>
+        <div className="flex space-x-2 mb-3">
+          <div className="flex-1 p-2 bg-[#d0e92a]/10 text-white text-sm text-center rounded-lg border border-[#d0e92a]/30">
+            W-9 Form
+          </div>
+          <div className="flex-1 p-2 bg-[#0f2a35]/50 text-white text-sm text-center rounded-lg border border-[#21404d]">
+            W-8 Form
+          </div>
+        </div>
+        <div className="space-y-2">
+          <input type="text" placeholder="Legal Name" className="w-full p-2 bg-[#0f2a35]/50 text-white text-sm rounded-lg border border-[#21404d]" />
+          <input type="text" placeholder="Tax ID Number" className="w-full p-2 bg-[#0f2a35]/50 text-white text-sm rounded-lg border border-[#21404d]" />
+          
+          <div className="flex items-center space-x-2 p-1">
+            <input type="checkbox" className="h-4 w-4 rounded border-[#21404d] text-[#d0e92a]" />
+            <span className="text-white text-xs">I certify that all information is correct</span>
+          </div>
+        </div>
+      </div>
+      <button className="w-full p-3 bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-[#0f2a35] text-sm font-medium rounded-md flex items-center justify-center">
+        Submit Tax Information
+        <ArrowRight className="h-4 w-4 ml-1" />
+      </button>
+    </div>,
+    
+    // Step 4: Success screen
+    <div key="success" className="relative bg-[#143745] rounded-xl p-4 shadow-lg border border-[#21404d] animate-fade-in">
+      <div className="flex flex-col items-center justify-center py-6">
+        <div className="w-16 h-16 rounded-full bg-[#d0e92a]/20 flex items-center justify-center mb-4">
+          <Check className="h-8 w-8 text-[#d0e92a]" />
+        </div>
+        <h3 className="text-lg font-bold text-white mb-2">Success!</h3>
+        <p className="text-white/80 text-sm text-center mb-4">
+          Your payout has been processed via Cryptocurrency
+        </p>
+        <div className="bg-[#0f2a35]/50 w-full p-3 rounded-lg border border-[#21404d] text-center">
+          <p className="text-xs text-white/60">Transaction ID</p>
+          <p className="text-sm text-white font-mono">TX-29871345</p>
+        </div>
+      </div>
+    </div>
+  ];
+  
+  // Auto-cycle through widget steps
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentWidgetStep((prevStep) => (prevStep + 1) % widgetSteps.length);
+    }, 3000); // Change slide every 3 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="bg-[#f8fafc] text-slate-900 min-h-screen">
@@ -67,53 +220,7 @@ const Marketing = () => {
                 <div className="absolute inset-0 bg-[#143745] rounded-[30px] overflow-hidden z-10">
                   {/* Widget inside phone */}
                   <div className="absolute inset-3 pt-10 overflow-y-auto">
-                    <div className="relative bg-[#143745] rounded-xl p-4 shadow-lg border border-[#21404d]">
-                      <div className="flex items-center justify-between mb-5">
-                        <h3 className="text-lg font-bold text-white">Smart Payout Widget</h3>
-                        <div className="h-2 w-2 rounded-full bg-[#d0e92a]"></div>
-                      </div>
-                      <div className="space-y-3 mb-4">
-                        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
-                          <div className="flex items-center space-x-3">
-                            <Building className="h-5 w-5 text-white/70" />
-                            <span className="text-white text-sm">Bank Transfer</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-white/50" />
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
-                          <div className="flex items-center space-x-3">
-                            <CreditCard className="h-5 w-5 text-white/70" />
-                            <span className="text-white text-sm">Push to Card</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-white/50" />
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-[#d0e92a]/10 rounded-lg border border-[#d0e92a]/30">
-                          <div className="flex items-center space-x-3">
-                            <Bitcoin className="h-5 w-5 text-[#d0e92a]" />
-                            <span className="text-white text-sm">Cryptocurrency</span>
-                          </div>
-                          <ShieldCheck className="h-4 w-4 text-[#d0e92a]" />
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
-                          <div className="flex items-center space-x-3">
-                            <Wallet className="h-5 w-5 text-white/70" />
-                            <span className="text-white text-sm">Digital Wallet</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-white/50" />
-                        </div>
-                        <div className="flex items-center justify-between p-3 bg-[#0f2a35]/50 rounded-lg border border-[#21404d]">
-                          <div className="flex items-center space-x-3">
-                            <Gift className="h-5 w-5 text-white/70" />
-                            <span className="text-white text-sm">Gift Card</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-white/50" />
-                        </div>
-                      </div>
-                      <button className="w-full p-3 bg-[#d0e92a] hover:bg-[#d0e92a]/90 text-[#0f2a35] text-sm font-medium rounded-md flex items-center justify-center">
-                        Select Payout Method
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </button>
-                    </div>
+                    {widgetSteps[currentWidgetStep]}
                   </div>
                 </div>
                 
