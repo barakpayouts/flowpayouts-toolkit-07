@@ -520,15 +520,6 @@ const WidgetDemo = () => {
                     </TabsContent>
                     
                     <TabsContent value="ai" className="animate-fade-in">
-                      <div className="bg-payouts-dark/60 p-4 rounded-lg border border-white/10 mb-4">
-                        <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
-                          <Bot size={18} className="text-payouts-accent" />
-                          AI-Powered Widget Styling
-                        </h3>
-                        <p className="text-white/70 text-sm mb-4">
-                          Chat with our AI to customize the widget design based on your brand. Upload your logo or share your website, and let the AI create a style that matches your branding.
-                        </p>
-                      </div>
                       <AIStyleConfigurator setWidgetKey={setWidgetKey} />
                     </TabsContent>
                   </Tabs>

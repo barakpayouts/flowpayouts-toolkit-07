@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ChatWindow from './ChatWindow';
-import { Sparkles, Check, ChevronRight, ScanSearch, Palette } from 'lucide-react';
+import { Sparkles, Check, ChevronRight, ScanSearch, Palette, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface AIStyleConfiguratorProps {
@@ -30,8 +30,20 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
   };
   
   return (
-    <div className="bg-[#1A1F2C]/80 rounded-xl border border-white/10 p-0 overflow-hidden shadow-lg">
-      <div className="flex flex-col md:flex-row h-[600px]">
+    <div className="bg-[#1A1F2C]/95 rounded-xl border border-white/10 p-0 overflow-hidden shadow-lg">
+      <div className="p-4 border-b border-white/10">
+        <div className="flex items-center gap-2 mb-2">
+          <Bot size={18} className="text-payouts-accent" />
+          <h3 className="font-medium">AI-Powered Widget Styling</h3>
+        </div>
+        <p className="text-white/70 text-sm">
+          Chat with our AI to customize the widget design based on your brand. 
+          Upload your logo or share your website, and let the AI create a style 
+          that matches your branding.
+        </p>
+      </div>
+      
+      <div className="flex flex-col md:flex-row h-[500px]">
         <div className="w-full md:w-1/2 h-1/2 md:h-full">
           <ChatWindow onApplyStyle={handleStyleChange} />
         </div>
