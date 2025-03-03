@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Upload, Image, Bot, User, X, RefreshCw } from 'lucide-react';
+import { Send, Upload, Image, Bot, User, X, RefreshCw, Loader2 } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { cn } from '@/lib/utils';
 import { toast } from "sonner";
@@ -14,6 +14,46 @@ interface Message {
 interface ChatWindowProps {
   onApplyStyle: (styleChanges: any) => void;
 }
+
+// Available style presets
+const stylePresets = {
+  "bowl": {
+    name: "Bowl.com Branding",
+    primaryColor: "#0F2634",
+    accentColor: "#33C3F0",
+    backgroundColor: "#1A3C40",
+    textColor: "#ffffff",
+    borderColor: "#265073",
+    borderRadius: 8,
+  },
+  "blue": {
+    name: "Modern Blue",
+    primaryColor: "#243949",
+    accentColor: "#0EA5E9",
+    backgroundColor: "#304352",
+    textColor: "#ffffff",
+    borderColor: "#435363",
+    borderRadius: 10,
+  },
+  "purple": {
+    name: "Tech Purple",
+    primaryColor: "#1A1F2C",
+    accentColor: "#9b87f5",
+    backgroundColor: "#221F26",
+    textColor: "#ffffff",
+    borderColor: "#3A3544",
+    borderRadius: 12,
+  },
+  "green": {
+    name: "Green and Blue",
+    primaryColor: "#1A3C40",
+    accentColor: "#33C3F0",
+    backgroundColor: "#265073",
+    textColor: "#ffffff",
+    borderColor: "#2D6E7E",
+    borderRadius: 8,
+  }
+};
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const [messages, setMessages] = useState<Message[]>([
@@ -30,49 +70,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const { config } = useWidgetConfig();
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-
-  // Bowl.com branding colors
-  const bowlStyle = {
-    name: "Bowl.com Branding",
-    primaryColor: "#0F2634",
-    accentColor: "#33C3F0",
-    backgroundColor: "#1A3C40",
-    textColor: "#ffffff",
-    borderColor: "#265073",
-    borderRadius: 8,
-  };
-
-  // Example styles that the AI would generate based on the conversation and uploaded images
-  const predefinedStyles = [
-    {
-      name: "Modern Blue",
-      primaryColor: "#243949",
-      accentColor: "#0EA5E9",
-      backgroundColor: "#304352",
-      textColor: "#ffffff",
-      borderColor: "#435363",
-      borderRadius: 10,
-    },
-    {
-      name: "Tech Purple",
-      primaryColor: "#1A1F2C",
-      accentColor: "#9b87f5",
-      backgroundColor: "#221F26",
-      textColor: "#ffffff",
-      borderColor: "#3A3544",
-      borderRadius: 12,
-    },
-    {
-      name: "Green and Blue",
-      primaryColor: "#1A3C40",
-      accentColor: "#33C3F0",
-      backgroundColor: "#265073",
-      textColor: "#ffffff",
-      borderColor: "#2D6E7E",
-      borderRadius: 8,
-    },
-    bowlStyle
-  ];
 
   // Suggested prompts that users can click on
   const suggestedPrompts = [
@@ -94,6 +91,43 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       chatInputRef.current.style.height = 'auto';
       chatInputRef.current.style.height = `${Math.min(chatInputRef.current.scrollHeight, 80)}px`;
     }
+  };
+
+  const processUserInput = (userInput: string) => {
+    const lowerCaseInput = userInput.toLowerCase();
+    let selectedStyle = null;
+    let response = "";
+
+    // Process common style-related keywords
+    if (lowerCaseInput.includes('bowl.com') || lowerCaseInput.includes('bowl') || 
+        lowerCaseInput.includes('website') || lowerCaseInput.includes('match')) {
+      selectedStyle = stylePresets.bowl;
+      response = "I've analyzed the Bowl.com website and created a custom theme using their blue and green color palette. I've applied these colors to your widget design.";
+    }
+    else if (lowerCaseInput.includes('blue') || lowerCaseInput.includes('ocean')) {
+      selectedStyle = stylePresets.blue;
+      response = "I've created a vibrant blue theme that would work well for your brand. It conveys trust and professionalism while maintaining a modern look.";
+    }
+    else if (lowerCaseInput.includes('purple') || lowerCaseInput.includes('tech')) {
+      selectedStyle = stylePresets.purple;
+      response = "I've designed a tech-focused purple theme for your brand. It looks modern and innovative with a deep background and vibrant accent color.";
+    }
+    else if (lowerCaseInput.includes('green') && lowerCaseInput.includes('blue')) {
+      selectedStyle = stylePresets.green;
+      response = "I've created a green and blue theme that combines both colors for a fresh, professional look. This should match your brand colors perfectly.";
+    }
+    else if (uploadedImage || lowerCaseInput.includes('logo') || lowerCaseInput.includes('image') || lowerCaseInput.includes('upload')) {
+      selectedStyle = stylePresets.bowl; // Default to bowl style for image uploads in demo
+      response = "I've analyzed your brand assets and created a custom theme that matches your visual identity. The colors have been extracted from your logo and applied to your widget.";
+    }
+    else {
+      // Default response for unrecognized inputs
+      const randomStyle = Object.values(stylePresets)[Math.floor(Math.random() * Object.values(stylePresets).length)];
+      selectedStyle = randomStyle;
+      response = `Based on your description, I've created a custom ${randomStyle.name.toLowerCase()} style that should work well for your brand. The colors complement each other while maintaining good contrast for readability.`;
+    }
+
+    return { response, selectedStyle };
   };
 
   const handleSendMessage = async () => {
@@ -118,72 +152,34 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       setMessages(prev => [...prev, { role: 'assistant', content: '', isLoading: true }]);
     }, 300);
 
-    // Simulate AI response after a delay
+    // Process the input with a simulated delay to seem more realistic
     setTimeout(() => {
-      simulateAIResponse(userMessage);
+      const { response, selectedStyle } = processUserInput(userMessage);
+      
+      // Update the loading message with the actual response
+      setMessages(prev => {
+        const newMessages = [...prev];
+        const loadingIndex = newMessages.findIndex(msg => msg.isLoading);
+        if (loadingIndex !== -1) {
+          newMessages[loadingIndex] = { role: 'assistant', content: response };
+        } else {
+          newMessages.push({ role: 'assistant', content: response });
+        }
+        return newMessages;
+      });
+      
+      // Apply the style changes if a style was selected
+      if (selectedStyle) {
+        onApplyStyle(selectedStyle);
+        
+        toast.success(`Applied ${selectedStyle.name} theme`, {
+          description: "The widget styling has been updated."
+        });
+      }
+      
       setIsProcessing(false);
       setUploadedImage(null);
     }, 1500);
-  };
-
-  const simulateAIResponse = (userMessage: string) => {
-    const lowerCaseMsg = userMessage.toLowerCase();
-    let aiResponse = '';
-    let styleToApply = null;
-
-    // Check if user mentioned bowl.com or wants their branding
-    if (lowerCaseMsg.includes('bowl.com') || lowerCaseMsg.includes('bowl') || lowerCaseMsg.includes('this brand')) {
-      aiResponse = "I've analyzed the Bowl.com website and created a custom theme using their blue and green color palette. I've applied these colors to your widget design.";
-      styleToApply = bowlStyle;
-    }
-    // Simulate AI understanding different user inputs
-    else if (lowerCaseMsg.includes('blue') || lowerCaseMsg.includes('ocean')) {
-      aiResponse = "I think a vibrant ocean blue theme would work well for your brand. It conveys trust and professionalism. I've created a style based on blue tones.";
-      styleToApply = predefinedStyles[0];
-    } 
-    else if (lowerCaseMsg.includes('purple') || lowerCaseMsg.includes('tech')) {
-      aiResponse = "A tech-focused purple theme would be perfect for your brand. It looks modern and innovative. I've applied this style to your widget.";
-      styleToApply = predefinedStyles[1];
-    }
-    else if (lowerCaseMsg.includes('green') && lowerCaseMsg.includes('blue')) {
-      aiResponse = "I've created a green and blue theme that combines both colors for a fresh, professional look. This should match your brand colors perfectly.";
-      styleToApply = predefinedStyles[2];
-    }
-    else if (lowerCaseMsg.includes('website') || lowerCaseMsg.includes('match')) {
-      aiResponse = "Based on your website colors, I've designed a blue theme that should complement your existing brand identity perfectly.";
-      styleToApply = bowlStyle;
-    }
-    else if (uploadedImage || lowerCaseMsg.includes('logo') || lowerCaseMsg.includes('image') || lowerCaseMsg.includes('upload')) {
-      aiResponse = "I've analyzed your brand assets and created a custom theme that matches your visual identity. The colors and style elements have been extracted from your logo.";
-      // Use bowl.com style for logo uploads in this case
-      styleToApply = bowlStyle;
-    }
-    else {
-      aiResponse = "Based on your preferences, I've created a custom style that should work well for your brand. You can always ask me to adjust specific elements like colors, borders, or spacing.";
-      // Use a random style for the demo
-      styleToApply = predefinedStyles[Math.floor(Math.random() * predefinedStyles.length)];
-    }
-
-    // Update the loading message with the actual response
-    setMessages(prev => {
-      const newMessages = [...prev];
-      const loadingIndex = newMessages.findIndex(msg => msg.isLoading);
-      if (loadingIndex !== -1) {
-        newMessages[loadingIndex] = { role: 'assistant', content: aiResponse };
-      } else {
-        newMessages.push({ role: 'assistant', content: aiResponse });
-      }
-      return newMessages;
-    });
-
-    // Apply the style changes
-    if (styleToApply) {
-      onApplyStyle(styleToApply);
-      
-      toast.success(`Applied ${styleToApply.name} theme`, {
-        description: "The widget styling has been updated."
-      });
-    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -195,7 +191,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
 
   const handleSuggestedPrompt = (prompt: string) => {
     setInput(prompt);
-    // Focus the input after selecting a prompt
     if (chatInputRef.current) {
       chatInputRef.current.focus();
       // Simulate a click on the send button after a brief delay
@@ -285,8 +280,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
                   "max-w-[90%] rounded-lg p-2 ai-style-compact-message",
                   message.role === 'user' 
                     ? "bg-payouts-accent/20 text-white" 
-                    : "bg-white/10 text-white",
-                  message.isLoading && "animate-pulse"
+                    : "bg-white/10 text-white"
                 )}
               >
                 <div className="flex items-center gap-1 mb-1">
@@ -300,7 +294,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
                   </span>
                 </div>
                 
-                <p className="text-sm whitespace-pre-wrap">{message.content || (message.isLoading ? 'Designing your style...' : '')}</p>
+                {message.isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 size={14} className="animate-spin text-payouts-accent" />
+                    <p className="text-sm text-white/70">Analyzing and generating style...</p>
+                  </div>
+                ) : (
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                )}
                 
                 {index === messages.length - 1 && message.role === 'user' && uploadedImage && (
                   <div className="mt-2">

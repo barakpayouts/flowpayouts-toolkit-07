@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ChatWindow from './ChatWindow';
-import { Check, Palette, Bot } from 'lucide-react';
+import { Check, Palette, Bot, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from "sonner";
 
 interface AIStyleConfiguratorProps {
   setWidgetKey: (cb: (prev: number) => number) => void;
@@ -16,17 +17,29 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
   const [showPreview, setShowPreview] = useState(false);
   
   const handleStyleChange = (styleChanges: any) => {
+    // Log for debugging
+    console.log("Applying style changes:", styleChanges);
+    
     setPreviewStyle({
       ...config,
       ...styleChanges,
     });
     setShowPreview(true);
+    
+    // Show a message to let the user know what's happening
+    toast.info("Style preview generated", {
+      description: "Click 'Apply This Style' to update your widget"
+    });
   };
   
   const applyChanges = () => {
     updateConfig(previewStyle);
     setWidgetKey(prevKey => prevKey + 1);
     setShowPreview(false);
+    
+    toast.success("Style applied to widget", {
+      description: "Your changes have been saved and applied"
+    });
   };
   
   // Bowl.com example style for suggestion
@@ -188,7 +201,7 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
               >
                 <Button 
                   onClick={applyChanges}
-                  className="w-full flex items-center justify-center gap-2 py-1 text-payouts-dark font-semibold text-sm"
+                  className="w-full flex items-center justify-center gap-2 py-2 text-payouts-dark font-semibold text-sm"
                   style={{ 
                     backgroundColor: previewStyle.accentColor,
                     color: previewStyle.primaryColor,
@@ -197,7 +210,8 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
                   size="sm"
                 >
                   <Check size={14} />
-                  Apply This Style
+                  Apply This Style to Widget
+                  <ArrowRight size={14} className="ml-1" />
                 </Button>
               </motion.div>
             </div>
