@@ -1,7 +1,9 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import VerificationLayout from './VerificationLayout';
 import { useWidgetConfig, KYCDocumentType } from '@/hooks/use-widget-config';
-import { Check, Camera, FileText, Upload, Image, X } from 'lucide-react';
+import { Check, Camera, FileText, Upload, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { toast } from "sonner";
 
 const KYCVerification: React.FC<{
@@ -14,7 +16,7 @@ const KYCVerification: React.FC<{
   const [documentUploaded, setDocumentUploaded] = useState(false);
   const [selfieUploaded, setSelfieUploaded] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'document-select' | 'document-upload' | 'selfie'>('document-select');
+  const [currentStep, setCurrentStep] = useState<'document-select' | 'document-upload' | 'selfie' | 'camera-active'>('document-select');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -28,20 +30,30 @@ const KYCVerification: React.FC<{
   const [cameraActive, setCameraActive] = useState(false);
   const [streamActive, setStreamActive] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   
+  // Clean up camera resources when component unmounts
   useEffect(() => {
     return () => {
       stopCamera();
     };
-  }, [currentStep]);
+  }, []);
   
   const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-      tracks.forEach(track => track.stop());
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    
+    if (videoRef.current) {
       videoRef.current.srcObject = null;
-      setStreamActive(false);
-      setCameraActive(false);
+    }
+    
+    setStreamActive(false);
+    setCameraActive(false);
+    
+    if (currentStep === 'camera-active') {
+      setCurrentStep('selfie');
     }
   };
   
@@ -105,29 +117,37 @@ const KYCVerification: React.FC<{
   
   const startCamera = async () => {
     try {
+      setCameraActive(true);
+      setCurrentStep('camera-active');
       setCameraError(null);
       
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error("Camera access is not supported by this browser");
       }
       
-      const stream = await navigator.mediaDevices.getUserMedia({
+      console.log("Starting camera...");
+      const videoStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'user',
+          facingMode: 'user', 
           width: { ideal: 1280 },
           height: { ideal: 720 }
         },
         audio: false
       });
       
+      console.log("Camera stream obtained:", videoStream);
+      setStream(videoStream);
+      
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+        console.log("Setting video stream to video element");
+        videoRef.current.srcObject = videoStream;
+        
+        // Wait for the video to be loaded
         videoRef.current.onloadedmetadata = () => {
           if (videoRef.current) {
             videoRef.current.play()
               .then(() => {
                 console.log("Camera started successfully");
-                setCameraActive(true);
                 setStreamActive(true);
                 toast.success("Camera started successfully");
               })
@@ -138,6 +158,9 @@ const KYCVerification: React.FC<{
               });
           }
         };
+      } else {
+        console.error("Video ref is null");
+        setCameraError("Video element not found");
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -157,6 +180,8 @@ const KYCVerification: React.FC<{
       
       setCameraError(errorMessage);
       toast.error(errorMessage);
+      setCurrentStep('selfie');
+      setCameraActive(false);
     }
   };
   
@@ -170,20 +195,30 @@ const KYCVerification: React.FC<{
       
       const context = canvas.getContext('2d');
       if (context) {
+        // Draw the mirrored video frame onto the canvas
+        // First, translate to the right edge and flip horizontally
         context.translate(canvas.width, 0);
         context.scale(-1, 1);
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Reset the transformation matrix
         context.setTransform(1, 0, 0, 1, 0, 0);
         
+        // Convert the canvas to a data URL
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
         
+        // Stop the camera 
         stopCamera();
         
+        // Display the captured selfie
         setSelfiePreview(dataUrl);
         setSelfieUploaded(true);
+        setCurrentStep('selfie');
         
         toast.success("Selfie captured successfully");
       }
+    } else {
+      console.error("Cannot capture photo: video or canvas ref not available or stream not active");
+      toast.error("Cannot capture photo. Please try again.");
     }
   };
   
@@ -206,7 +241,10 @@ const KYCVerification: React.FC<{
   };
   
   const handleBack = () => {
-    if (currentStep === 'selfie') {
+    if (currentStep === 'camera-active') {
+      stopCamera();
+      setCurrentStep('selfie');
+    } else if (currentStep === 'selfie') {
       stopCamera();
       setCurrentStep('document-upload');
     } else if (currentStep === 'document-upload') {
@@ -224,14 +262,19 @@ const KYCVerification: React.FC<{
     } else if (currentStep === 'selfie' && selfieUploaded) {
       stopCamera();
       onNext();
+    } else if (currentStep === 'camera-active') {
+      capturePhoto();
     } else {
       toast.error("Please complete the current step first");
     }
   };
   
+  // Render different content based on the current step
   let title, description, content, buttonText;
+  let hideButtons = false;
   
   if (currentStep === 'document-select') {
+    // Document selection step
     title = "Identity Verification";
     description = "Select a valid government-issued photo ID for verification";
     buttonText = "Continue";
@@ -256,6 +299,7 @@ const KYCVerification: React.FC<{
           </div>
         </div>
         
+        {/* ID Card option */}
         <div 
           className={`document-option p-4 rounded-lg ${selectedDocument === 'id' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
           onClick={() => handleSelectDocument('id')}
@@ -274,6 +318,7 @@ const KYCVerification: React.FC<{
           </div>
         </div>
         
+        {/* Driver's License option */}
         <div 
           className={`document-option p-4 rounded-lg ${selectedDocument === 'driver_license' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
           onClick={() => handleSelectDocument('driver_license')}
@@ -294,6 +339,7 @@ const KYCVerification: React.FC<{
       </div>
     );
   } else if (currentStep === 'document-upload') {
+    // Document upload step
     title = `Upload Your ${selectedDocument === 'passport' ? 'Passport' : selectedDocument === 'id' ? 'ID Card' : 'Driver\'s License'}`;
     description = "Make sure all details are clearly visible";
     buttonText = documentUploaded ? "Continue to Selfie" : "Upload Document";
@@ -356,6 +402,7 @@ const KYCVerification: React.FC<{
             </div>
           )}
         </div>
+        
         <div className="text-sm opacity-70">
           <p className="mb-1">Requirements:</p>
           <ul className="list-disc pl-5 space-y-1">
@@ -368,9 +415,10 @@ const KYCVerification: React.FC<{
       </div>
     );
   } else if (currentStep === 'selfie') {
+    // Selfie instructions step
     title = "Take a Selfie";
     description = "We need to verify that you match your ID photo";
-    buttonText = selfieUploaded ? "Complete Verification" : "Capture Selfie";
+    buttonText = selfieUploaded ? "Complete Verification" : "Open Camera";
     
     content = (
       <div className="space-y-4">
@@ -414,48 +462,6 @@ const KYCVerification: React.FC<{
               >
                 Retake Selfie
               </button>
-            </div>
-          ) : cameraActive ? (
-            <div className="text-center">
-              <div className="relative mx-auto mb-4">
-                <div className="camera-feed w-full max-w-xs mx-auto rounded-xl overflow-hidden border-2 border-white/30 aspect-[3/4] relative">
-                  <video 
-                    ref={videoRef} 
-                    className="w-full h-full object-cover mirror"
-                    autoPlay
-                    playsInline
-                    muted
-                    style={{ transform: 'scaleX(-1)' }}
-                  ></video>
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-48 h-48 border-2 border-dashed border-white/70 rounded-full"></div>
-                  </div>
-                </div>
-                
-                <canvas ref={canvasRef} className="hidden"></canvas>
-              </div>
-              
-              {streamActive && (
-                <div className="space-y-2">
-                  <p className="text-sm opacity-70 mb-2">Center your face in the circle and keep a neutral expression</p>
-                  <div className="flex justify-center space-x-3">
-                    <button 
-                      className="py-2 px-4 rounded text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors"
-                      onClick={stopCamera}
-                    >
-                      Cancel
-                    </button>
-                    
-                    <button 
-                      className="py-2 px-4 rounded text-sm font-medium" 
-                      style={{backgroundColor: config.accentColor, color: 'black'}}
-                      onClick={capturePhoto}
-                    >
-                      Take Photo
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div className="text-center">
@@ -508,6 +514,56 @@ const KYCVerification: React.FC<{
         </div>
       </div>
     );
+  } else if (currentStep === 'camera-active') {
+    // Camera active view with capture button
+    title = "Take a Selfie";
+    description = "Center your face in the circle and take a photo";
+    buttonText = "Capture Photo";
+    hideButtons = true; // Hide the standard buttons
+    
+    content = (
+      <div className="space-y-4">
+        <div className="camera-container bg-black/50 border border-white/10 rounded-lg p-4 text-center relative">
+          <div className="relative mx-auto">
+            <div className="camera-feed w-full max-w-xs mx-auto rounded-xl overflow-hidden border-2 border-white/30 aspect-[3/4] relative">
+              <video 
+                ref={videoRef} 
+                className="w-full h-full object-cover mirror"
+                autoPlay
+                playsInline
+                muted
+                style={{ transform: 'scaleX(-1)' }} // Mirror the video
+              ></video>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-48 h-48 border-2 border-dashed border-white/70 rounded-full"></div>
+              </div>
+            </div>
+            
+            <canvas ref={canvasRef} className="hidden"></canvas>
+          </div>
+          
+          <div className="mt-6 flex justify-center gap-3">
+            <Button 
+              variant="dark"
+              className="flex-1 text-white font-medium"
+              onClick={stopCamera}
+            >
+              Cancel
+            </Button>
+            <Button 
+              className="flex-1 text-gray-900 font-semibold hover:text-gray-900"
+              style={{
+                background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+                boxShadow: `0 4px 15px ${config.accentColor}40`,
+              }}
+              onClick={capturePhoto}
+            >
+              Capture Photo
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   return (
@@ -520,6 +576,7 @@ const KYCVerification: React.FC<{
       isAuthorized={isAuthorized}
       setIsAuthorized={setIsAuthorized}
       buttonText={buttonText}
+      hideButtons={hideButtons} // Pass the new hideButtons prop
     >
       {content}
     </VerificationLayout>

@@ -16,7 +16,8 @@ interface VerificationLayoutProps {
   isAuthorized?: boolean;
   setIsAuthorized?: (value: boolean) => void;
   disableNext?: boolean;
-  buttonText?: string; // Added buttonText prop
+  buttonText?: string;
+  hideButtons?: boolean; // New prop to hide back/next buttons
 }
 
 const VerificationLayout: React.FC<VerificationLayoutProps> = ({
@@ -30,7 +31,8 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   isAuthorized = false,
   setIsAuthorized,
   disableNext = false,
-  buttonText, // Added buttonText prop
+  buttonText,
+  hideButtons = false, // Default is false
 }) => {
   const { config } = useWidgetConfig();
 
@@ -43,73 +45,75 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
       
       {children}
       
-      <div className="mt-6 bg-white/5 backdrop-blur-md p-5 rounded-xl border border-white/10">
-        {setIsAuthorized && (
-          <div className="flex items-center gap-3 mb-4">
-            <div className="relative">
-              <input
-                id="authorize"
-                type="checkbox"
-                checked={isAuthorized}
-                onChange={() => setIsAuthorized(!isAuthorized)}
-                className="w-4 h-4 opacity-0 absolute"
-              />
-              <div 
-                className={cn(
-                  "w-5 h-5 rounded border flex items-center justify-center transition-all",
-                  isAuthorized 
-                    ? "bg-gradient-to-r border-0" 
-                    : "bg-white/5 border-white/20"
-                )}
-                style={{
-                  background: isAuthorized 
-                    ? `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)` 
-                    : undefined,
-                }}
-              >
-                {isAuthorized && <Lock size={12} className="text-payouts-dark" />}
+      {!hideButtons && ( // Only render this section if hideButtons is false
+        <div className="mt-6 bg-white/5 backdrop-blur-md p-5 rounded-xl border border-white/10">
+          {setIsAuthorized && (
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative">
+                <input
+                  id="authorize"
+                  type="checkbox"
+                  checked={isAuthorized}
+                  onChange={() => setIsAuthorized(!isAuthorized)}
+                  className="w-4 h-4 opacity-0 absolute"
+                />
+                <div 
+                  className={cn(
+                    "w-5 h-5 rounded border flex items-center justify-center transition-all",
+                    isAuthorized 
+                      ? "bg-gradient-to-r border-0" 
+                      : "bg-white/5 border-white/20"
+                  )}
+                  style={{
+                    background: isAuthorized 
+                      ? `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)` 
+                      : undefined,
+                  }}
+                >
+                  {isAuthorized && <Lock size={12} className="text-payouts-dark" />}
+                </div>
               </div>
+              <label 
+                htmlFor="authorize"
+                className="text-sm font-medium leading-none cursor-pointer"
+              >
+                I authorize the verification of my bank account
+              </label>
             </div>
-            <label 
-              htmlFor="authorize"
-              className="text-sm font-medium leading-none cursor-pointer"
-            >
-              I authorize the verification of my bank account
-            </label>
+          )}
+          
+          <div className="flex items-center gap-3 bg-white/5 p-4 rounded-lg mb-5">
+            <Lock 
+              size={18} 
+              style={{ color: config.accentColor }} 
+            />
+            <p className="text-xs text-white/80">
+              Your information is protected with bank-level encryption and will be used solely for verification purposes
+            </p>
           </div>
-        )}
-        
-        <div className="flex items-center gap-3 bg-white/5 p-4 rounded-lg mb-5">
-          <Lock 
-            size={18} 
-            style={{ color: config.accentColor }} 
-          />
-          <p className="text-xs text-white/80">
-            Your information is protected with bank-level encryption and will be used solely for verification purposes
-          </p>
+          
+          <div className="flex gap-3">
+            <Button
+              onClick={onBack}
+              variant="dark"
+              className="flex-1 text-white font-medium"
+            >
+              Back
+            </Button>
+            <Button
+              onClick={onNext}
+              disabled={disableNext}
+              className="flex-1 text-gray-900 font-semibold hover:text-gray-900"
+              style={{
+                background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+                boxShadow: `0 4px 15px ${config.accentColor}40`,
+              }}
+            >
+              {buttonText || (isLastStep ? 'Complete' : 'Next')}
+            </Button>
+          </div>
         </div>
-        
-        <div className="flex gap-3">
-          <Button
-            onClick={onBack}
-            variant="dark"
-            className="flex-1 text-white font-medium"
-          >
-            Back
-          </Button>
-          <Button
-            onClick={onNext}
-            disabled={disableNext}
-            className="flex-1 text-gray-900 font-semibold hover:text-gray-900"
-            style={{
-              background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
-              boxShadow: `0 4px 15px ${config.accentColor}40`,
-            }}
-          >
-            {buttonText || (isLastStep ? 'Complete' : 'Next')}
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
