@@ -9,28 +9,27 @@ import VerificationLayout from './VerificationLayout';
 
 const StatementVerification: React.FC = () => {
   const { config } = useWidgetConfig();
-  const [showUploadUI, setShowUploadUI] = useState(false);
   const [invoiceUploaded, setInvoiceUploaded] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const handleUploadClick = () => {
-    setShowUploadUI(true);
-  };
-  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedFileName(file.name);
-      setInvoiceUploaded(true);
-      toast.success("Invoice uploaded successfully", {
-        description: `${file.name} has been added to your invoices`
-      });
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      handleFileUploadSuccess(file.name);
+    }
+  };
+  
+  const handleFileUploadSuccess = (fileName: string) => {
+    setUploadedFileName(fileName);
+    setInvoiceUploaded(true);
+    toast.success("Statement uploaded successfully", {
+      description: `${fileName} has been added to your account`
+    });
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
   
@@ -44,13 +43,15 @@ const StatementVerification: React.FC = () => {
       // Simulate file selection after delay
       setTimeout(() => {
         const fileName = "statement_may2023.pdf";
-        setUploadedFileName(fileName);
-        setInvoiceUploaded(true);
-        toast.success("Statement uploaded successfully", {
-          description: `${fileName} has been added to your account`
-        });
+        handleFileUploadSuccess(fileName);
       }, 1500);
     }, 1000);
+  };
+  
+  const handleChooseFile = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
   
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -69,12 +70,13 @@ const StatementVerification: React.FC = () => {
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       const file = files[0];
-      setUploadedFileName(file.name);
-      setInvoiceUploaded(true);
-      toast.success("Statement uploaded successfully", {
-        description: `${file.name} has been added to your account`
-      });
+      handleFileUploadSuccess(file.name);
     }
+  };
+  
+  const handleUploadAnother = () => {
+    setInvoiceUploaded(false);
+    setUploadedFileName(null);
   };
   
   return (
@@ -112,15 +114,13 @@ const StatementVerification: React.FC = () => {
             
             <p className="text-sm opacity-70 mt-4">Your statement has been added to your account</p>
             
-            <button 
-              className="mt-4 py-2 px-4 rounded text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors"
-              onClick={() => {
-                setInvoiceUploaded(false);
-                setUploadedFileName(null);
-              }}
+            <Button 
+              className="mt-4 py-2 px-4"
+              variant="glass"
+              onClick={handleUploadAnother}
             >
               Upload Another Statement
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
@@ -151,11 +151,7 @@ const StatementVerification: React.FC = () => {
               variant="glass"
               size="default"
               className="mx-auto"
-              onClick={() => {
-                if (fileInputRef.current) {
-                  fileInputRef.current.click();
-                }
-              }}
+              onClick={handleChooseFile}
             >
               Choose From Computer
             </Button>
