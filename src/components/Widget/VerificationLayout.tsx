@@ -51,7 +51,9 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
       onUploadInvoice(); // Call the provided handler if it exists
     } else {
       // Show file upload UI instead of toast options
-      fileInputRef.current?.click();
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
     }
   };
   
@@ -179,7 +181,11 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
                   <button 
                     className="py-2 px-4 rounded text-sm font-medium" 
                     style={{backgroundColor: config.accentColor, color: 'black'}}
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (fileInputRef.current) {
+                        fileInputRef.current.click();
+                      }
+                    }}
                   >
                     Choose From Computer
                   </button>
