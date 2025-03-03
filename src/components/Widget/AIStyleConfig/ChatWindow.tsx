@@ -15,7 +15,7 @@ interface ChatWindowProps {
   onApplyStyle: (styleChanges: any) => void;
 }
 
-// Available style presets
+// Style presets that the AI can recommend
 const stylePresets = {
   "bowl": {
     name: "Bowl.com Branding",
@@ -52,6 +52,42 @@ const stylePresets = {
     textColor: "#ffffff",
     borderColor: "#2D6E7E",
     borderRadius: 8,
+  },
+  "dark": {
+    name: "Dark Mode",
+    primaryColor: "#121212",
+    accentColor: "#BB86FC",
+    backgroundColor: "#1E1E1E",
+    textColor: "#ffffff",
+    borderColor: "#333333",
+    borderRadius: 8,
+  },
+  "light": {
+    name: "Light Mode",
+    primaryColor: "#FFFFFF",
+    accentColor: "#6200EE",
+    backgroundColor: "#F5F5F5",
+    textColor: "#121212",
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+  },
+  "coral": {
+    name: "Coral Accent",
+    primaryColor: "#1A1A2E",
+    accentColor: "#FF6B6B",
+    backgroundColor: "#16213E",
+    textColor: "#ffffff",
+    borderColor: "#0F3460",
+    borderRadius: 10,
+  },
+  "forest": {
+    name: "Forest Green",
+    primaryColor: "#1B2D2A",
+    accentColor: "#57CC99",
+    backgroundColor: "#2D4739",
+    textColor: "#ffffff",
+    borderColor: "#395B50",
+    borderRadius: 8,
   }
 };
 
@@ -70,12 +106,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const { config } = useWidgetConfig();
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [aiKey, setAiKey] = useState<string>('');
 
   // Suggested prompts that users can click on
   const suggestedPrompts = [
     "Make it match our website colors",
     "Our brand uses green and blue",
-    "Upload our logo to extract colors"
+    "Create a dark modern theme",
+    "I need a bright, cheerful design"
   ];
 
   useEffect(() => {
@@ -93,41 +131,129 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     }
   };
 
-  const processUserInput = (userInput: string) => {
+  // Function to analyze user input and determine the best style preset
+  const analyzeUserInput = async (userInput: string) => {
+    // First, try to directly match keywords for faster response
     const lowerCaseInput = userInput.toLowerCase();
-    let selectedStyle = null;
-    let response = "";
-
-    // Process common style-related keywords
+    
+    // Direct keyword matching for quick responses
     if (lowerCaseInput.includes('bowl.com') || lowerCaseInput.includes('bowl') || 
-        lowerCaseInput.includes('website') || lowerCaseInput.includes('match')) {
-      selectedStyle = stylePresets.bowl;
-      response = "I've analyzed the Bowl.com website and created a custom theme using their blue and green color palette. I've applied these colors to your widget design.";
+        (lowerCaseInput.includes('website') && lowerCaseInput.includes('match'))) {
+      return {
+        stylePreset: stylePresets.bowl,
+        explanation: "I've analyzed the Bowl.com website and created a custom theme using their blue and green color palette. I've applied these colors to your widget design."
+      };
     }
-    else if (lowerCaseInput.includes('blue') || lowerCaseInput.includes('ocean')) {
+    
+    if (lowerCaseInput.includes('dark') || lowerCaseInput.includes('night')) {
+      return {
+        stylePreset: stylePresets.dark,
+        explanation: "I've created a sleek dark theme that reduces eye strain while maintaining a professional look. The purple accent adds a touch of elegance."
+      };
+    }
+    
+    if (lowerCaseInput.includes('light') || lowerCaseInput.includes('bright') || lowerCaseInput.includes('white')) {
+      return {
+        stylePreset: stylePresets.light,
+        explanation: "I've designed a clean, light theme that's perfect for readability and a minimalist aesthetic. The purple accent provides a nice contrast."
+      };
+    }
+    
+    if (lowerCaseInput.includes('blue') && !lowerCaseInput.includes('green')) {
+      return {
+        stylePreset: stylePresets.blue,
+        explanation: "I've created a vibrant blue theme that conveys trust and professionalism while maintaining a modern look."
+      };
+    }
+    
+    if (lowerCaseInput.includes('purple') || lowerCaseInput.includes('tech')) {
+      return {
+        stylePreset: stylePresets.purple,
+        explanation: "I've designed a tech-focused purple theme for your brand. It looks modern and innovative with a deep background and vibrant accent color."
+      };
+    }
+    
+    if ((lowerCaseInput.includes('green') && lowerCaseInput.includes('blue')) || 
+        lowerCaseInput.includes('forest') || lowerCaseInput.includes('nature')) {
+      return {
+        stylePreset: stylePresets.green,
+        explanation: "I've created a green and blue theme that combines both colors for a fresh, professional look that evokes nature and trust."
+      };
+    }
+    
+    if (lowerCaseInput.includes('coral') || lowerCaseInput.includes('red') || lowerCaseInput.includes('warm')) {
+      return {
+        stylePreset: stylePresets.coral,
+        explanation: "I've designed a bold theme with coral accents that create energy and excitement while maintaining readability."
+      };
+    }
+    
+    if (lowerCaseInput.includes('forest') || (lowerCaseInput.includes('green') && !lowerCaseInput.includes('blue'))) {
+      return {
+        stylePreset: stylePresets.forest,
+        explanation: "I've created a calming forest green theme that conveys growth, harmony, and ecological awareness."
+      };
+    }
+
+    // Process using AI model simulation
+    // This would be replaced with an actual AI API call in a production environment
+    // The simulation analyzes the input text for style preferences
+    const aiResponse = await simulateAIAnalysis(userInput);
+    return aiResponse;
+  };
+
+  // This function simulates an AI analysis of the user's input
+  // In a real implementation, this would be replaced with an API call to an AI service
+  const simulateAIAnalysis = async (userInput: string) => {
+    // Simulate AI processing time for a more realistic experience
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const input = userInput.toLowerCase();
+    let selectedStyle = null;
+    let explanation = "";
+    
+    // More comprehensive analysis of the input
+    if (input.includes('professional') || input.includes('corporate') || input.includes('business')) {
       selectedStyle = stylePresets.blue;
-      response = "I've created a vibrant blue theme that would work well for your brand. It conveys trust and professionalism while maintaining a modern look.";
+      explanation = "Based on your request for a professional look, I've created a blue-themed design that conveys trust and reliability - perfect for corporate environments.";
     }
-    else if (lowerCaseInput.includes('purple') || lowerCaseInput.includes('tech')) {
+    else if (input.includes('modern') || input.includes('sleek') || input.includes('minimal')) {
+      selectedStyle = stylePresets.dark;
+      explanation = "I've created a modern, sleek design with clean lines and a dark background. This contemporary style works well for tech-forward brands.";
+    }
+    else if (input.includes('creative') || input.includes('artistic') || input.includes('bold')) {
       selectedStyle = stylePresets.purple;
-      response = "I've designed a tech-focused purple theme for your brand. It looks modern and innovative with a deep background and vibrant accent color.";
+      explanation = "For your creative brand, I've designed a bold purple theme that stands out and conveys innovation and imagination.";
     }
-    else if (lowerCaseInput.includes('green') && lowerCaseInput.includes('blue')) {
-      selectedStyle = stylePresets.green;
-      response = "I've created a green and blue theme that combines both colors for a fresh, professional look. This should match your brand colors perfectly.";
+    else if (input.includes('eco') || input.includes('natural') || input.includes('organic')) {
+      selectedStyle = stylePresets.forest;
+      explanation = "I've created an eco-friendly green theme that reflects natural, organic values and environmental consciousness.";
     }
-    else if (uploadedImage || lowerCaseInput.includes('logo') || lowerCaseInput.includes('image') || lowerCaseInput.includes('upload')) {
-      selectedStyle = stylePresets.bowl; // Default to bowl style for image uploads in demo
-      response = "I've analyzed your brand assets and created a custom theme that matches your visual identity. The colors have been extracted from your logo and applied to your widget.";
+    else if (input.includes('friendly') || input.includes('warm') || input.includes('welcoming')) {
+      selectedStyle = stylePresets.coral;
+      explanation = "To create a warm, friendly feel, I've designed a theme with coral accents that feels welcoming and energetic.";
+    }
+    else if (input.includes('clean') || input.includes('simple') || input.includes('accessible')) {
+      selectedStyle = stylePresets.light;
+      explanation = "I've created a clean, simple design with high contrast for excellent readability and accessibility.";
     }
     else {
-      // Default response for unrecognized inputs
-      const randomStyle = Object.values(stylePresets)[Math.floor(Math.random() * Object.values(stylePresets).length)];
-      selectedStyle = randomStyle;
-      response = `Based on your description, I've created a custom ${randomStyle.name.toLowerCase()} style that should work well for your brand. The colors complement each other while maintaining good contrast for readability.`;
+      // If no specific keywords match, use uploaded image or choose a reasonable default
+      if (uploadedImage) {
+        selectedStyle = stylePresets.bowl; // In a real implementation, would analyze the image colors
+        explanation = "I've analyzed your uploaded image and created a theme based on its dominant colors and visual style.";
+      } else {
+        // Default to a random style if nothing else matches
+        const styles = Object.values(stylePresets);
+        selectedStyle = styles[Math.floor(Math.random() * styles.length)];
+        explanation = `Based on your description, I've created a custom ${selectedStyle.name.toLowerCase()} style that should work well for your brand.`;
+      }
     }
-
-    return { response, selectedStyle };
+    
+    return {
+      stylePreset: selectedStyle,
+      explanation: explanation
+    };
   };
 
   const handleSendMessage = async () => {
@@ -147,39 +273,56 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     }
     setIsProcessing(true);
 
-    // Add AI loading message after a short delay to improve UX
-    setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'assistant', content: '', isLoading: true }]);
-    }, 300);
-
-    // Process the input with a simulated delay to seem more realistic
-    setTimeout(() => {
-      const { response, selectedStyle } = processUserInput(userMessage);
+    // Add AI loading message
+    setMessages(prev => [...prev, { role: 'assistant', content: '', isLoading: true }]);
+    
+    try {
+      // Process the user input to get style recommendations
+      const { stylePreset, explanation } = await analyzeUserInput(userMessage);
       
       // Update the loading message with the actual response
       setMessages(prev => {
         const newMessages = [...prev];
         const loadingIndex = newMessages.findIndex(msg => msg.isLoading);
         if (loadingIndex !== -1) {
-          newMessages[loadingIndex] = { role: 'assistant', content: response };
+          newMessages[loadingIndex] = { role: 'assistant', content: explanation };
         } else {
-          newMessages.push({ role: 'assistant', content: response });
+          newMessages.push({ role: 'assistant', content: explanation });
         }
         return newMessages;
       });
       
-      // Apply the style changes if a style was selected
-      if (selectedStyle) {
-        onApplyStyle(selectedStyle);
+      // Apply the style changes
+      if (stylePreset) {
+        onApplyStyle(stylePreset);
         
-        toast.success(`Applied ${selectedStyle.name} theme`, {
+        toast.success(`Applied ${stylePreset.name} theme`, {
           description: "The widget styling has been updated."
         });
       }
+    } catch (error) {
+      // Handle errors gracefully
+      console.error("Error processing AI response:", error);
       
+      setMessages(prev => {
+        const newMessages = [...prev];
+        const loadingIndex = newMessages.findIndex(msg => msg.isLoading);
+        if (loadingIndex !== -1) {
+          newMessages[loadingIndex] = { 
+            role: 'assistant', 
+            content: "I'm sorry, I encountered an issue analyzing your request. Please try again with different wording." 
+          };
+        }
+        return newMessages;
+      });
+      
+      toast.error("Error generating style", {
+        description: "There was a problem processing your request."
+      });
+    } finally {
       setIsProcessing(false);
       setUploadedImage(null);
-    }, 1500);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -193,10 +336,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     setInput(prompt);
     if (chatInputRef.current) {
       chatInputRef.current.focus();
-      // Simulate a click on the send button after a brief delay
+      // Send after a brief delay
       setTimeout(() => {
         handleSendMessage();
-      }, 500);
+      }, 100);
     }
   };
 
