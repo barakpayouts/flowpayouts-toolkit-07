@@ -1,212 +1,238 @@
 
 import React, { useState, useRef } from 'react';
-import { Button } from "@/components/ui/button";
-import { Upload, X, FileUp, Check, AlertCircle } from 'lucide-react';
+import { X, Upload, FileText, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { toast } from "sonner";
 
 interface UploadInvoiceProps {
   onClose: () => void;
-  onUploadSuccess?: () => void;
 }
 
-const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, onUploadSuccess }) => {
+const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
+  const { config } = useWidgetConfig();
+  const [dragging, setDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsDragging(true);
+    setDragging(true);
   };
 
   const handleDragLeave = () => {
-    setIsDragging(false);
+    setDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsDragging(false);
+    setDragging(false);
     
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const droppedFile = e.dataTransfer.files[0];
-      handleFileSelected(droppedFile);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
     }
   };
 
-  const handleFileSelected = (selectedFile: File) => {
-    // Check if file is PDF or image
-    const fileType = selectedFile.type;
-    if (!fileType.includes('pdf') && !fileType.includes('image')) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (file: File) => {
+    // Check file type
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+    if (!validTypes.includes(file.type)) {
       toast.error("Invalid file type", {
-        description: "Please upload a PDF or image file"
+        description: "Please upload a PDF, JPEG, or PNG file."
       });
       return;
     }
     
     // Check file size (max 5MB)
-    if (selectedFile.size > 5 * 1024 * 1024) {
+    if (file.size > 5 * 1024 * 1024) {
       toast.error("File too large", {
-        description: "Maximum file size is 5MB"
+        description: "Maximum file size is 5MB."
       });
       return;
     }
     
-    setFile(selectedFile);
-  };
-
-  const triggerFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFileSelected(e.target.files[0]);
-    }
+    setFile(file);
   };
 
   const handleUpload = () => {
     if (!file) return;
     
-    setIsUploading(true);
+    setUploading(true);
     
     // Simulate upload progress
-    let progress = 0;
+    let currentProgress = 0;
     const interval = setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
-      
-      if (progress >= 100) {
+      currentProgress += Math.random() * 10;
+      if (currentProgress > 100) {
+        currentProgress = 100;
         clearInterval(interval);
+        
+        // Simulate completion after progress reaches 100%
         setTimeout(() => {
-          setIsUploading(false);
+          setUploading(false);
+          setUploaded(true);
+          
           toast.success("Invoice uploaded successfully", {
-            description: "Your invoice has been submitted for review"
+            description: "Your invoice has been uploaded and will be processed."
           });
-          if (onUploadSuccess) onUploadSuccess();
-          onClose();
+          
+          // Close modal after a short delay
+          setTimeout(() => {
+            onClose();
+          }, 1500);
         }, 500);
       }
-    }, 300);
+      setProgress(currentProgress);
+    }, 200);
   };
 
-  const removeFile = () => {
+  const handleRemoveFile = () => {
     setFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    setProgress(0);
+    setUploading(false);
+    setUploaded(false);
+  };
+
+  const getFileSize = (size: number) => {
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   return (
-    <div className="bg-payouts-dark/95 backdrop-blur-md p-6 rounded-lg border border-white/10 shadow-lg w-full max-w-md">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-white">Upload Invoice</h3>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onClose}
-          className="text-white/70 hover:text-white hover:bg-white/10"
-        >
-          <X size={18} />
-        </Button>
-      </div>
-      
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div 
-        onDragOver={handleDragOver} 
-        onDragLeave={handleDragLeave} 
-        onDrop={handleDrop}
-        onClick={!file ? triggerFileInput : undefined}
-        className={`border-2 border-dashed rounded-lg p-8 mb-4 transition-all cursor-pointer flex flex-col items-center justify-center
-          ${isDragging ? 'border-payouts-accent bg-payouts-accent/10' : 'border-white/20 hover:border-white/40 bg-white/5'}
-          ${file ? 'py-4' : 'py-8'}`}
+        className="w-full max-w-md p-6 rounded-xl shadow-xl"
+        style={{ 
+          background: `${config.primaryColor}`,
+          border: `1px solid ${config.borderColor}`
+        }}
       >
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleFileChange} 
-          className="hidden" 
-          accept=".pdf,.jpg,.jpeg,.png" 
-        />
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold">Upload Invoice</h2>
+          <Button 
+            variant="dark" 
+            size="icon" 
+            onClick={onClose}
+            className="h-8 w-8"
+          >
+            <X size={16} />
+          </Button>
+        </div>
         
         {!file ? (
-          <>
-            <Upload size={32} className="text-white/60 mb-3" />
-            <p className="text-white font-medium mb-1">Drag & drop or click to upload</p>
-            <p className="text-white/60 text-sm text-center">
-              Supported formats: PDF, JPG, PNG (Max size: 5MB)
-            </p>
-          </>
+          <div 
+            className={`invoice-upload-dropzone ${dragging ? 'dragging' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              className="hidden" 
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={handleFileChange}
+            />
+            <div className="flex flex-col items-center gap-3">
+              <div 
+                className="w-14 h-14 rounded-full flex items-center justify-center"
+                style={{ background: `${config.accentColor}20` }}
+              >
+                <Upload 
+                  size={24} 
+                  style={{ color: config.accentColor }} 
+                />
+              </div>
+              <div>
+                <p className="font-medium mb-1">Drop your invoice here</p>
+                <p className="text-xs text-white/60">or click to browse files</p>
+              </div>
+              <p className="text-xs text-white/60 mt-2">
+                Supports PDF, JPEG, PNG (max 5MB)
+              </p>
+            </div>
+          </div>
         ) : (
-          <div className="w-full">
-            <div className="flex items-center justify-between bg-white/10 p-3 rounded-lg mb-3">
-              <div className="flex items-center gap-3">
-                <FileUp size={20} className="text-payouts-accent" />
-                <div className="truncate max-w-[200px]">
-                  <p className="text-white font-medium truncate">{file.name}</p>
-                  <p className="text-white/60 text-xs">
-                    {(file.size / 1024).toFixed(0)} KB
-                  </p>
+          <div className="space-y-4">
+            <div className="invoice-file-preview">
+              <div 
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: `${config.accentColor}20` }}
+              >
+                <FileText 
+                  size={18} 
+                  className="invoice-file-preview-icon"
+                  style={{ color: config.accentColor }}
+                />
+              </div>
+              <div className="invoice-file-preview-info">
+                <p className="invoice-file-preview-name">{file.name}</p>
+                <p className="invoice-file-preview-size">{getFileSize(file.size)}</p>
+              </div>
+              {!uploading && !uploaded && (
+                <Button 
+                  variant="dark" 
+                  size="icon" 
+                  onClick={handleRemoveFile}
+                  className="h-7 w-7 bg-white/10"
+                >
+                  <X size={14} />
+                </Button>
+              )}
+              {uploaded && (
+                <div 
+                  className="w-7 h-7 rounded-full flex items-center justify-center"
+                  style={{ background: config.accentColor }}
+                >
+                  <Check size={14} className="text-payouts-dark" />
+                </div>
+              )}
+            </div>
+            
+            {(uploading || uploaded) && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span>{uploaded ? 'Complete' : 'Uploading...'}</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
+                <div className="invoice-upload-progress">
+                  <div 
+                    className="invoice-upload-progress-bar" 
+                    style={{ 
+                      width: `${progress}%`,
+                      background: config.accentColor
+                    }} 
+                  />
                 </div>
               </div>
+            )}
+            
+            {!uploading && !uploaded && (
               <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeFile();
+                onClick={handleUpload}
+                className="w-full font-semibold"
+                style={{
+                  background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+                  color: config.primaryColor,
                 }}
-                className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8"
               >
-                <X size={16} />
+                <Upload size={16} className="mr-2" />
+                Upload Invoice
               </Button>
-            </div>
-            
-            <div className="text-center text-white/70 text-sm">
-              {isUploading ? 'Uploading...' : 'File ready to upload'}
-            </div>
-            
-            {isUploading && (
-              <div className="w-full bg-white/10 rounded-full h-2 mt-2">
-                <div 
-                  className="bg-payouts-accent h-2 rounded-full transition-all" 
-                  style={{ width: `${uploadProgress}%` }}
-                ></div>
-              </div>
             )}
           </div>
         )}
-      </div>
-      
-      <div className="flex items-center gap-3 text-sm text-white/70 mb-4">
-        <AlertCircle size={16} />
-        <span>All invoices are reviewed before being processed</span>
-      </div>
-      
-      <div className="flex gap-3">
-        <Button 
-          variant="outline" 
-          onClick={onClose} 
-          className="flex-1 border-white/20 text-white hover:bg-white/10"
-        >
-          Cancel
-        </Button>
-        <Button 
-          onClick={handleUpload} 
-          disabled={!file || isUploading}
-          className="flex-1 bg-payouts-accent text-payouts-dark hover:bg-payouts-accent/90 flex items-center gap-2"
-        >
-          {isUploading ? (
-            <>Uploading... {uploadProgress}%</>
-          ) : (
-            <>
-              <Upload size={16} />
-              Upload Invoice
-            </>
-          )}
-        </Button>
       </div>
     </div>
   );

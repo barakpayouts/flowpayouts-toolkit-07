@@ -17,7 +17,8 @@ interface VerificationLayoutProps {
   setIsAuthorized?: (value: boolean) => void;
   disableNext?: boolean;
   buttonText?: string;
-  hideButtons?: boolean; // New prop to hide back/next buttons
+  hideButtons?: boolean;
+  showUploadInvoice?: boolean; // New prop to control invoice upload visibility
 }
 
 const VerificationLayout: React.FC<VerificationLayoutProps> = ({
@@ -32,7 +33,8 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   setIsAuthorized,
   disableNext = false,
   buttonText,
-  hideButtons = false, // Default is false
+  hideButtons = false,
+  showUploadInvoice = false, // Default is false
 }) => {
   const { config } = useWidgetConfig();
 

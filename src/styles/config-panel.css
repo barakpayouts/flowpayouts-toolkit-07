@@ -192,3 +192,45 @@ input:checked + .toggle-slider:before {
   opacity: 0.7;
 }
 
+/* Upload button styling */
+.upload-invoice-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(208, 233, 42, 0.15);
+  color: var(--accent, #d0e92a);
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(208, 233, 42, 0.3);
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.upload-invoice-button:hover {
+  background: rgba(208, 233, 42, 0.25);
+  border-color: rgba(208, 233, 42, 0.5);
+}
+
+.upload-invoice-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Make sure the UploadInvoice component is visible */
+.dashboard-tabs {
+  position: relative;
+}
+
+.dashboard-action-button {
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* Ensure invoice upload button is visible */
+.invoice-upload-container {
+  margin-bottom: 20px;
+  display: block;
+  width: 100%;
+}
