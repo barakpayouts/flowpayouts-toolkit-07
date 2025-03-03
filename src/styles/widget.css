@@ -43,7 +43,7 @@
   background-color: var(--accent, #d0e92a);
   color: var(--primary-bg, #0f2a35);
   transform: scale(1.1);
-  box-shadow: 0 0 12px rgba(208, 233, 42, 0.5);
+  box-shadow: 0 0 12px var(--accent-glow, rgba(208, 233, 42, 0.5));
 }
 
 .step-number {
@@ -151,6 +151,25 @@
   gap: 0.35rem;
   padding: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Bowl.com specific styles */
+.bowl-brand-button {
+  background-color: #33C3F0;
+  color: #0F2634;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.bowl-brand-button:hover {
+  background-color: #1EAEDB;
+  box-shadow: 0 0 10px rgba(51, 195, 240, 0.5);
+}
+
+.bowl-brand-bg {
+  background-color: #1A3C40;
+  color: #ffffff;
+  border-color: #265073;
 }
 
 /* Shadow for glow effect */

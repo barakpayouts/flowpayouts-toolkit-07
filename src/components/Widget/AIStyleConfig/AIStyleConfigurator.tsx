@@ -29,6 +29,17 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
     setShowPreview(false);
   };
   
+  // Bowl.com example style for suggestion
+  const bowlStyle = {
+    name: "Bowl.com Branding",
+    primaryColor: "#0F2634",
+    accentColor: "#33C3F0",
+    backgroundColor: "#1A3C40",
+    textColor: "#ffffff",
+    borderColor: "#265073",
+    borderRadius: 8,
+  };
+  
   return (
     <div className="bg-[#1A1F2C]/95 rounded-xl border border-white/10 p-0 overflow-hidden shadow-lg">
       <div className="p-2 border-b border-white/10">
@@ -66,33 +77,21 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
               <div className="flex flex-col items-center gap-1 w-full">
                 <button 
                   className="suggestion-chip flex items-center justify-center w-full"
-                  onClick={() => handleStyleChange(
-                    {
-                      name: "Green and Blue",
-                      primaryColor: "#1A3C40",
-                      accentColor: "#1EAEDB",
-                      backgroundColor: "#265073",
-                      textColor: "#ffffff",
-                      borderColor: "#2D6E7E",
-                      borderRadius: 8,
-                    }
-                  )}
+                  onClick={() => handleStyleChange(bowlStyle)}
                 >
-                  "Make it match our website colors"
+                  "Make it match the Bowl.com website"
                 </button>
                 <button
                   className="suggestion-chip flex items-center justify-center w-full"
-                  onClick={() => handleStyleChange(
-                    {
-                      name: "Ocean Blue",
-                      primaryColor: "#003366",
-                      accentColor: "#33C3F0",
-                      backgroundColor: "#004E89",
-                      textColor: "#ffffff",
-                      borderColor: "#2A6F97",
-                      borderRadius: 8,
-                    }
-                  )}
+                  onClick={() => handleStyleChange({
+                    name: "Ocean Blue",
+                    primaryColor: "#003366",
+                    accentColor: "#33C3F0",
+                    backgroundColor: "#004E89",
+                    textColor: "#ffffff",
+                    borderColor: "#2A6F97",
+                    borderRadius: 8,
+                  })}
                 >
                   "Our brand uses green and blue"
                 </button>

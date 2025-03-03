@@ -31,6 +31,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+  // Bowl.com branding colors
+  const bowlStyle = {
+    name: "Bowl.com Branding",
+    primaryColor: "#0F2634",
+    accentColor: "#33C3F0",
+    backgroundColor: "#1A3C40",
+    textColor: "#ffffff",
+    borderColor: "#265073",
+    borderRadius: 8,
+  };
+
   // Example styles that the AI would generate based on the conversation and uploaded images
   const predefinedStyles = [
     {
@@ -54,21 +65,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     {
       name: "Green and Blue",
       primaryColor: "#1A3C40",
-      accentColor: "#1EAEDB",
+      accentColor: "#33C3F0",
       backgroundColor: "#265073",
       textColor: "#ffffff",
       borderColor: "#2D6E7E",
       borderRadius: 8,
     },
-    {
-      name: "Vibrant Ocean",
-      primaryColor: "#003366",
-      accentColor: "#33C3F0",
-      backgroundColor: "#004E89",
-      textColor: "#ffffff",
-      borderColor: "#2A6F97",
-      borderRadius: 8,
-    }
+    bowlStyle
   ];
 
   // Suggested prompts that users can click on
@@ -128,10 +131,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     let aiResponse = '';
     let styleToApply = null;
 
+    // Check if user mentioned bowl.com or wants their branding
+    if (lowerCaseMsg.includes('bowl.com') || lowerCaseMsg.includes('bowl') || lowerCaseMsg.includes('this brand')) {
+      aiResponse = "I've analyzed the Bowl.com website and created a custom theme using their blue and green color palette. I've applied these colors to your widget design.";
+      styleToApply = bowlStyle;
+    }
     // Simulate AI understanding different user inputs
-    if (lowerCaseMsg.includes('blue') || lowerCaseMsg.includes('ocean')) {
+    else if (lowerCaseMsg.includes('blue') || lowerCaseMsg.includes('ocean')) {
       aiResponse = "I think a vibrant ocean blue theme would work well for your brand. It conveys trust and professionalism. I've created a style based on blue tones.";
-      styleToApply = predefinedStyles[3];
+      styleToApply = predefinedStyles[0];
     } 
     else if (lowerCaseMsg.includes('purple') || lowerCaseMsg.includes('tech')) {
       aiResponse = "A tech-focused purple theme would be perfect for your brand. It looks modern and innovative. I've applied this style to your widget.";
@@ -142,13 +150,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       styleToApply = predefinedStyles[2];
     }
     else if (lowerCaseMsg.includes('website') || lowerCaseMsg.includes('match')) {
-      aiResponse = "Based on your website colors, I've designed a modern blue theme that should complement your existing brand identity perfectly.";
-      styleToApply = predefinedStyles[0];
+      aiResponse = "Based on your website colors, I've designed a blue theme that should complement your existing brand identity perfectly.";
+      styleToApply = bowlStyle;
     }
     else if (uploadedImage || lowerCaseMsg.includes('logo') || lowerCaseMsg.includes('image') || lowerCaseMsg.includes('upload')) {
       aiResponse = "I've analyzed your brand assets and created a custom theme that matches your visual identity. The colors and style elements have been extracted from your logo.";
-      // Use green and blue style for logo uploads
-      styleToApply = predefinedStyles[2];
+      // Use bowl.com style for logo uploads in this case
+      styleToApply = bowlStyle;
     }
     else {
       aiResponse = "Based on your preferences, I've created a custom style that should work well for your brand. You can always ask me to adjust specific elements like colors, borders, or spacing.";
