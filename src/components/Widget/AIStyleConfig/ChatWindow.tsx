@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Upload, Image, Bot, User, X, RefreshCw, Loader2, Info, KeyRound } from 'lucide-react';
+import { Send, Upload, Image, Bot, User, X, RefreshCw, Loader2, Info, KeyRound, AlertTriangle } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { cn } from '@/lib/utils';
 import { toast } from "sonner";
@@ -14,7 +14,6 @@ interface ChatWindowProps {
   onApplyStyle: (styleChanges: any) => void;
 }
 
-// Style presets that the AI can recommend
 const stylePresets = {
   "bowl": {
     name: "Bowl.com Branding",
@@ -108,6 +107,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const [apiKey, setApiKey] = useState<string>('');
   const [showKeyInput, setShowKeyInput] = useState(true);
   const [isKeyValid, setIsKeyValid] = useState(false);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
 
   const suggestedPrompts = [
     "Make it match our website colors",
@@ -192,7 +192,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         const errorData = await response.json();
         console.error("OpenAI API Error:", errorData);
         
-        if (errorData.error?.message?.includes("API key")) {
+        if (errorData.error?.code === "insufficient_quota") {
+          setQuotaExceeded(true);
+          setIsKeyValid(false);
+          setShowKeyInput(true);
+          toast.error("OpenAI API quota exceeded", {
+            description: "Your API key has exceeded its quota. Please use a different key or upgrade your plan."
+          });
+          throw new Error("OpenAI API quota exceeded");
+        } else if (errorData.error?.message?.includes("API key")) {
           setIsKeyValid(false);
           setShowKeyInput(true);
           toast.error("Invalid OpenAI API key", {
@@ -205,6 +213,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       
       // If we reach here, the key is valid
       setIsKeyValid(true);
+      setQuotaExceeded(false);
       
       const data = await response.json();
       const aiResponse = data.choices[0]?.message?.content;
@@ -389,13 +398,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       // Handle errors gracefully
       console.error("Error processing AI response:", error);
       
+      let errorMessage = "I'm sorry, I encountered an issue analyzing your request.";
+      
+      if (quotaExceeded) {
+        errorMessage = "I'm sorry, but your OpenAI API key has exceeded its quota. Please use a different key or upgrade your plan at OpenAI.";
+      } else if (!isKeyValid) {
+        errorMessage = "I'm sorry, I encountered an issue with your API key. Please make sure you've entered a valid OpenAI API key.";
+      }
+      
       setMessages(prev => {
         const newMessages = [...prev];
         const loadingIndex = newMessages.findIndex(msg => msg.isLoading);
         if (loadingIndex !== -1) {
           newMessages[loadingIndex] = { 
             role: 'assistant', 
-            content: "I'm sorry, I encountered an issue analyzing your request. Please make sure you've entered a valid OpenAI API key." 
+            content: errorMessage
           };
         }
         return newMessages;
@@ -472,6 +489,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
               }]);
               setUploadedImage(null);
               setInput('');
+              setQuotaExceeded(false);
             }}
           >
             <RefreshCw size={12} />
@@ -485,6 +503,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             <KeyRound size={12} className="text-payouts-accent" />
             <span>Enter your OpenAI API key to enable AI styling</span>
           </div>
+          
+          {quotaExceeded && (
+            <div className="mb-2 p-2 bg-orange-900/30 border border-orange-700/30 rounded-md flex items-start gap-2">
+              <AlertTriangle size={14} className="text-orange-400 mt-0.5" />
+              <div className="text-xs text-orange-200">
+                <p className="font-medium mb-0.5">API Quota Exceeded</p>
+                <p>Your OpenAI API key has run out of credits. Please use a different API key or upgrade your plan at OpenAI.</p>
+              </div>
+            </div>
+          )}
+          
           <div className="flex gap-2">
             <input
               type="password"
@@ -507,7 +536,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         </div>
       )}
       
-      {/* Suggested prompts section */}
       <div className="suggestions-container">
         {suggestedPrompts.map((prompt, index) => (
           <button
