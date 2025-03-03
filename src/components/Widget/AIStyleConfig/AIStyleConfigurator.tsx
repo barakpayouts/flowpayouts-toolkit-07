@@ -31,104 +31,104 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
   
   return (
     <div className="bg-[#1A1F2C]/95 rounded-xl border border-white/10 p-0 overflow-hidden shadow-lg">
-      <div className="p-4 border-b border-white/10">
-        <div className="flex items-center gap-2 mb-2">
-          <Bot size={18} className="text-payouts-accent" />
-          <h3 className="font-medium">AI-Powered Widget Styling</h3>
+      <div className="p-3 border-b border-white/10">
+        <div className="flex items-center gap-2 mb-1">
+          <Bot size={16} className="text-payouts-accent" />
+          <h3 className="font-medium text-sm">AI-Powered Widget Styling</h3>
         </div>
-        <p className="text-white/70 text-sm">
+        <p className="text-white/70 text-xs">
           Chat with our AI to customize the widget design based on your brand. 
           Upload your logo or share your website, and let the AI create a style 
           that matches your branding.
         </p>
       </div>
       
-      <div className="flex flex-col md:flex-row h-[500px]">
+      <div className="flex flex-col md:flex-row h-[400px]">
         <div className="w-full md:w-1/2 h-1/2 md:h-full">
           <ChatWindow onApplyStyle={handleStyleChange} />
         </div>
         
-        <div className="w-full md:w-1/2 h-1/2 md:h-full border-t md:border-t-0 md:border-l border-white/10 bg-gradient-to-br from-[#1A1F2C] to-[#141824] p-6 flex flex-col">
-          <div className="flex items-center gap-2 mb-6">
-            <Palette size={20} className="text-payouts-accent" />
-            <h3 className="font-medium text-lg">Style Preview</h3>
+        <div className="w-full md:w-1/2 h-1/2 md:h-full border-t md:border-t-0 md:border-l border-white/10 bg-gradient-to-br from-[#1A1F2C] to-[#141824] p-4 flex flex-col">
+          <div className="flex items-center gap-2 mb-4">
+            <Palette size={16} className="text-payouts-accent" />
+            <h3 className="font-medium text-sm">Style Preview</h3>
           </div>
           
           {!showPreview ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
-              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                <ScanSearch size={28} className="text-white/40" />
+              <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                <ScanSearch size={20} className="text-white/40" />
               </div>
-              <h3 className="text-lg font-medium mb-2">No style changes yet</h3>
-              <p className="text-white/60 mb-6 max-w-xs">
+              <h3 className="text-sm font-medium mb-2">No style changes yet</h3>
+              <p className="text-white/60 mb-4 max-w-xs text-xs">
                 Chat with the Style AI to create a custom look for your widget based on your brand
               </p>
-              <div className="flex flex-col items-start gap-3 bg-white/5 p-4 rounded-lg text-sm text-white/70 w-full max-w-xs">
+              <div className="flex flex-col items-start gap-2 bg-white/5 p-3 rounded-lg text-xs text-white/70 w-full max-w-xs">
                 <p className="flex items-center gap-2">
-                  <ChevronRight size={14} className="text-payouts-accent" />
+                  <ChevronRight size={12} className="text-payouts-accent" />
                   "Make it match our website colors"
                 </p>
                 <p className="flex items-center gap-2">
-                  <ChevronRight size={14} className="text-payouts-accent" />
+                  <ChevronRight size={12} className="text-payouts-accent" />
                   "Our brand uses green and blue"
                 </p>
                 <p className="flex items-center gap-2">
-                  <ChevronRight size={14} className="text-payouts-accent" />
+                  <ChevronRight size={12} className="text-payouts-accent" />
                   "Upload our logo to extract colors"
                 </p>
               </div>
             </div>
           ) : (
             <div className="flex-1 flex flex-col">
-              <div className="grid grid-cols-1 gap-4 mb-4">
-                <div className="bg-white/5 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium mb-3 text-white/70">Color Palette</h4>
-                  <div className="flex gap-2 mb-4">
+              <div className="grid grid-cols-1 gap-3 mb-3">
+                <div className="bg-white/5 p-3 rounded-lg">
+                  <h4 className="text-xs font-medium mb-2 text-white/70">Color Palette</h4>
+                  <div className="flex gap-2 mb-3">
                     <div className="flex-1 flex flex-col items-center">
                       <div 
-                        className="w-10 h-10 rounded-md mb-1"
+                        className="w-8 h-8 rounded-md mb-1"
                         style={{ backgroundColor: previewStyle.primaryColor }}
                       ></div>
-                      <span className="text-xs text-white/60">Primary</span>
+                      <span className="text-[10px] text-white/60">Primary</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center">
                       <div 
-                        className="w-10 h-10 rounded-md mb-1"
+                        className="w-8 h-8 rounded-md mb-1"
                         style={{ backgroundColor: previewStyle.accentColor }}
                       ></div>
-                      <span className="text-xs text-white/60">Accent</span>
+                      <span className="text-[10px] text-white/60">Accent</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center">
                       <div 
-                        className="w-10 h-10 rounded-md mb-1"
+                        className="w-8 h-8 rounded-md mb-1"
                         style={{ backgroundColor: previewStyle.backgroundColor }}
                       ></div>
-                      <span className="text-xs text-white/60">Background</span>
+                      <span className="text-[10px] text-white/60">Background</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center">
                       <div 
-                        className="w-10 h-10 rounded-md border border-white/10 mb-1"
+                        className="w-8 h-8 rounded-md border border-white/10 mb-1"
                         style={{ backgroundColor: previewStyle.borderColor }}
                       ></div>
-                      <span className="text-xs text-white/60">Border</span>
+                      <span className="text-[10px] text-white/60">Border</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-white/5 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium mb-3 text-white/70">Style Preview</h4>
-                  <div className="space-y-3">
+                <div className="bg-white/5 p-3 rounded-lg">
+                  <h4 className="text-xs font-medium mb-2 text-white/70">Style Preview</h4>
+                  <div className="space-y-2">
                     <div 
-                      className="h-16 rounded-lg border p-3 flex items-center justify-between"
+                      className="h-12 rounded-lg border p-2 flex items-center justify-between"
                       style={{ 
                         backgroundColor: previewStyle.backgroundColor,
                         borderColor: previewStyle.borderColor,
                         borderRadius: `${previewStyle.borderRadius}px`,
                       }}
                     >
-                      <div className="w-32 h-6 bg-white/10 rounded"></div>
+                      <div className="w-24 h-4 bg-white/10 rounded"></div>
                       <div 
-                        className="w-24 h-8 rounded flex items-center justify-center text-xs font-medium"
+                        className="w-20 h-6 rounded flex items-center justify-center text-[10px] font-medium"
                         style={{ 
                           backgroundColor: previewStyle.accentColor,
                           color: previewStyle.primaryColor,
@@ -140,7 +140,7 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
                     </div>
                     
                     <div 
-                      className="h-16 rounded-lg border flex items-center gap-3 p-3"
+                      className="h-12 rounded-lg border flex items-center gap-2 p-2"
                       style={{ 
                         backgroundColor: previewStyle.backgroundColor,
                         borderColor: previewStyle.borderColor,
@@ -148,14 +148,14 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
                       }}
                     >
                       <div 
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        className="w-8 h-8 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: previewStyle.accentColor }}
                       >
-                        <Sparkles size={16} style={{ color: previewStyle.primaryColor }} />
+                        <Sparkles size={12} style={{ color: previewStyle.primaryColor }} />
                       </div>
                       <div className="flex-1">
-                        <div className="w-full h-3 bg-white/10 rounded mb-2"></div>
-                        <div className="w-2/3 h-3 bg-white/10 rounded"></div>
+                        <div className="w-full h-2 bg-white/10 rounded mb-1"></div>
+                        <div className="w-2/3 h-2 bg-white/10 rounded"></div>
                       </div>
                     </div>
                   </div>
@@ -169,15 +169,15 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
               >
                 <Button 
                   onClick={applyChanges}
-                  className="w-full flex items-center justify-center gap-2 py-6 text-payouts-dark font-semibold"
+                  className="w-full flex items-center justify-center gap-2 py-3 text-payouts-dark font-semibold text-sm"
                   style={{ 
                     backgroundColor: previewStyle.accentColor,
                     color: previewStyle.primaryColor,
                   }}
                   variant="accent"
-                  size="lg"
+                  size="default"
                 >
-                  <Check size={18} />
+                  <Check size={14} />
                   Apply This Style
                 </Button>
               </motion.div>

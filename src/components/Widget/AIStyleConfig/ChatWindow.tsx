@@ -188,15 +188,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
 
   return (
     <div className="flex flex-col h-full bg-[#1A1F2C] border border-white/10 rounded-xl overflow-hidden">
-      <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
+      <div className="p-3 border-b border-white/10 bg-white/5 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Bot size={20} className="text-payouts-accent" />
-          <h3 className="font-medium">Style Assistant</h3>
+          <Bot size={16} className="text-payouts-accent" />
+          <h3 className="font-medium text-sm">Style Assistant</h3>
         </div>
         <Button 
           variant="outline" 
           size="sm" 
-          className="h-8 px-2 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+          className="h-7 px-2 bg-white/5 border-white/10 hover:bg-white/10 text-white"
           onClick={() => {
             setMessages([{ 
               role: 'assistant', 
@@ -205,12 +205,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             setUploadedImage(null);
           }}
         >
-          <RefreshCw size={14} />
+          <RefreshCw size={12} />
         </Button>
       </div>
       
-      <div className="flex-1 p-4 overflow-y-auto bg-black/20">
-        <div className="space-y-4">
+      <div className="flex-1 p-3 overflow-y-auto bg-black/20 max-h-[280px]">
+        <div className="space-y-3">
           {messages.map((message, index) => (
             <div 
               key={index} 
@@ -221,25 +221,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             >
               <div 
                 className={cn(
-                  "max-w-[80%] rounded-lg p-3",
+                  "max-w-[90%] rounded-lg p-2",
                   message.role === 'user' 
                     ? "bg-payouts-accent/20 text-white" 
                     : "bg-white/10 text-white",
                   message.isLoading && "animate-pulse"
                 )}
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-1 mb-1">
                   {message.role === 'assistant' ? (
-                    <Bot size={16} className="text-payouts-accent" />
+                    <Bot size={14} className="text-payouts-accent" />
                   ) : (
-                    <User size={16} className="text-payouts-accent" />
+                    <User size={14} className="text-payouts-accent" />
                   )}
                   <span className="text-xs font-medium text-white/70">
                     {message.role === 'user' ? 'You' : 'Style AI'}
                   </span>
                 </div>
                 
-                {message.content || (message.isLoading ? 'Designing your style...' : '')}
+                <p className="text-sm whitespace-pre-wrap">{message.content || (message.isLoading ? 'Designing your style...' : '')}</p>
                 
                 {index === messages.length - 1 && message.role === 'user' && uploadedImage && (
                   <div className="mt-2">
@@ -247,7 +247,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
                       <img 
                         src={uploadedImage} 
                         alt="Uploaded logo" 
-                        className="max-h-40 rounded-md border border-white/20" 
+                        className="max-h-32 rounded-md border border-white/20" 
                       />
                       <button 
                         className="absolute top-1 right-1 bg-black/40 rounded-full p-1 text-white/80 hover:text-white"
@@ -266,10 +266,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       </div>
       
       {uploadedImage && (
-        <div className="px-4 pt-2">
+        <div className="px-3 pt-2">
           <div className="bg-white/10 rounded-md p-2 flex justify-between items-center">
-            <div className="flex items-center gap-2 text-sm text-white/70 truncate">
-              <Image size={14} className="text-payouts-accent" />
+            <div className="flex items-center gap-2 text-xs text-white/70 truncate">
+              <Image size={12} className="text-payouts-accent" />
               <span className="truncate">Logo uploaded and ready to analyze</span>
             </div>
             <Button 
@@ -297,22 +297,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             type="button"
             variant="outline"
             size="icon"
-            className="shrink-0 h-9 w-9 bg-white/5 border-white/10 hover:bg-white/10"
+            className="shrink-0 h-8 w-8 bg-white/5 border-white/10 hover:bg-white/10"
             onClick={triggerFileInput}
             title="Upload logo"
           >
-            <Upload size={16} className="text-white/70" />
+            <Upload size={14} className="text-white/70" />
           </Button>
           
           <div className="flex-1 bg-white/5 rounded-md flex items-center border border-white/10">
             <textarea
-              className="flex-1 py-2 px-3 bg-transparent text-sm text-white placeholder:text-white/50 resize-none outline-none"
+              className="flex-1 py-2 px-3 bg-transparent text-xs text-white placeholder:text-white/50 resize-none outline-none"
               placeholder="Ask about styling, or share your website..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
-              style={{minHeight: '36px', maxHeight: '120px'}}
+              style={{minHeight: '32px', maxHeight: '80px'}}
             />
           </div>
           
@@ -320,7 +320,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             type="button"
             variant="accent"
             size="icon"
-            className="shrink-0 h-9 w-9"
+            className="shrink-0 h-8 w-8"
             onClick={handleSendMessage}
             disabled={isProcessing || (!input.trim() && !uploadedImage)}
             style={{
@@ -328,7 +328,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
               color: '#143745',
             }}
           >
-            <Send size={16} />
+            <Send size={14} />
           </Button>
         </div>
       </div>
