@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Send, Upload, Image, Bot, User, Palette, X, RefreshCw } from 'lucide-react';
+import { Send, Upload, Image, Bot, User, X, RefreshCw } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { cn } from '@/lib/utils';
 import { toast } from "sonner";
@@ -29,6 +29,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { config } = useWidgetConfig();
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
 
   // Example styles that the AI would generate based on the conversation and uploaded images
   const predefinedStyles = [
@@ -70,6 +71,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     }
   ];
 
+  // Suggested prompts that users can click on
+  const suggestedPrompts = [
+    "Make it match our website colors",
+    "Our brand uses green and blue",
+    "Upload our logo to extract colors"
+  ];
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -86,15 +94,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     
     setMessages(prev => [
       ...prev, 
-      { role: 'user', content: userMessage },
-      { role: 'assistant', content: '', isLoading: true }
+      { role: 'user', content: userMessage }
     ]);
     
     setInput('');
     setIsProcessing(true);
 
-    // In a real implementation, this would call an AI API
-    // For this demo, we'll simulate a response after a delay
+    // Add AI loading message after a short delay to improve UX
+    setTimeout(() => {
+      setMessages(prev => [...prev, { role: 'assistant', content: '', isLoading: true }]);
+    }, 300);
+
+    // Simulate AI response after a delay
     setTimeout(() => {
       simulateAIResponse(userMessage);
       setIsProcessing(false);
@@ -138,7 +149,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     // Update the loading message with the actual response
     setMessages(prev => {
       const newMessages = [...prev];
-      newMessages[newMessages.length - 1] = { role: 'assistant', content: aiResponse };
+      const loadingIndex = newMessages.findIndex(msg => msg.isLoading);
+      if (loadingIndex !== -1) {
+        newMessages[loadingIndex] = { role: 'assistant', content: aiResponse };
+      } else {
+        newMessages.push({ role: 'assistant', content: aiResponse });
+      }
       return newMessages;
     });
 
@@ -156,6 +172,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  const handleSuggestedPrompt = (prompt: string) => {
+    setInput(prompt);
+    // Focus the input after selecting a prompt
+    if (chatInputRef.current) {
+      chatInputRef.current.focus();
     }
   };
 
@@ -203,6 +227,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
               content: 'Hello! I can help you customize your widget design. Tell me about your brand colors and style preferences, or share your logo or website link.' 
             }]);
             setUploadedImage(null);
+            setInput('');
           }}
         >
           <RefreshCw size={12} />
@@ -265,6 +290,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         </div>
       </div>
       
+      {/* Suggested prompts section */}
+      <div className="px-3 pt-2 pb-1">
+        <div className="flex flex-wrap gap-2">
+          {suggestedPrompts.map((prompt, index) => (
+            <button
+              key={index}
+              className="text-sm bg-white/10 hover:bg-white/15 text-white px-3 py-1.5 rounded-full transition-colors"
+              onClick={() => handleSuggestedPrompt(prompt)}
+            >
+              "{prompt}"
+            </button>
+          ))}
+        </div>
+      </div>
+      
       {uploadedImage && (
         <div className="px-3 pt-2">
           <div className="bg-white/10 rounded-md p-2 flex justify-between items-center">
@@ -297,22 +337,23 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             type="button"
             variant="outline"
             size="icon"
-            className="shrink-0 h-8 w-8 bg-white/5 border-white/10 hover:bg-white/10"
+            className="shrink-0 h-9 w-9 bg-white/5 border-white/10 hover:bg-white/10"
             onClick={triggerFileInput}
             title="Upload logo"
           >
-            <Upload size={14} className="text-white/70" />
+            <Upload size={16} className="text-white/70" />
           </Button>
           
           <div className="flex-1 bg-white/5 rounded-md flex items-center border border-white/10">
             <textarea
-              className="flex-1 py-2 px-3 bg-transparent text-xs text-white placeholder:text-white/50 resize-none outline-none"
+              ref={chatInputRef}
+              className="flex-1 py-2 px-3 bg-transparent text-sm text-white placeholder:text-white/50 resize-none outline-none"
               placeholder="Ask about styling, or share your website..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
-              style={{minHeight: '32px', maxHeight: '80px'}}
+              style={{minHeight: "32px", maxHeight: "80px"}}
             />
           </div>
           
@@ -320,7 +361,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             type="button"
             variant="accent"
             size="icon"
-            className="shrink-0 h-8 w-8"
+            className="shrink-0 h-9 w-9"
             onClick={handleSendMessage}
             disabled={isProcessing || (!input.trim() && !uploadedImage)}
             style={{
@@ -328,7 +369,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
               color: '#143745',
             }}
           >
-            <Send size={14} />
+            <Send size={16} />
           </Button>
         </div>
       </div>
