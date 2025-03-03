@@ -89,7 +89,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const autoResizeTextarea = () => {
     if (chatInputRef.current) {
       chatInputRef.current.style.height = 'auto';
-      chatInputRef.current.style.height = `${Math.min(chatInputRef.current.scrollHeight, 100)}px`;
+      chatInputRef.current.style.height = `${Math.min(chatInputRef.current.scrollHeight, 80)}px`;
     }
   };
 
@@ -225,14 +225,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#1A1F2C] border border-white/10 rounded-xl overflow-hidden">
-      <div className="p-3 border-b border-white/10 bg-white/5 flex justify-between items-center">
+    <div className="flex flex-col h-full bg-[#1A1F2C] border border-white/10 rounded-xl overflow-hidden ai-style-compact">
+      <div className="p-2 border-b border-white/10 bg-white/5 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Bot size={16} className="text-payouts-accent" />
+          <Bot size={16} className="text-payouts-accent ai-style-header-icon" />
           <h3 className="font-medium text-sm">Style Assistant</h3>
         </div>
         <button 
-          className="h-7 px-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-md flex items-center justify-center"
+          className="h-6 px-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-md flex items-center justify-center"
           onClick={() => {
             setMessages([{ 
               role: 'assistant', 
@@ -261,9 +261,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       
       <div 
         ref={messagesContainerRef}
-        className="flex-1 p-3 overflow-y-auto bg-black/20 max-h-[280px]"
+        className="flex-1 p-2 overflow-y-auto bg-black/20 chat-messages"
       >
-        <div className="space-y-3">
+        <div className="space-y-2">
           {messages.map((message, index) => (
             <div 
               key={index} 
@@ -274,7 +274,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             >
               <div 
                 className={cn(
-                  "max-w-[90%] rounded-lg p-2",
+                  "max-w-[90%] rounded-lg p-2 ai-style-compact-message",
                   message.role === 'user' 
                     ? "bg-payouts-accent/20 text-white" 
                     : "bg-white/10 text-white",
@@ -283,7 +283,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
               >
                 <div className="flex items-center gap-1 mb-1">
                   {message.role === 'assistant' ? (
-                    <Bot size={14} className="text-payouts-accent" />
+                    <Bot size={14} className="text-payouts-accent ai-style-bot-icon" />
                   ) : (
                     <User size={14} className="text-payouts-accent" />
                   )}
@@ -319,7 +319,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       </div>
       
       {uploadedImage && (
-        <div className="px-3 pt-2">
+        <div className="px-2 pt-2">
           <div className="bg-white/10 rounded-md p-2 flex justify-between items-center">
             <div className="flex items-center gap-2 text-xs text-white/70 truncate">
               <Image size={12} className="text-payouts-accent" />
@@ -335,7 +335,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         </div>
       )}
       
-      <div className="p-3 border-t border-white/10 bg-white/5">
+      <div className="p-2 border-t border-white/10 bg-white/5 chat-input-container">
         <div className="flex gap-2 items-center">
           <input 
             type="file"
@@ -346,9 +346,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
           />
           <button
             type="button"
-            className="ai-upload-button h-9 w-9 flex items-center justify-center"
+            className="ai-upload-button flex items-center justify-center"
             onClick={triggerFileInput}
             title="Upload logo"
+            aria-label="Upload logo"
           >
             <Upload size={16} className="text-white/70" />
           </button>
@@ -357,7 +358,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             <textarea
               ref={chatInputRef}
               className="chat-input"
-              placeholder="Ask about styling, or share your website..."
+              placeholder="Ask about styling..."
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);
@@ -370,7 +371,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
           
           <button
             type="button"
-            className={`chat-button h-9 w-9 flex items-center justify-center ${
+            className={`chat-button h-8 w-8 flex items-center justify-center ${
               isProcessing || (!input.trim() && !uploadedImage) ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             onClick={handleSendMessage}
@@ -379,6 +380,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
               backgroundColor: config.accentColor,
               color: '#143745',
             }}
+            aria-label="Send message"
           >
             <Send size={16} />
           </button>
