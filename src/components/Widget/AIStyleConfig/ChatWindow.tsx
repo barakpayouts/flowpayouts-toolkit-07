@@ -187,7 +187,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-payouts-dark border border-white/10 rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full bg-[#1A1F2C] border border-white/10 rounded-xl overflow-hidden">
       <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Bot size={20} className="text-payouts-accent" />

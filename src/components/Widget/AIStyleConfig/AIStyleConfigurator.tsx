@@ -30,13 +30,13 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
   };
   
   return (
-    <div className="bg-black/30 rounded-xl border border-white/10 p-0 overflow-hidden">
+    <div className="bg-[#1A1F2C]/80 rounded-xl border border-white/10 p-0 overflow-hidden shadow-lg">
       <div className="flex flex-col md:flex-row h-[600px]">
         <div className="w-full md:w-1/2 h-1/2 md:h-full">
           <ChatWindow onApplyStyle={handleStyleChange} />
         </div>
         
-        <div className="w-full md:w-1/2 h-1/2 md:h-full border-t md:border-t-0 md:border-l border-white/10 bg-gradient-to-br from-payouts-dark to-payouts-dark/80 p-6 flex flex-col">
+        <div className="w-full md:w-1/2 h-1/2 md:h-full border-t md:border-t-0 md:border-l border-white/10 bg-gradient-to-br from-[#1A1F2C] to-[#141824] p-6 flex flex-col">
           <div className="flex items-center gap-2 mb-6">
             <Palette size={20} className="text-payouts-accent" />
             <h3 className="font-medium text-lg">Style Preview</h3>
@@ -162,6 +162,8 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
                     backgroundColor: previewStyle.accentColor,
                     color: previewStyle.primaryColor,
                   }}
+                  variant="accent"
+                  size="lg"
                 >
                   <Check size={18} />
                   Apply This Style
