@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Lock, Upload } from 'lucide-react';
+import { Lock, Upload, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
+import { toast } from 'sonner';
 
 interface VerificationLayoutProps {
   children: React.ReactNode;
@@ -39,6 +40,78 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   onUploadInvoice,
 }) => {
   const { config } = useWidgetConfig();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Function to handle file upload directly from the component
+  const handleUploadClick = () => {
+    if (onUploadInvoice) {
+      onUploadInvoice(); // Call the provided handler if it exists
+    } else {
+      // Fallback implementation if no handler provided
+      showUploadOptions();
+    }
+  };
+  
+  // Shows upload options in a toast
+  const showUploadOptions = () => {
+    toast(
+      <div className="flex flex-col gap-2">
+        <h3 className="font-medium">Upload Invoice</h3>
+        <button 
+          onClick={() => fileInputRef.current?.click()}
+          className="text-left px-3 py-2 hover:bg-gray-100 rounded-md flex items-center gap-2"
+        >
+          <FileText size={16} />
+          From Computer
+        </button>
+        <button
+          onClick={handleGoogleDriveUpload}
+          className="text-left px-3 py-2 hover:bg-gray-100 rounded-md flex items-center gap-2"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 22L14.5 2H19.5L9.5 22H4.5Z" fill="#4285F4"/>
+            <path d="M14.5 22L19.5 12H24.5L19.5 22H14.5Z" fill="#EA4335"/>
+            <path d="M9.5 12L14.5 2L19.5 12L14.5 22L9.5 12Z" fill="#FBBC05"/>
+            <path d="M0 12L4.5 2H9.5L5 12L0 12Z" fill="#34A853"/>
+          </svg>
+          From Google Drive
+        </button>
+      </div>,
+      {
+        duration: 5000,
+        position: "bottom-center",
+      }
+    );
+  };
+  
+  const handleGoogleDriveUpload = () => {
+    // Simulate Google Drive integration
+    toast.info("Connecting to Google Drive...");
+    setTimeout(() => {
+      toast.success("Connected to Google Drive", {
+        description: "Select a file from your Google Drive"
+      });
+      // Simulate file selection after delay
+      setTimeout(() => {
+        toast.success("Invoice uploaded successfully", {
+          description: "invoice_may2023.pdf has been added to your invoices"
+        });
+      }, 1500);
+    }, 1000);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      toast.success("Invoice uploaded successfully", {
+        description: `${file.name} has been added to your invoices`
+      });
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   return (
     <div className="py-5">
@@ -47,11 +120,20 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         {description && <p className="text-white/70">{description}</p>}
       </div>
       
+      {/* Hidden file input for invoice upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+        onChange={handleFileChange}
+      />
+      
       {/* Show Upload Invoice button if enabled */}
-      {showUploadInvoice && onUploadInvoice && (
+      {showUploadInvoice && (
         <div className="invoice-upload-container mb-4">
           <button
-            onClick={onUploadInvoice}
+            onClick={handleUploadClick}
             className="upload-invoice-button w-full"
           >
             <Upload size={18} />
