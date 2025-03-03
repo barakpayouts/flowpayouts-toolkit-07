@@ -106,7 +106,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const { config } = useWidgetConfig();
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const [aiKey, setAiKey] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>('');
+  const [showKeyInput, setShowKeyInput] = useState(false);
 
   // Suggested prompts that users can click on
   const suggestedPrompts = [
@@ -131,9 +132,117 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     }
   };
 
-  // Function to analyze user input and determine the best style preset
-  const analyzeUserInput = async (userInput: string) => {
-    // First, try to directly match keywords for faster response
+  // Function to analyze user input using OpenAI API
+  const analyzeUserInputWithOpenAI = async (userInput: string) => {
+    if (!apiKey) {
+      toast.error("OpenAI API key required", {
+        description: "Please set your OpenAI API key to use AI styling"
+      });
+      setShowKeyInput(true);
+      throw new Error("OpenAI API key required");
+    }
+
+    try {
+      const prompt = `
+      As an AI style expert, analyze the following user description and recommend a widget style for a web application.
+      User description: "${userInput}"
+      
+      Available styles:
+      ${Object.entries(stylePresets).map(([key, style]) => (
+        `- ${style.name}: Primary color ${style.primaryColor}, Accent color ${style.accentColor}, Background color ${style.backgroundColor}`
+      )).join('\n')}
+      
+      Based on the user's description, recommend ONE of these styles or suggest modifications to one of them.
+      
+      Return your response in this exact JSON format:
+      {
+        "recommendedStyle": "STYLE_KEY", 
+        "explanation": "Your explanation here",
+        "primaryColor": "#hex",
+        "accentColor": "#hex",
+        "backgroundColor": "#hex",
+        "textColor": "#hex",
+        "borderColor": "#hex",
+        "borderRadius": 8
+      }
+      
+      Where STYLE_KEY is one of: bowl, blue, purple, green, dark, light, coral, forest.
+      `;
+
+      console.log("Sending request to OpenAI...");
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { 
+              role: "user", 
+              content: prompt 
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("OpenAI API Error:", errorData);
+        throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+      }
+      
+      const data = await response.json();
+      const aiResponse = data.choices[0]?.message?.content;
+      
+      if (!aiResponse) {
+        throw new Error("No response from OpenAI");
+      }
+      
+      try {
+        // Try to parse the JSON response
+        const parsedResponse = JSON.parse(aiResponse);
+        
+        // Get the recommended style preset
+        const styleKey = parsedResponse.recommendedStyle;
+        let stylePreset = stylePresets[styleKey as keyof typeof stylePresets];
+        
+        // If OpenAI provided custom colors, merge them with the preset
+        if (parsedResponse.primaryColor) {
+          stylePreset = {
+            ...stylePreset,
+            name: stylePreset.name,
+            primaryColor: parsedResponse.primaryColor || stylePreset.primaryColor,
+            accentColor: parsedResponse.accentColor || stylePreset.accentColor,
+            backgroundColor: parsedResponse.backgroundColor || stylePreset.backgroundColor,
+            textColor: parsedResponse.textColor || stylePreset.textColor,
+            borderColor: parsedResponse.borderColor || stylePreset.borderColor,
+            borderRadius: parsedResponse.borderRadius || stylePreset.borderRadius,
+          };
+        }
+        
+        return {
+          stylePreset,
+          explanation: parsedResponse.explanation
+        };
+      } catch (parseError) {
+        console.error("Error parsing OpenAI response:", parseError);
+        // Fall back to direct keyword matching if parsing fails
+        return analyzeUserInputWithKeywords(userInput);
+      }
+    } catch (error) {
+      console.error("Error calling OpenAI API:", error);
+      // Fall back to direct keyword matching
+      return analyzeUserInputWithKeywords(userInput);
+    }
+  };
+
+  // Fallback keyword-based analysis if API call fails
+  const analyzeUserInputWithKeywords = (userInput: string) => {
     const lowerCaseInput = userInput.toLowerCase();
     
     // Direct keyword matching for quick responses
@@ -195,64 +304,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       };
     }
 
-    // Process using AI model simulation
-    // This would be replaced with an actual AI API call in a production environment
-    // The simulation analyzes the input text for style preferences
-    const aiResponse = await simulateAIAnalysis(userInput);
-    return aiResponse;
-  };
-
-  // This function simulates an AI analysis of the user's input
-  // In a real implementation, this would be replaced with an API call to an AI service
-  const simulateAIAnalysis = async (userInput: string) => {
-    // Simulate AI processing time for a more realistic experience
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const input = userInput.toLowerCase();
-    let selectedStyle = null;
-    let explanation = "";
-    
-    // More comprehensive analysis of the input
-    if (input.includes('professional') || input.includes('corporate') || input.includes('business')) {
-      selectedStyle = stylePresets.blue;
-      explanation = "Based on your request for a professional look, I've created a blue-themed design that conveys trust and reliability - perfect for corporate environments.";
-    }
-    else if (input.includes('modern') || input.includes('sleek') || input.includes('minimal')) {
-      selectedStyle = stylePresets.dark;
-      explanation = "I've created a modern, sleek design with clean lines and a dark background. This contemporary style works well for tech-forward brands.";
-    }
-    else if (input.includes('creative') || input.includes('artistic') || input.includes('bold')) {
-      selectedStyle = stylePresets.purple;
-      explanation = "For your creative brand, I've designed a bold purple theme that stands out and conveys innovation and imagination.";
-    }
-    else if (input.includes('eco') || input.includes('natural') || input.includes('organic')) {
-      selectedStyle = stylePresets.forest;
-      explanation = "I've created an eco-friendly green theme that reflects natural, organic values and environmental consciousness.";
-    }
-    else if (input.includes('friendly') || input.includes('warm') || input.includes('welcoming')) {
-      selectedStyle = stylePresets.coral;
-      explanation = "To create a warm, friendly feel, I've designed a theme with coral accents that feels welcoming and energetic.";
-    }
-    else if (input.includes('clean') || input.includes('simple') || input.includes('accessible')) {
-      selectedStyle = stylePresets.light;
-      explanation = "I've created a clean, simple design with high contrast for excellent readability and accessibility.";
-    }
-    else {
-      // If no specific keywords match, use uploaded image or choose a reasonable default
-      if (uploadedImage) {
-        selectedStyle = stylePresets.bowl; // In a real implementation, would analyze the image colors
-        explanation = "I've analyzed your uploaded image and created a theme based on its dominant colors and visual style.";
-      } else {
-        // Default to a random style if nothing else matches
-        const styles = Object.values(stylePresets);
-        selectedStyle = styles[Math.floor(Math.random() * styles.length)];
-        explanation = `Based on your description, I've created a custom ${selectedStyle.name.toLowerCase()} style that should work well for your brand.`;
-      }
-    }
-    
+    // Default fallback if no keywords match
+    const styles = Object.values(stylePresets);
+    const randomStyle = styles[Math.floor(Math.random() * styles.length)];
     return {
-      stylePreset: selectedStyle,
-      explanation: explanation
+      stylePreset: randomStyle,
+      explanation: `Based on your description, I've created a custom ${randomStyle.name.toLowerCase()} style that should work well for your brand.`
     };
   };
 
@@ -277,8 +334,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     setMessages(prev => [...prev, { role: 'assistant', content: '', isLoading: true }]);
     
     try {
-      // Process the user input to get style recommendations
-      const { stylePreset, explanation } = await analyzeUserInput(userMessage);
+      // Process the user input to get style recommendations - use OpenAI if API key exists
+      const { stylePreset, explanation } = await analyzeUserInputWithOpenAI(userMessage);
+      
+      console.log("AI analysis complete:", stylePreset);
       
       // Update the loading message with the actual response
       setMessages(prev => {
@@ -294,6 +353,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       
       // Apply the style changes
       if (stylePreset) {
+        console.log("Applying style changes:", stylePreset);
         onApplyStyle(stylePreset);
         
         toast.success(`Applied ${stylePreset.name} theme`, {
@@ -310,7 +370,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         if (loadingIndex !== -1) {
           newMessages[loadingIndex] = { 
             role: 'assistant', 
-            content: "I'm sorry, I encountered an issue analyzing your request. Please try again with different wording." 
+            content: "I'm sorry, I encountered an issue analyzing your request. Please try again with different wording or set your OpenAI API key." 
           };
         }
         return newMessages;
@@ -377,19 +437,37 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
           <Bot size={16} className="text-payouts-accent ai-style-header-icon" />
           <h3 className="font-medium text-sm">Style Assistant</h3>
         </div>
-        <button 
-          className="h-6 px-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-md flex items-center justify-center"
-          onClick={() => {
-            setMessages([{ 
-              role: 'assistant', 
-              content: 'Hello! I can help you customize your widget design. Tell me about your brand colors and style preferences, or share your logo or website link.' 
-            }]);
-            setUploadedImage(null);
-            setInput('');
-          }}
-        >
-          <RefreshCw size={12} />
-        </button>
+        <div className="flex items-center gap-2">
+          {showKeyInput ? (
+            <input
+              type="password"
+              placeholder="OpenAI API Key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="text-xs px-2 py-1 bg-white/10 border border-white/20 rounded text-white w-32"
+            />
+          ) : (
+            <button
+              className="text-xs px-2 py-1 bg-white/10 border border-white/20 rounded text-white hover:bg-white/20"
+              onClick={() => setShowKeyInput(true)}
+            >
+              Set API Key
+            </button>
+          )}
+          <button 
+            className="h-6 px-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-md flex items-center justify-center"
+            onClick={() => {
+              setMessages([{ 
+                role: 'assistant', 
+                content: 'Hello! I can help you customize your widget design. Tell me about your brand colors and style preferences, or share your logo or website link.' 
+              }]);
+              setUploadedImage(null);
+              setInput('');
+            }}
+          >
+            <RefreshCw size={12} />
+          </button>
+        </div>
       </div>
       
       {/* Suggested prompts section */}

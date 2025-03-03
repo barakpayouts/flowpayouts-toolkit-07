@@ -510,3 +510,36 @@
   50% { box-shadow: 0 0 0 2px var(--accent, #33c3f0); }
   100% { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0); }
 }
+
+/* API Key Input Styling */
+.api-key-input {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.api-key-submit {
+  background-color: var(--accent, #33c3f0);
+  color: var(--primary-bg, #0f2634);
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.api-key-submit:hover {
+  filter: brightness(1.1);
+}
