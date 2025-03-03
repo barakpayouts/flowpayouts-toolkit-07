@@ -108,6 +108,8 @@
   outline: none;
   resize: none;
   min-height: 38px;
+  max-height: 100px;
+  overflow-y: auto;
 }
 
 .chat-button {
@@ -124,17 +126,31 @@
 
 /* Suggestion prompt chips */
 .suggestion-chip {
+  display: inline-block;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 9999px;
-  padding: 0.375rem 0.75rem;
+  padding: 0.5rem 1rem;
   font-size: 0.875rem;
   color: white;
   transition: all 0.2s ease;
   cursor: pointer;
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .suggestion-chip:hover {
   background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.suggestions-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Shadow for glow effect */
@@ -144,6 +160,86 @@
 
 .shadow-glow-hover {
   box-shadow: 0 0 20px rgba(208, 233, 42, 0.7);
+}
+
+/* AI Style specific styles */
+.ai-style-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.ai-style-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .ai-style-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ai-upload-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-upload-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.ai-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0.75rem;
+}
+
+.ai-preview-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.uploaded-image-container {
+  position: relative;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.uploaded-image {
+  max-height: 100px;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.remove-image-button {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Responsive adjustments for mobile */
@@ -167,7 +263,13 @@
   }
   
   .suggestion-chip {
-    padding: 0.25rem 0.5rem;
+    padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
+    margin-bottom: 0.375rem;
+    margin-right: 0.375rem;
+  }
+  
+  .suggestions-container {
+    padding: 0.5rem;
   }
 }

@@ -1,6 +1,5 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
 import { Send, Upload, Image, Bot, User, X, RefreshCw } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { cn } from '@/lib/utils';
@@ -30,6 +29,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { config } = useWidgetConfig();
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Example styles that the AI would generate based on the conversation and uploaded images
   const predefinedStyles = [
@@ -52,21 +52,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       borderRadius: 12,
     },
     {
-      name: "Corporate Green",
-      primaryColor: "#054232",
-      accentColor: "#8FE388",
-      backgroundColor: "#0B5D44",
+      name: "Green and Blue",
+      primaryColor: "#1A3C40",
+      accentColor: "#1EAEDB",
+      backgroundColor: "#265073",
       textColor: "#ffffff",
-      borderColor: "#1C7A60",
-      borderRadius: 6,
+      borderColor: "#2D6E7E",
+      borderRadius: 8,
     },
     {
-      name: "Vibrant Orange",
-      primaryColor: "#5C2101",
-      accentColor: "#F97316",
-      backgroundColor: "#7A3415",
+      name: "Vibrant Ocean",
+      primaryColor: "#003366",
+      accentColor: "#33C3F0",
+      backgroundColor: "#004E89",
       textColor: "#ffffff",
-      borderColor: "#944830",
+      borderColor: "#2A6F97",
       borderRadius: 8,
     }
   ];
@@ -86,6 +86,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const autoResizeTextarea = () => {
+    if (chatInputRef.current) {
+      chatInputRef.current.style.height = 'auto';
+      chatInputRef.current.style.height = `${Math.min(chatInputRef.current.scrollHeight, 100)}px`;
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim() && !uploadedImage) return;
 
@@ -98,6 +105,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     ]);
     
     setInput('');
+    if (chatInputRef.current) {
+      chatInputRef.current.style.height = 'auto';
+    }
     setIsProcessing(true);
 
     // Add AI loading message after a short delay to improve UX
@@ -120,25 +130,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
 
     // Simulate AI understanding different user inputs
     if (lowerCaseMsg.includes('blue') || lowerCaseMsg.includes('ocean')) {
-      aiResponse = "I think a modern blue theme would work well for your brand. It conveys trust and professionalism. I've created a style based on blue tones.";
-      styleToApply = predefinedStyles[0];
+      aiResponse = "I think a vibrant ocean blue theme would work well for your brand. It conveys trust and professionalism. I've created a style based on blue tones.";
+      styleToApply = predefinedStyles[3];
     } 
     else if (lowerCaseMsg.includes('purple') || lowerCaseMsg.includes('tech')) {
       aiResponse = "A tech-focused purple theme would be perfect for your brand. It looks modern and innovative. I've applied this style to your widget.";
       styleToApply = predefinedStyles[1];
     }
-    else if (lowerCaseMsg.includes('green') || lowerCaseMsg.includes('eco') || lowerCaseMsg.includes('nature')) {
-      aiResponse = "I've created a natural green theme that aligns with your eco-friendly brand values. This conveys growth and sustainability.";
+    else if (lowerCaseMsg.includes('green') && lowerCaseMsg.includes('blue')) {
+      aiResponse = "I've created a green and blue theme that combines both colors for a fresh, professional look. This should match your brand colors perfectly.";
       styleToApply = predefinedStyles[2];
     }
-    else if (lowerCaseMsg.includes('orange') || lowerCaseMsg.includes('warm') || lowerCaseMsg.includes('energetic')) {
-      aiResponse = "I've designed a vibrant orange theme that's energetic and bold - perfect for your dynamic brand!";
-      styleToApply = predefinedStyles[3];
+    else if (lowerCaseMsg.includes('website') || lowerCaseMsg.includes('match')) {
+      aiResponse = "Based on your website colors, I've designed a modern blue theme that should complement your existing brand identity perfectly.";
+      styleToApply = predefinedStyles[0];
     }
     else if (uploadedImage || lowerCaseMsg.includes('logo') || lowerCaseMsg.includes('image') || lowerCaseMsg.includes('upload')) {
       aiResponse = "I've analyzed your brand assets and created a custom theme that matches your visual identity. The colors and style elements have been extracted from your logo.";
-      // Use a random style for the demo
-      styleToApply = predefinedStyles[Math.floor(Math.random() * predefinedStyles.length)];
+      // Use green and blue style for logo uploads
+      styleToApply = predefinedStyles[2];
     }
     else {
       aiResponse = "Based on your preferences, I've created a custom style that should work well for your brand. You can always ask me to adjust specific elements like colors, borders, or spacing.";
@@ -180,6 +190,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     // Focus the input after selecting a prompt
     if (chatInputRef.current) {
       chatInputRef.current.focus();
+      // Simulate a click on the send button after a brief delay
+      setTimeout(() => {
+        handleSendMessage();
+      }, 500);
     }
   };
 
@@ -217,10 +231,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
           <Bot size={16} className="text-payouts-accent" />
           <h3 className="font-medium text-sm">Style Assistant</h3>
         </div>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="h-7 px-2 bg-white/5 border-white/10 hover:bg-white/10 text-white"
+        <button 
+          className="h-7 px-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-md flex items-center justify-center"
           onClick={() => {
             setMessages([{ 
               role: 'assistant', 
@@ -231,10 +243,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
           }}
         >
           <RefreshCw size={12} />
-        </Button>
+        </button>
       </div>
       
-      <div className="flex-1 p-3 overflow-y-auto bg-black/20 max-h-[280px]">
+      {/* Suggested prompts section */}
+      <div className="suggestions-container">
+        {suggestedPrompts.map((prompt, index) => (
+          <button
+            key={index}
+            className="suggestion-chip"
+            onClick={() => handleSuggestedPrompt(prompt)}
+          >
+            "{prompt}"
+          </button>
+        ))}
+      </div>
+      
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 p-3 overflow-y-auto bg-black/20 max-h-[280px]"
+      >
         <div className="space-y-3">
           {messages.map((message, index) => (
             <div 
@@ -268,17 +296,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
                 
                 {index === messages.length - 1 && message.role === 'user' && uploadedImage && (
                   <div className="mt-2">
-                    <div className="relative inline-block">
+                    <div className="uploaded-image-container">
                       <img 
                         src={uploadedImage} 
                         alt="Uploaded logo" 
-                        className="max-h-32 rounded-md border border-white/20" 
+                        className="uploaded-image" 
                       />
                       <button 
-                        className="absolute top-1 right-1 bg-black/40 rounded-full p-1 text-white/80 hover:text-white"
+                        className="remove-image-button"
                         onClick={() => setUploadedImage(null)}
                       >
-                        <X size={12} />
+                        <X size={12} className="text-white" />
                       </button>
                     </div>
                   </div>
@@ -290,21 +318,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         </div>
       </div>
       
-      {/* Suggested prompts section */}
-      <div className="px-3 pt-2 pb-1">
-        <div className="flex flex-wrap gap-2">
-          {suggestedPrompts.map((prompt, index) => (
-            <button
-              key={index}
-              className="text-sm bg-white/10 hover:bg-white/15 text-white px-3 py-1.5 rounded-full transition-colors"
-              onClick={() => handleSuggestedPrompt(prompt)}
-            >
-              "{prompt}"
-            </button>
-          ))}
-        </div>
-      </div>
-      
       {uploadedImage && (
         <div className="px-3 pt-2">
           <div className="bg-white/10 rounded-md p-2 flex justify-between items-center">
@@ -312,14 +325,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
               <Image size={12} className="text-payouts-accent" />
               <span className="truncate">Logo uploaded and ready to analyze</span>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-6 w-6 p-0 text-white/70 hover:text-white"
+            <button 
+              className="h-6 w-6 p-0 text-white/70 hover:text-white bg-transparent flex items-center justify-center"
               onClick={() => setUploadedImage(null)}
             >
               <X size={12} />
-            </Button>
+            </button>
           </div>
         </div>
       )}
@@ -333,35 +344,35 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             className="hidden"
             accept="image/*"
           />
-          <Button
+          <button
             type="button"
-            variant="outline"
-            size="icon"
-            className="shrink-0 h-9 w-9 bg-white/5 border-white/10 hover:bg-white/10"
+            className="ai-upload-button h-9 w-9 flex items-center justify-center"
             onClick={triggerFileInput}
             title="Upload logo"
           >
             <Upload size={16} className="text-white/70" />
-          </Button>
+          </button>
           
           <div className="flex-1 bg-white/5 rounded-md flex items-center border border-white/10">
             <textarea
               ref={chatInputRef}
-              className="flex-1 py-2 px-3 bg-transparent text-sm text-white placeholder:text-white/50 resize-none outline-none"
+              className="chat-input"
               placeholder="Ask about styling, or share your website..."
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                autoResizeTextarea();
+              }}
               onKeyDown={handleKeyDown}
               rows={1}
-              style={{minHeight: "32px", maxHeight: "80px"}}
             />
           </div>
           
-          <Button
+          <button
             type="button"
-            variant="accent"
-            size="icon"
-            className="shrink-0 h-9 w-9"
+            className={`chat-button h-9 w-9 flex items-center justify-center ${
+              isProcessing || (!input.trim() && !uploadedImage) ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             onClick={handleSendMessage}
             disabled={isProcessing || (!input.trim() && !uploadedImage)}
             style={{
@@ -370,7 +381,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             }}
           >
             <Send size={16} />
-          </Button>
+          </button>
         </div>
       </div>
     </div>

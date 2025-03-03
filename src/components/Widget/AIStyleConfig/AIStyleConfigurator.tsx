@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ChatWindow from './ChatWindow';
-import { Sparkles, Check, ChevronRight, ScanSearch, Palette, Bot } from 'lucide-react';
+import { Check, Palette, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface AIStyleConfiguratorProps {
@@ -43,12 +43,12 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
         </p>
       </div>
       
-      <div className="flex flex-col md:flex-row h-[400px]">
-        <div className="w-full md:w-1/2 h-1/2 md:h-full">
+      <div className="ai-style-grid">
+        <div className="h-full">
           <ChatWindow onApplyStyle={handleStyleChange} />
         </div>
         
-        <div className="w-full md:w-1/2 h-1/2 md:h-full border-t md:border-t-0 md:border-l border-white/10 bg-gradient-to-br from-[#1A1F2C] to-[#141824] p-4 flex flex-col">
+        <div className="border-t md:border-t-0 md:border-l border-white/10 bg-gradient-to-br from-[#1A1F2C] to-[#141824] p-4 flex flex-col h-full">
           <div className="flex items-center gap-2 mb-4">
             <Palette size={16} className="text-payouts-accent" />
             <h3 className="font-medium text-sm">Style Preview</h3>
@@ -57,25 +57,45 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
           {!showPreview ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-4">
               <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
-                <ScanSearch size={20} className="text-white/40" />
+                <Palette size={20} className="text-white/40" />
               </div>
               <h3 className="text-sm font-medium mb-2">No style changes yet</h3>
               <p className="text-white/60 mb-4 max-w-xs text-xs">
                 Chat with the Style AI to create a custom look for your widget based on your brand
               </p>
-              <div className="flex flex-col items-start gap-2 bg-white/5 p-3 rounded-lg text-xs text-white/70 w-full max-w-xs">
-                <p className="flex items-center gap-2">
-                  <ChevronRight size={12} className="text-payouts-accent" />
+              <div className="flex flex-col items-center gap-2">
+                <button 
+                  className="suggestion-chip flex items-center justify-center w-full"
+                  onClick={() => handleStyleChange(
+                    {
+                      name: "Green and Blue",
+                      primaryColor: "#1A3C40",
+                      accentColor: "#1EAEDB",
+                      backgroundColor: "#265073",
+                      textColor: "#ffffff",
+                      borderColor: "#2D6E7E",
+                      borderRadius: 8,
+                    }
+                  )}
+                >
                   "Make it match our website colors"
-                </p>
-                <p className="flex items-center gap-2">
-                  <ChevronRight size={12} className="text-payouts-accent" />
+                </button>
+                <button
+                  className="suggestion-chip flex items-center justify-center w-full"
+                  onClick={() => handleStyleChange(
+                    {
+                      name: "Ocean Blue",
+                      primaryColor: "#003366",
+                      accentColor: "#33C3F0",
+                      backgroundColor: "#004E89",
+                      textColor: "#ffffff",
+                      borderColor: "#2A6F97",
+                      borderRadius: 8,
+                    }
+                  )}
+                >
                   "Our brand uses green and blue"
-                </p>
-                <p className="flex items-center gap-2">
-                  <ChevronRight size={12} className="text-payouts-accent" />
-                  "Upload our logo to extract colors"
-                </p>
+                </button>
               </div>
             </div>
           ) : (
@@ -151,7 +171,7 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
                         className="w-8 h-8 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: previewStyle.accentColor }}
                       >
-                        <Sparkles size={12} style={{ color: previewStyle.primaryColor }} />
+                        <Bot size={12} style={{ color: previewStyle.primaryColor }} />
                       </div>
                       <div className="flex-1">
                         <div className="w-full h-2 bg-white/10 rounded mb-1"></div>
@@ -169,7 +189,7 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
               >
                 <Button 
                   onClick={applyChanges}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-payouts-dark font-semibold text-sm"
+                  className="w-full flex items-center justify-center gap-2 py-2 text-payouts-dark font-semibold text-sm"
                   style={{ 
                     backgroundColor: previewStyle.accentColor,
                     color: previewStyle.primaryColor,
