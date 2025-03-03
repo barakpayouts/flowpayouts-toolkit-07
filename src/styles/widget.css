@@ -1,3 +1,4 @@
+
 /* Widget styling */
 .widget-container {
   background-color: var(--bg-color, #143745);
@@ -542,4 +543,48 @@
 
 .api-key-submit:hover {
   filter: brightness(1.1);
+}
+
+/* Additional API Key Info styling */
+.api-key-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.api-key-container {
+  padding: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.api-key-section {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Disabled state for chat elements */
+.chat-input:disabled {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+}
+
+.suggestion-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: none;
+}
+
+.suggestion-chip:disabled:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: none;
 }

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Upload, Image, Bot, User, X, RefreshCw, Loader2 } from 'lucide-react';
+import { Send, Upload, Image, Bot, User, X, RefreshCw, Loader2, Info, KeyRound } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { cn } from '@/lib/utils';
 import { toast } from "sonner";
@@ -105,10 +105,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const { config } = useWidgetConfig();
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const [apiKey, setApiKey] = useState<string>('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');
-  const [showKeyInput, setShowKeyInput] = useState(false);
+  const [apiKey, setApiKey] = useState<string>('');
+  const [showKeyInput, setShowKeyInput] = useState(true);
+  const [isKeyValid, setIsKeyValid] = useState(false);
 
-  // Suggested prompts that users can click on
   const suggestedPrompts = [
     "Make it match our website colors",
     "Our brand uses green and blue",
@@ -131,8 +131,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     }
   };
 
-  // Function to analyze user input using OpenAI API
   const analyzeUserInputWithOpenAI = async (userInput: string) => {
+    if (!apiKey) {
+      toast.error("OpenAI API key required", {
+        description: "Please enter a valid OpenAI API key to use AI styling"
+      });
+      setShowKeyInput(true);
+      throw new Error("OpenAI API key required");
+    }
+
     try {
       const prompt = `
       As an AI style expert, analyze the following user description and recommend a widget style for a web application.
@@ -184,8 +191,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("OpenAI API Error:", errorData);
+        
+        if (errorData.error?.message?.includes("API key")) {
+          setIsKeyValid(false);
+          setShowKeyInput(true);
+          toast.error("Invalid OpenAI API key", {
+            description: errorData.error?.message || "Please check your API key format and permissions"
+          });
+        }
+        
         throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
       }
+      
+      // If we reach here, the key is valid
+      setIsKeyValid(true);
       
       const data = await response.json();
       const aiResponse = data.choices[0]?.message?.content;
@@ -232,7 +251,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     }
   };
 
-  // Fallback keyword-based analysis if API call fails
   const analyzeUserInputWithKeywords = (userInput: string) => {
     const lowerCaseInput = userInput.toLowerCase();
     
@@ -304,6 +322,22 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     };
   };
 
+  const validateApiKey = () => {
+    // Basic validation - check if it starts with "sk-" and has sufficient length
+    if (apiKey.startsWith('sk-') && apiKey.length > 20) {
+      setIsKeyValid(true);
+      setShowKeyInput(false);
+      toast.success("API key set", {
+        description: "Your OpenAI API key has been saved for this session"
+      });
+    } else {
+      setIsKeyValid(false);
+      toast.error("Invalid API key format", {
+        description: "OpenAI API keys typically start with 'sk-' and are longer"
+      });
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim() && !uploadedImage) return;
 
@@ -361,7 +395,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         if (loadingIndex !== -1) {
           newMessages[loadingIndex] = { 
             role: 'assistant', 
-            content: "I'm sorry, I encountered an issue analyzing your request. Please try again with different wording." 
+            content: "I'm sorry, I encountered an issue analyzing your request. Please make sure you've entered a valid OpenAI API key." 
           };
         }
         return newMessages;
@@ -445,6 +479,34 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         </div>
       </div>
       
+      {showKeyInput && (
+        <div className="bg-white/5 p-3 border-b border-white/10">
+          <div className="text-xs text-white/70 mb-2 flex items-center gap-1">
+            <KeyRound size={12} className="text-payouts-accent" />
+            <span>Enter your OpenAI API key to enable AI styling</span>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="password"
+              placeholder="OpenAI API Key (starts with sk-...)"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="text-xs px-3 py-2 bg-white/10 border border-white/20 rounded text-white flex-grow"
+            />
+            <button
+              className="text-xs px-3 py-2 bg-payouts-accent text-payouts-dark rounded font-medium"
+              onClick={validateApiKey}
+            >
+              Set Key
+            </button>
+          </div>
+          <div className="text-xs text-white/60 mt-2 flex items-start gap-1">
+            <Info size={10} className="mt-0.5" />
+            <span>You need an OpenAI API key with access to gpt-3.5-turbo model. Your key is stored only in your browser for this session.</span>
+          </div>
+        </div>
+      )}
+      
       {/* Suggested prompts section */}
       <div className="suggestions-container">
         {suggestedPrompts.map((prompt, index) => (
@@ -452,6 +514,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             key={index}
             className="suggestion-chip"
             onClick={() => handleSuggestedPrompt(prompt)}
+            disabled={!isKeyValid && showKeyInput}
           >
             "{prompt}"
           </button>
@@ -555,15 +618,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
             onClick={triggerFileInput}
             title="Upload logo"
             aria-label="Upload logo"
+            disabled={!isKeyValid && showKeyInput}
           >
-            <Upload size={16} className="text-white/70" />
+            <Upload size={16} className={`${(!isKeyValid && showKeyInput) ? 'text-white/30' : 'text-white/70'}`} />
           </button>
           
           <div className="flex-1 bg-white/5 rounded-md flex items-center border border-white/10">
             <textarea
               ref={chatInputRef}
               className="chat-input"
-              placeholder="Ask about styling..."
+              placeholder={isKeyValid || !showKeyInput ? "Ask about styling..." : "Enter your API key first..."}
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);
@@ -571,16 +635,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
               }}
               onKeyDown={handleKeyDown}
               rows={1}
+              disabled={!isKeyValid && showKeyInput}
             />
           </div>
           
           <button
             type="button"
             className={`chat-button h-8 w-8 flex items-center justify-center ${
-              isProcessing || (!input.trim() && !uploadedImage) ? 'opacity-50 cursor-not-allowed' : ''
+              isProcessing || (!input.trim() && !uploadedImage) || (!isKeyValid && showKeyInput) ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             onClick={handleSendMessage}
-            disabled={isProcessing || (!input.trim() && !uploadedImage)}
+            disabled={isProcessing || (!input.trim() && !uploadedImage) || (!isKeyValid && showKeyInput)}
             style={{
               backgroundColor: config.accentColor,
               color: '#143745',
