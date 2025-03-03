@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import VerificationLayout from './VerificationLayout';
 import { useWidgetConfig, KYCDocumentType } from '@/hooks/use-widget-config';
@@ -30,7 +29,6 @@ const KYCVerification: React.FC<{
   const [streamActive, setStreamActive] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   
-  // Clean up camera stream when component unmounts or when step changes
   useEffect(() => {
     return () => {
       stopCamera();
@@ -124,10 +122,21 @@ const KYCVerification: React.FC<{
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
-        setCameraActive(true);
-        setStreamActive(true);
-        toast.success("Camera started successfully");
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play()
+              .then(() => {
+                console.log("Camera started successfully");
+                setCameraActive(true);
+                setStreamActive(true);
+                toast.success("Camera started successfully");
+              })
+              .catch((error) => {
+                console.error("Error playing video:", error);
+                toast.error("Error starting camera: " + error.message);
+              });
+          }
+        };
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -155,22 +164,20 @@ const KYCVerification: React.FC<{
       const video = videoRef.current;
       const canvas = canvasRef.current;
       
-      // Set canvas dimensions to match video dimensions
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       
-      // Draw the video frame on the canvas
       const context = canvas.getContext('2d');
       if (context) {
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.setTransform(1, 0, 0, 1, 0, 0);
         
-        // Convert the canvas to a data URL
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
         
-        // Stop the camera stream
         stopCamera();
         
-        // Set the selfie preview to the captured image
         setSelfiePreview(dataUrl);
         setSelfieUploaded(true);
         
@@ -199,7 +206,7 @@ const KYCVerification: React.FC<{
   
   const handleBack = () => {
     if (currentStep === 'selfie') {
-      stopCamera(); // Ensure camera is stopped when going back
+      stopCamera();
       setCurrentStep('document-upload');
     } else if (currentStep === 'document-upload') {
       setCurrentStep('document-select');
@@ -214,7 +221,7 @@ const KYCVerification: React.FC<{
     } else if (currentStep === 'document-upload' && documentUploaded) {
       setCurrentStep('selfie');
     } else if (currentStep === 'selfie' && selfieUploaded) {
-      stopCamera(); // Ensure camera is stopped before proceeding
+      stopCamera();
       onNext();
     } else {
       toast.error("Please complete the current step first");
