@@ -224,28 +224,29 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       
       try {
         // Try to parse the JSON response
+        console.log("AI response:", aiResponse);
         const parsedResponse = JSON.parse(aiResponse);
+        console.log("Parsed response:", parsedResponse);
         
         // Get the recommended style preset
         const styleKey = parsedResponse.recommendedStyle;
         let stylePreset = stylePresets[styleKey as keyof typeof stylePresets];
         
-        // If OpenAI provided custom colors, merge them with the preset
-        if (parsedResponse.primaryColor) {
-          stylePreset = {
-            ...stylePreset,
-            name: stylePreset.name,
-            primaryColor: parsedResponse.primaryColor || stylePreset.primaryColor,
-            accentColor: parsedResponse.accentColor || stylePreset.accentColor,
-            backgroundColor: parsedResponse.backgroundColor || stylePreset.backgroundColor,
-            textColor: parsedResponse.textColor || stylePreset.textColor,
-            borderColor: parsedResponse.borderColor || stylePreset.borderColor,
-            borderRadius: parsedResponse.borderRadius || stylePreset.borderRadius,
-          };
-        }
+        // Create a style object to apply
+        const styleToApply = {
+          primaryColor: parsedResponse.primaryColor || stylePreset.primaryColor,
+          accentColor: parsedResponse.accentColor || stylePreset.accentColor,
+          backgroundColor: parsedResponse.backgroundColor || stylePreset.backgroundColor,
+          textColor: parsedResponse.textColor || stylePreset.textColor,
+          borderColor: parsedResponse.borderColor || stylePreset.borderColor,
+          borderRadius: parsedResponse.borderRadius || stylePreset.borderRadius,
+          name: stylePreset.name,
+        };
+        
+        console.log("Style to apply:", styleToApply);
         
         return {
-          stylePreset,
+          stylePreset: styleToApply,
           explanation: parsedResponse.explanation
         };
       } catch (parseError) {
@@ -395,7 +396,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         });
       }
     } catch (error) {
-      // Handle errors gracefully
       console.error("Error processing AI response:", error);
       
       let errorMessage = "I'm sorry, I encountered an issue analyzing your request.";

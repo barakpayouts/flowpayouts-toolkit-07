@@ -18,12 +18,21 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
   
   const handleStyleChange = (styleChanges: any) => {
     // Log for debugging
-    console.log("Applying style changes:", styleChanges);
+    console.log("AIStyleConfigurator received style changes:", styleChanges);
     
-    setPreviewStyle({
+    // Ensure we have all the expected properties
+    const validatedStyle = {
       ...config,
-      ...styleChanges,
-    });
+      primaryColor: styleChanges.primaryColor || config.primaryColor,
+      accentColor: styleChanges.accentColor || config.accentColor,
+      backgroundColor: styleChanges.backgroundColor || config.backgroundColor,
+      textColor: styleChanges.textColor || config.textColor,
+      borderColor: styleChanges.borderColor || config.borderColor,
+      borderRadius: styleChanges.borderRadius || config.borderRadius,
+    };
+    
+    // Update the preview
+    setPreviewStyle(validatedStyle);
     setShowPreview(true);
     
     // Show a message to let the user know what's happening
@@ -33,7 +42,11 @@ const AIStyleConfigurator: React.FC<AIStyleConfiguratorProps> = ({ setWidgetKey 
   };
   
   const applyChanges = () => {
+    // Apply changes to the global widget config
+    console.log("Applying style changes to widget config:", previewStyle);
     updateConfig(previewStyle);
+    
+    // Trigger widget refresh
     setWidgetKey(prevKey => prevKey + 1);
     setShowPreview(false);
     

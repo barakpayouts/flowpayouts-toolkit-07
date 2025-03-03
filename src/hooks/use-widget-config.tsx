@@ -95,10 +95,13 @@ export const useWidgetConfig = create<WidgetConfigState>((set) => ({
       return { config: { ...state.config, payoutMethods } };
     }),
   
-  updateConfig: (updates: Partial<WidgetConfig>) => 
-    set((state) => ({
+  updateConfig: (updates: Partial<WidgetConfig>) => {
+    console.log("useWidgetConfig: Updating config with", updates);
+    
+    return set((state) => ({
       config: { ...state.config, ...updates }
-    })),
+    }));
+  },
   
   setPayoutsOnlyMode: (enabled: boolean) => 
     set((state) => ({
