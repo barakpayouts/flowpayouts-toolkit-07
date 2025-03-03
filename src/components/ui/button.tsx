@@ -37,12 +37,15 @@ const buttonVariants = cva(
           "bg-button-dark text-white hover:bg-button-dark/90 shadow-md hover:shadow-lg transition-all border border-white/10",
         accent: 
           "bg-payouts-accent text-payouts-dark hover:bg-payouts-accent-light shadow-lg shadow-payouts-accent/20 hover:shadow-xl hover:shadow-payouts-accent/30 transition-all",
+        glow:
+          "bg-payouts-accent text-payouts-dark shadow-glow hover:shadow-xl hover:shadow-accent-glow transition-all hover:-translate-y-0.5",
       },
       size: {
         default: "h-9 px-4 py-2",
         sm: "h-8 rounded-md px-3 text-xs",
         lg: "h-10 rounded-md px-8",
         icon: "h-9 w-9",
+        wide: "h-12 rounded-md px-8 py-3 w-full",
       },
     },
     defaultVariants: {

@@ -204,8 +204,8 @@ const PlaidVerification: React.FC<PlaidVerificationProps> = ({
           
           <Button
             type="submit"
-            variant="glow"
-            size="wide"
+            variant="accent"
+            size="lg"
             disabled={!credentials.username || !credentials.password}
             className="w-full"
             style={{
