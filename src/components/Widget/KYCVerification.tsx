@@ -1,8 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import VerificationLayout from './VerificationLayout';
 import { useWidgetConfig, KYCDocumentType } from '@/hooks/use-widget-config';
-import { Check, Camera, FileText, Upload } from 'lucide-react';
+import { Check, Camera, FileText, Upload, Image } from 'lucide-react';
 import { toast } from "sonner";
 
 const KYCVerification: React.FC<{
@@ -17,21 +16,88 @@ const KYCVerification: React.FC<{
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [currentStep, setCurrentStep] = useState<'document-select' | 'document-upload' | 'selfie'>('document-select');
   
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  
+  const [documentPreview, setDocumentPreview] = useState<string | null>(null);
+  const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
+  
+  const [isDragging, setIsDragging] = useState(false);
+  
   const handleSelectDocument = (document: KYCDocumentType) => {
     setSelectedDocument(document);
   };
   
-  const handleDocumentUpload = () => {
-    // Simulate document upload
-    toast.success("Document uploaded successfully");
-    setDocumentUploaded(true);
-    setCurrentStep('selfie');
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      handleFileUpload(files[0]);
+    }
   };
   
-  const handleSelfieUpload = () => {
-    // Simulate selfie upload
-    toast.success("Selfie captured successfully");
-    setSelfieUploaded(true);
+  const handleFileUpload = (file: File) => {
+    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Invalid file type. Please upload JPG, PNG, or PDF");
+      return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File is too large. Maximum size is 5MB");
+      return;
+    }
+    
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target) {
+          setDocumentPreview(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setDocumentPreview('pdf');
+    }
+    
+    toast.success("Document uploaded successfully");
+    setDocumentUploaded(true);
+  };
+  
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+  
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+  
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
+  
+  const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target) {
+          setSelfiePreview(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+      
+      toast.success("Selfie captured successfully");
+      setSelfieUploaded(true);
+    }
   };
   
   const handleBack = () => {
@@ -127,14 +193,44 @@ const KYCVerification: React.FC<{
     
     content = (
       <div className="space-y-4">
-        <div className="upload-container bg-white/5 border border-white/10 rounded-lg p-6 text-center">
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          onChange={handleFileSelect} 
+          className="hidden" 
+          accept="image/*,application/pdf"
+        />
+        
+        <div 
+          className={`upload-container ${isDragging ? 'bg-white/10' : 'bg-white/5'} border ${isDragging ? 'border-' + config.accentColor : 'border-white/10'} rounded-lg p-6 text-center transition-all`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           {documentUploaded ? (
             <div className="text-center">
               <div className="mx-auto w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-3">
                 <Check size={24} className="text-white" />
               </div>
               <p className="font-medium">Document uploaded successfully!</p>
-              <p className="text-sm opacity-70 mt-2">Your document has been uploaded and is being processed.</p>
+              
+              {documentPreview && (
+                <div className="mt-4 flex justify-center">
+                  {documentPreview === 'pdf' ? (
+                    <div className="p-4 bg-white/10 rounded-lg w-40 h-32 flex items-center justify-center">
+                      <FileText size={48} className="text-white" />
+                    </div>
+                  ) : (
+                    <img 
+                      src={documentPreview} 
+                      alt="Document Preview" 
+                      className="max-w-full max-h-40 rounded-lg border border-white/20" 
+                    />
+                  )}
+                </div>
+              )}
+              
+              <p className="text-sm opacity-70 mt-4">Your document has been uploaded and is being processed.</p>
             </div>
           ) : (
             <div className="text-center">
@@ -146,7 +242,7 @@ const KYCVerification: React.FC<{
               <button 
                 className="py-2 px-4 rounded text-sm font-medium" 
                 style={{backgroundColor: config.accentColor, color: 'black'}}
-                onClick={handleDocumentUpload}
+                onClick={() => fileInputRef.current?.click()}
               >
                 Choose File
               </button>
@@ -171,6 +267,15 @@ const KYCVerification: React.FC<{
     
     content = (
       <div className="space-y-4">
+        <input 
+          type="file" 
+          ref={cameraInputRef} 
+          onChange={handleCameraCapture} 
+          className="hidden" 
+          accept="image/*" 
+          capture="user"
+        />
+        
         <div className="upload-container bg-white/5 border border-white/10 rounded-lg p-6 text-center">
           {selfieUploaded ? (
             <div className="text-center">
@@ -178,19 +283,37 @@ const KYCVerification: React.FC<{
                 <Check size={24} className="text-white" />
               </div>
               <p className="font-medium">Selfie captured successfully!</p>
-              <p className="text-sm opacity-70 mt-2">Your selfie has been uploaded and is being verified.</p>
+              
+              {selfiePreview && (
+                <div className="mt-4 flex justify-center">
+                  <div className="relative w-40 h-40 rounded-full overflow-hidden border-2 border-white/20">
+                    <img 
+                      src={selfiePreview} 
+                      alt="Selfie Preview" 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                </div>
+              )}
+              
+              <p className="text-sm opacity-70 mt-4">Your selfie has been uploaded and is being verified.</p>
             </div>
           ) : (
             <div className="text-center">
-              <div className="camera-icon w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
-                <Camera size={32} className="opacity-70" />
+              <div className="relative">
+                <div className="camera-preview w-52 h-52 rounded-full bg-black/40 flex items-center justify-center mx-auto mb-4 overflow-hidden border-2 border-dashed border-white/30">
+                  <Camera size={48} className="opacity-70" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-36 h-36 border-2 border-dashed border-white/50 rounded-full"></div>
+                  </div>
+                </div>
               </div>
               <p className="font-medium mb-2">Position your face in the frame</p>
               <p className="text-sm opacity-70 mb-4">Make sure your face is well-lit and clearly visible</p>
               <button 
                 className="py-2 px-4 rounded text-sm font-medium" 
                 style={{backgroundColor: config.accentColor, color: 'black'}}
-                onClick={handleSelfieUpload}
+                onClick={() => cameraInputRef.current?.click()}
               >
                 Take Selfie
               </button>
