@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 import VerificationLayout from './VerificationLayout';
 import { useWidgetConfig, KYCDocumentType } from '@/hooks/use-widget-config';
-import { Check, Camera, FileText, Upload, Image } from 'lucide-react';
+import { Check, Camera, FileText, Upload, Image, X } from 'lucide-react';
 import { toast } from "sonner";
 
 const KYCVerification: React.FC<{
@@ -18,11 +19,33 @@ const KYCVerification: React.FC<{
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   
   const [documentPreview, setDocumentPreview] = useState<string | null>(null);
   const [selfiePreview, setSelfiePreview] = useState<string | null>(null);
   
   const [isDragging, setIsDragging] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [streamActive, setStreamActive] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  
+  // Clean up camera stream when component unmounts or when step changes
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [currentStep]);
+  
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+      setStreamActive(false);
+      setCameraActive(false);
+    }
+  };
   
   const handleSelectDocument = (document: KYCDocumentType) => {
     setSelectedDocument(document);
@@ -82,6 +105,80 @@ const KYCVerification: React.FC<{
     }
   };
   
+  const startCamera = async () => {
+    try {
+      setCameraError(null);
+      
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Camera access is not supported by this browser");
+      }
+      
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+        setCameraActive(true);
+        setStreamActive(true);
+        toast.success("Camera started successfully");
+      }
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+      let errorMessage = "Could not access camera";
+      
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+          errorMessage = "Camera permission denied. Please allow camera access and try again.";
+        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+          errorMessage = "No camera found on this device.";
+        } else if (error.name === 'NotReadableError' || error.name === 'TrackStartError') {
+          errorMessage = "Camera is already in use by another application.";
+        } else if (error.name === 'OverconstrainedError') {
+          errorMessage = "Camera doesn't meet the required constraints.";
+        }
+      }
+      
+      setCameraError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
+  
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current && streamActive) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      
+      // Set canvas dimensions to match video dimensions
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      // Draw the video frame on the canvas
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Convert the canvas to a data URL
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        
+        // Stop the camera stream
+        stopCamera();
+        
+        // Set the selfie preview to the captured image
+        setSelfiePreview(dataUrl);
+        setSelfieUploaded(true);
+        
+        toast.success("Selfie captured successfully");
+      }
+    }
+  };
+  
   const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -102,6 +199,7 @@ const KYCVerification: React.FC<{
   
   const handleBack = () => {
     if (currentStep === 'selfie') {
+      stopCamera(); // Ensure camera is stopped when going back
       setCurrentStep('document-upload');
     } else if (currentStep === 'document-upload') {
       setCurrentStep('document-select');
@@ -116,6 +214,7 @@ const KYCVerification: React.FC<{
     } else if (currentStep === 'document-upload' && documentUploaded) {
       setCurrentStep('selfie');
     } else if (currentStep === 'selfie' && selfieUploaded) {
+      stopCamera(); // Ensure camera is stopped before proceeding
       onNext();
     } else {
       toast.error("Please complete the current step first");
@@ -297,6 +396,57 @@ const KYCVerification: React.FC<{
               )}
               
               <p className="text-sm opacity-70 mt-4">Your selfie has been uploaded and is being verified.</p>
+              
+              <button 
+                className="mt-4 py-2 px-4 rounded text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors"
+                onClick={() => {
+                  setSelfieUploaded(false);
+                  setSelfiePreview(null);
+                }}
+              >
+                Retake Selfie
+              </button>
+            </div>
+          ) : cameraActive ? (
+            <div className="text-center">
+              <div className="relative mx-auto mb-4">
+                <div className="camera-feed w-full max-w-xs mx-auto rounded-xl overflow-hidden border-2 border-white/30 aspect-[3/4] relative">
+                  <video 
+                    ref={videoRef} 
+                    className="w-full h-full object-cover mirror"
+                    autoPlay
+                    playsInline
+                    muted
+                  ></video>
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-48 h-48 border-2 border-dashed border-white/70 rounded-full"></div>
+                  </div>
+                </div>
+                
+                <canvas ref={canvasRef} className="hidden"></canvas>
+              </div>
+              
+              {streamActive && (
+                <div className="space-y-2">
+                  <p className="text-sm opacity-70 mb-2">Center your face in the circle and keep a neutral expression</p>
+                  <div className="flex justify-center space-x-3">
+                    <button 
+                      className="py-2 px-4 rounded text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors"
+                      onClick={stopCamera}
+                    >
+                      Cancel
+                    </button>
+                    
+                    <button 
+                      className="py-2 px-4 rounded text-sm font-medium" 
+                      style={{backgroundColor: config.accentColor, color: 'black'}}
+                      onClick={capturePhoto}
+                    >
+                      Take Photo
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center">
@@ -310,16 +460,34 @@ const KYCVerification: React.FC<{
               </div>
               <p className="font-medium mb-2">Position your face in the frame</p>
               <p className="text-sm opacity-70 mb-4">Make sure your face is well-lit and clearly visible</p>
-              <button 
-                className="py-2 px-4 rounded text-sm font-medium" 
-                style={{backgroundColor: config.accentColor, color: 'black'}}
-                onClick={() => cameraInputRef.current?.click()}
-              >
-                Take Selfie
-              </button>
+              
+              {cameraError && (
+                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 text-white rounded-lg text-sm">
+                  <p className="font-medium mb-1">Camera Error</p>
+                  <p>{cameraError}</p>
+                </div>
+              )}
+              
+              <div className="flex flex-col sm:flex-row justify-center gap-2">
+                <button 
+                  className="py-2 px-4 rounded text-sm font-medium" 
+                  style={{backgroundColor: config.accentColor, color: 'black'}}
+                  onClick={startCamera}
+                >
+                  Open Camera
+                </button>
+                
+                <button 
+                  className="py-2 px-4 rounded text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors" 
+                  onClick={() => cameraInputRef.current?.click()}
+                >
+                  Upload Selfie
+                </button>
+              </div>
             </div>
           )}
         </div>
+        
         <div className="text-sm opacity-70">
           <p className="mb-1">Tips for a good selfie:</p>
           <ul className="list-disc pl-5 space-y-1">

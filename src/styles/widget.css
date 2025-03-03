@@ -1,4 +1,3 @@
-
 /* Widget styling */
 .widget-container {
   background-color: var(--bg-color, #143745);
@@ -587,4 +586,13 @@
 .suggestion-chip:disabled:hover {
   background-color: rgba(255, 255, 255, 0.05);
   transform: none;
+}
+
+/* Custom camera styles */
+.camera-feed {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.mirror {
+  transform: scaleX(-1);
 }
