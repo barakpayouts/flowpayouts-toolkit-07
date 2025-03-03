@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
 import BankVerification from './BankVerification';
 import TaxForm from './TaxForm';
+import KYCVerification from './KYCVerification';
 import BankTransfer from './PayoutMethods/BankTransfer';
 import Cryptocurrency from './PayoutMethods/Cryptocurrency';
 import DigitalWallet from './PayoutMethods/DigitalWallet';
@@ -81,6 +81,7 @@ const PayoutWidget = () => {
   // Prepare steps based on config
   const steps = [
     ...(config.steps.includes('profile') ? ['profile'] : []),
+    ...(config.steps.includes('kyc') ? ['kyc'] : []),
     'payout', // Select payout method
     'details', // Enter details for selected method
     ...(config.steps.includes('bank') ? ['bank'] : []),
@@ -215,6 +216,14 @@ const PayoutWidget = () => {
             onNext={handleNextStep} 
             onBack={handleBackStep}
             isLastStep={isLastStep} 
+          />
+        );
+      case 'kyc':
+        return (
+          <KYCVerification
+            onNext={handleNextStep}
+            onBack={handleBackStep}
+            isLastStep={isLastStep}
           />
         );
       case 'bank':

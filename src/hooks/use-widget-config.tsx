@@ -59,7 +59,7 @@ const DEFAULT_BORDER_COLOR = '#21404d';
 // Default config
 const defaultConfig: WidgetConfig = {
   recipientType: 'vendor',
-  steps: ['profile', 'bank', 'tax', 'kyc'],
+  steps: ['profile', 'kyc', 'bank', 'tax'], // Changed order to put 'kyc' before bank
   payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift'],
   showProgressBar: true,
   showStepNumbers: true,
