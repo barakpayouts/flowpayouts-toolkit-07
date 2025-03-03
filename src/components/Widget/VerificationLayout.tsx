@@ -16,6 +16,7 @@ interface VerificationLayoutProps {
   isAuthorized?: boolean;
   setIsAuthorized?: (value: boolean) => void;
   disableNext?: boolean;
+  buttonText?: string; // Added buttonText prop
 }
 
 const VerificationLayout: React.FC<VerificationLayoutProps> = ({
@@ -29,6 +30,7 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   isAuthorized = false,
   setIsAuthorized,
   disableNext = false,
+  buttonText, // Added buttonText prop
 }) => {
   const { config } = useWidgetConfig();
 
@@ -104,7 +106,7 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
               boxShadow: `0 4px 15px ${config.accentColor}40`,
             }}
           >
-            {isLastStep ? 'Complete' : 'Next'}
+            {buttonText || (isLastStep ? 'Complete' : 'Next')}
           </Button>
         </div>
       </div>
