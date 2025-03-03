@@ -2,11 +2,12 @@
 import { create } from 'zustand';
 
 export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
-export type VerificationStep = 'profile' | 'bank' | 'tax';
+export type VerificationStep = 'profile' | 'bank' | 'tax' | 'kyc';
 export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 'gift';
 export type ButtonStyle = 'rounded' | 'square' | 'pill';
 export type BankVerificationMethod = 'plaid' | 'statement' | 'microdeposit';
 export type TaxFormType = 'w9' | 'w8';
+export type KYCDocumentType = 'passport' | 'id' | 'driver_license';
 
 // Add this interface for the payout method components
 export interface PayoutMethodProps {
@@ -58,7 +59,7 @@ const DEFAULT_BORDER_COLOR = '#21404d';
 // Default config
 const defaultConfig: WidgetConfig = {
   recipientType: 'vendor',
-  steps: ['profile', 'bank', 'tax'],
+  steps: ['profile', 'bank', 'tax', 'kyc'],
   payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift'],
   showProgressBar: true,
   showStepNumbers: true,

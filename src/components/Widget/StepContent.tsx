@@ -1,58 +1,39 @@
 
 import React from 'react';
-import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 import ProfileInfo from './ProfileInfo';
 import BankVerification from './BankVerification';
 import TaxForm from './TaxForm';
-import MethodSelection from './PayoutSteps/MethodSelection';
-import MethodDetails from './PayoutSteps/MethodDetails';
+import KYCVerification from './KYCVerification';
+import { VerificationStep } from '@/hooks/use-widget-config';
 
-const StepContent: React.FC = () => {
-  const { currentStep, steps, handleNextStep, handleBackStep } = usePayoutWidget();
+interface StepContentProps {
+  currentStep: number;
+  steps: VerificationStep[];
+  onNext: () => void;
+  onBack: () => void;
+}
+
+const StepContent: React.FC<StepContentProps> = ({ 
+  currentStep, 
+  steps, 
+  onNext, 
+  onBack 
+}) => {
+  const currentStepType = steps[currentStep];
+  const isLastStep = currentStep === steps.length - 1;
   
-  const getStepContent = () => {
-    const step = steps[currentStep];
-    const isLastStep = currentStep === steps.length - 1;
-    
-    switch (step) {
-      case 'profile':
-        return (
-          <ProfileInfo 
-            onNext={handleNextStep} 
-            onBack={handleBackStep}
-            isLastStep={isLastStep} 
-          />
-        );
-      case 'bank':
-        return (
-          <BankVerification 
-            onNext={handleNextStep} 
-            onBack={handleBackStep}
-            isLastStep={isLastStep} 
-          />
-        );
-      case 'tax':
-        return (
-          <TaxForm 
-            onNext={handleNextStep} 
-            onBack={handleBackStep}
-            isLastStep={isLastStep} 
-          />
-        );
-      case 'payout':
-        return <MethodSelection />;
-      case 'details':
-        return <MethodDetails />;
-      default:
-        return null;
-    }
-  };
-  
-  return (
-    <div className="step-content">
-      {getStepContent()}
-    </div>
-  );
+  switch (currentStepType) {
+    case 'profile':
+      return <ProfileInfo onNext={onNext} onBack={onBack} isLastStep={isLastStep} />;
+    case 'bank':
+      return <BankVerification onNext={onNext} onBack={onBack} isLastStep={isLastStep} />;
+    case 'tax':
+      return <TaxForm onNext={onNext} onBack={onBack} isLastStep={isLastStep} />;
+    case 'kyc':
+      return <KYCVerification onNext={onNext} onBack={onBack} isLastStep={isLastStep} />;
+    default:
+      return <div>Step content not found</div>;
+  }
 };
 
 export default StepContent;

@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import PayoutWidget from "@/components/Widget/PayoutWidget";
 import { RecipientType, VerificationStep, PayoutMethod, useWidgetConfig } from '@/hooks/use-widget-config';
-import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid, Bot } from 'lucide-react';
+import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid, Bot, Scan } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -73,6 +72,7 @@ const WidgetDemo = () => {
     { value: 'profile', label: 'Profile Information', icon: <FileSliders size={16} /> },
     { value: 'bank', label: 'Bank Verification', icon: <CreditCard size={16} /> },
     { value: 'tax', label: 'Tax Information', icon: <LayoutGrid size={16} /> },
+    { value: 'kyc', label: 'Identity Verification (KYC)', icon: <Scan size={16} /> },
   ];
 
   const payoutMethodOptions: { value: PayoutMethod; label: string; icon: string }[] = [

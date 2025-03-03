@@ -23,6 +23,7 @@ const buttonVariants = cva(
         purple: "bg-[#9b87f5] text-white hover:bg-[#8B5CF6]",
         dark: "bg-black/30 hover:bg-black/40 text-white border border-white/10",
         glass: "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20",
+        camera: "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 rounded-full p-2",
       },
       size: {
         default: "h-10 px-4 py-2",
