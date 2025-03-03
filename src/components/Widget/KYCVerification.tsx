@@ -133,6 +133,7 @@ const KYCVerification: React.FC<{
               })
               .catch((error) => {
                 console.error("Error playing video:", error);
+                setCameraError("Error playing video: " + error.message);
                 toast.error("Error starting camera: " + error.message);
               });
           }
@@ -424,6 +425,7 @@ const KYCVerification: React.FC<{
                     autoPlay
                     playsInline
                     muted
+                    style={{ transform: 'scaleX(-1)' }}
                   ></video>
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="w-48 h-48 border-2 border-dashed border-white/70 rounded-full"></div>
