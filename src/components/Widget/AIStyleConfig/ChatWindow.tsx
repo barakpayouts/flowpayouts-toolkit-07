@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Upload, Image, Bot, User, X, RefreshCw, Loader2 } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
@@ -106,7 +105,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
   const { config } = useWidgetConfig();
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>('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');
   const [showKeyInput, setShowKeyInput] = useState(false);
 
   // Suggested prompts that users can click on
@@ -134,14 +133,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
 
   // Function to analyze user input using OpenAI API
   const analyzeUserInputWithOpenAI = async (userInput: string) => {
-    if (!apiKey) {
-      toast.error("OpenAI API key required", {
-        description: "Please set your OpenAI API key to use AI styling"
-      });
-      setShowKeyInput(true);
-      throw new Error("OpenAI API key required");
-    }
-
     try {
       const prompt = `
       As an AI style expert, analyze the following user description and recommend a widget style for a web application.
@@ -334,7 +325,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
     setMessages(prev => [...prev, { role: 'assistant', content: '', isLoading: true }]);
     
     try {
-      // Process the user input to get style recommendations - use OpenAI if API key exists
+      // Process the user input to get style recommendations - use OpenAI API
       const { stylePreset, explanation } = await analyzeUserInputWithOpenAI(userMessage);
       
       console.log("AI analysis complete:", stylePreset);
@@ -370,7 +361,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
         if (loadingIndex !== -1) {
           newMessages[loadingIndex] = { 
             role: 'assistant', 
-            content: "I'm sorry, I encountered an issue analyzing your request. Please try again with different wording or set your OpenAI API key." 
+            content: "I'm sorry, I encountered an issue analyzing your request. Please try again with different wording." 
           };
         }
         return newMessages;
@@ -435,25 +426,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       <div className="p-2 border-b border-white/10 bg-white/5 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Bot size={16} className="text-payouts-accent ai-style-header-icon" />
-          <h3 className="font-medium text-sm">Style Assistant</h3>
+          <h3 className="font-medium text-sm">Style Assistant (OpenAI Powered)</h3>
         </div>
         <div className="flex items-center gap-2">
-          {showKeyInput ? (
-            <input
-              type="password"
-              placeholder="OpenAI API Key"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="text-xs px-2 py-1 bg-white/10 border border-white/20 rounded text-white w-32"
-            />
-          ) : (
-            <button
-              className="text-xs px-2 py-1 bg-white/10 border border-white/20 rounded text-white hover:bg-white/20"
-              onClick={() => setShowKeyInput(true)}
-            >
-              Set API Key
-            </button>
-          )}
           <button 
             className="h-6 px-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-md flex items-center justify-center"
             onClick={() => {
