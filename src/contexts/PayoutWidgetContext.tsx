@@ -53,7 +53,6 @@ interface PayoutWidgetContextType {
   setSelectedInvoice: (invoice: InvoiceData | null) => void;
   uploadedInvoices: InvoiceData[];
   setUploadedInvoices: (invoices: InvoiceData[]) => void;
-  // Helper functions
   handleNextStep: () => void;
   handleBackStep: () => void;
   handleSelectPayoutMethod: (method: PayoutMethod) => void;
@@ -80,10 +79,8 @@ export const usePayoutWidget = () => {
 };
 
 export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Steps based on config
   const steps = ['profile', 'payout', 'details', 'bank', 'tax'];
   
-  // State
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState<PayoutMethod>(null);
   const [selectedDetailOption, setSelectedDetailOption] = useState<DetailOption>(null);
@@ -97,7 +94,6 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(null);
   const [uploadedInvoices, setUploadedInvoices] = useState<InvoiceData[]>([]);
   
-  // Demo payout data
   const payouts = [
     { 
       id: 'p1', 
@@ -146,7 +142,6 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
     },
   ];
 
-  // Handle upload invoice
   const handleUploadInvoice = (file: File) => {
     const newInvoice: InvoiceData = {
       id: `user-${Date.now()}`,
@@ -167,13 +162,11 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
   };
   
-  // Handle view invoice
   const handleViewInvoice = (invoice: InvoiceData) => {
     setSelectedInvoice(invoice);
     setIsInvoiceDetailOpen(true);
   };
   
-  // Handle download invoice
   const handleDownloadInvoice = () => {
     toast.success("Invoice download started", {
       description: "Your invoice is being downloaded."
@@ -181,13 +174,10 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const handleNextStep = () => {
-    // If we're at payout step and have selected a method, go to details step
     if (steps[currentStep] === 'payout' && selectedMethod) {
       setCurrentStep(currentStep + 1);
     } 
-    // If we're at details step
     else if (steps[currentStep] === 'details') {
-      // For methods that need a specific option to be selected
       if ((selectedMethod === 'Digital Wallet' || selectedMethod === 'Prepaid Card' || selectedMethod === 'Gift Card') 
           && !selectedDetailOption) {
         toast.error("Please select an option to continue", {
@@ -196,20 +186,15 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return;
       }
       
-      // If we have Bank Transfer and there's a bank verification step, go to it
       if (selectedMethod === 'Bank Transfer' && steps.includes('bank')) {
-        // Find the index of bank step
         const bankStepIndex = steps.indexOf('bank');
         setCurrentStep(bankStepIndex);
       } 
-      // Otherwise skip to the next step after details (could be tax or end)
       else {
-        // If we're at details and there's a next step (not bank), go to it
         const nextStepIndex = currentStep + 1;
         if (nextStepIndex < steps.length) {
           setCurrentStep(nextStepIndex);
         } else {
-          // If there are no more steps, show success
           setShowSuccess(true);
           setOnboardingCompleted(true);
           toast.success("Payout successful!", {
@@ -218,11 +203,9 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
       }
     }
-    // For other steps (profile, bank, tax), just go to the next step
     else if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Last step completed, show success
       setShowSuccess(true);
       setOnboardingCompleted(true);
       toast.success("Payout successful!", {
@@ -233,7 +216,6 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
   
   const handleBackStep = () => {
     if (steps[currentStep] === 'details') {
-      // Go back to payout method selection
       setSelectedMethod(null);
       setSelectedDetailOption(null);
       setCurrentStep(steps.indexOf('payout'));
@@ -244,7 +226,6 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const handleSelectPayoutMethod = (method: PayoutMethod) => {
     setSelectedMethod(method);
-    // Reset the detail option when changing method
     setSelectedDetailOption(null);
   };
   
@@ -264,9 +245,8 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
   
   const handleLogin = () => {
-    // Simulate login
     setIsLoggedIn(true);
-    setOnboardingCompleted(true); // Assuming user has completed onboarding before
+    setOnboardingCompleted(true);
     setSelectedMethod('Digital Wallet');
     setSelectedDetailOption('PayPal');
     toast.success("Welcome back!", {
@@ -324,7 +304,6 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setSelectedInvoice,
     uploadedInvoices,
     setUploadedInvoices,
-    // Helper functions
     handleNextStep,
     handleBackStep,
     handleSelectPayoutMethod,

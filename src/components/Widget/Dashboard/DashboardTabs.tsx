@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock } from 'lucide-react';
+
+import React from 'react';
+import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { usePayoutWidget, PayoutRecord, InvoiceData } from '@/contexts/PayoutWidgetContext';
 import { cn } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from "@/components/ui/sheet";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
 // Function to determine status color based on payment status
@@ -21,28 +23,71 @@ const getStatusColor = (status: string) => {
 
 const DashboardTabs: React.FC = () => {
   const { config } = useWidgetConfig();
-  const { payouts } = usePayoutWidget();
-  const [selectedInvoice, setSelectedInvoice] = useState<PayoutRecord | null>(null);
-  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
-  const [fileUploadName, setFileUploadName] = useState<string | null>(null);
+  const { 
+    payouts, 
+    uploadedInvoices, 
+    handleUploadInvoice, 
+    handleViewInvoice, 
+    handleDownloadInvoice,
+    isInvoiceDetailOpen,
+    setIsInvoiceDetailOpen,
+    selectedInvoice,
+    setSelectedInvoice,
+    isInvoiceUploadOpen,
+    setIsInvoiceUploadOpen
+  } = usePayoutWidget();
+  const [uploadProgress, setUploadProgress] = React.useState(0);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [uploadSource, setUploadSource] = React.useState<'computer' | 'google' | null>(null);
 
-  const handleInvoiceClick = (invoice: PayoutRecord) => {
-    setSelectedInvoice(invoice);
-    setInvoiceDialogOpen(true);
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setFileUploadName(file.name);
-      // Simulating upload success
-      setTimeout(() => {
-        toast.success("Invoice uploaded successfully", {
-          description: `${file.name} has been uploaded and is being processed.`
-        });
-        setFileUploadName(null);
-      }, 1500);
+      setSelectedFile(file);
+      setUploadSource('computer');
     }
+  };
+
+  const simulateUpload = () => {
+    if (!selectedFile) return;
+    
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        const newProgress = prev + Math.random() * 20;
+        if (newProgress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            handleUploadInvoice(selectedFile);
+            setIsUploading(false);
+            setSelectedFile(null);
+            setUploadSource(null);
+          }, 500);
+          return 100;
+        }
+        return newProgress;
+      });
+    }, 300);
+  };
+
+  const handleGoogleDriveUpload = () => {
+    // Simulate Google Drive selection
+    setUploadSource('google');
+    toast.info("Google Drive", {
+      description: "Connecting to Google Drive...",
+    });
+    
+    // Simulate file selection after a delay
+    setTimeout(() => {
+      const mockFile = new File(["dummy content"], "invoice-from-drive.pdf", { type: "application/pdf" });
+      setSelectedFile(mockFile);
+      toast.success("File selected from Google Drive", {
+        description: "invoice-from-drive.pdf has been selected"
+      });
+    }, 1500);
   };
 
   return (
@@ -155,54 +200,68 @@ const DashboardTabs: React.FC = () => {
         <TabsContent value="invoices" className="mt-0">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-sm font-medium">Your Invoices</h3>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Upload size={14} />
-                  <span>Upload Invoice</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="space-y-4">
-                  <h4 className="font-medium">Upload New Invoice</h4>
-                  <p className="text-sm opacity-70">Upload a PDF or image of your invoice</p>
-                  
-                  <div className="flex items-center justify-center w-full">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-white/5 border-white/20 hover:bg-white/10">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        {fileUploadName ? (
-                          <div className="text-center">
-                            <p className="mb-2 text-sm text-gray-300">{fileUploadName}</p>
-                            <p className="text-xs text-gray-400">Uploading...</p>
-                          </div>
-                        ) : (
-                          <>
-                            <Upload className="w-8 h-8 mb-3 text-gray-400" />
-                            <p className="mb-2 text-sm text-gray-300"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                            <p className="text-xs text-gray-400">PDF, PNG, JPG or JPEG (MAX. 10MB)</p>
-                          </>
-                        )}
-                      </div>
-                      <input 
-                        id="dropzone-file" 
-                        type="file" 
-                        className="hidden" 
-                        accept=".pdf,.png,.jpg,.jpeg"
-                        onChange={handleFileUpload}
-                      />
-                    </label>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-2"
+              onClick={() => setIsInvoiceUploadOpen(true)}
+            >
+              <Upload size={14} />
+              <span>Upload Invoice</span>
+            </Button>
           </div>
 
           <div className="invoices-list space-y-3">
+            {/* Show uploaded invoices */}
+            {uploadedInvoices.map(invoice => (
+              <div 
+                key={invoice.id} 
+                className="invoice-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
+                onClick={() => handleViewInvoice(invoice)}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{invoice.invoice}</p>
+                      {invoice.isUploaded && (
+                        <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded-full">
+                          New
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm opacity-70">{invoice.description}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Calendar size={14} className="opacity-60" />
+                      <span className="text-xs opacity-70">{invoice.date}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="font-medium">{invoice.amount}</span>
+                    <span className={`text-sm ${getStatusColor(invoice.status)}`}>
+                      {invoice.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Show system invoices */}
             {payouts.map(payout => (
               <div 
                 key={payout.id} 
                 className="invoice-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
-                onClick={() => handleInvoiceClick(payout)}
+                onClick={() => {
+                  // Convert payout to invoice format for viewing
+                  const invoice: InvoiceData = {
+                    id: payout.id,
+                    invoice: payout.invoice,
+                    date: payout.date,
+                    amount: payout.amount,
+                    description: payout.description,
+                    status: payout.status
+                  };
+                  handleViewInvoice(invoice);
+                }}
               >
                 <div className="flex justify-between items-start">
                   <div>
@@ -226,9 +285,133 @@ const DashboardTabs: React.FC = () => {
         </TabsContent>
       </Tabs>
 
+      {/* Invoice Upload Dialog */}
+      <Sheet open={isInvoiceUploadOpen} onOpenChange={setIsInvoiceUploadOpen}>
+        <SheetContent className="sm:max-w-md" style={{ background: config.primaryColor, borderColor: `${config.accentColor}20` }}>
+          <SheetHeader>
+            <SheetTitle>Upload Invoice</SheetTitle>
+            <SheetDescription>
+              Upload an invoice from your computer or Google Drive
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="mt-6 space-y-4">
+            {!selectedFile ? (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div 
+                    className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                    onClick={() => document.getElementById('invoice-upload-input')?.click()}
+                  >
+                    <div className="p-3 rounded-full bg-white/10">
+                      <FileImage size={20} style={{ color: config.accentColor }} />
+                    </div>
+                    <p className="font-medium text-sm">From Computer</p>
+                    <p className="text-xs opacity-70">Upload from your device</p>
+                  </div>
+                  
+                  <div 
+                    className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                    onClick={handleGoogleDriveUpload}
+                  >
+                    <div className="p-3 rounded-full bg-white/10">
+                      <FileText size={20} style={{ color: config.accentColor }} />
+                    </div>
+                    <p className="font-medium text-sm">Google Drive</p>
+                    <p className="text-xs opacity-70">Import from Google Drive</p>
+                  </div>
+                </div>
+                
+                <input 
+                  type="file"
+                  id="invoice-upload-input"
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleFileSelect}
+                />
+                
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10 mt-6">
+                  <p className="text-sm opacity-80 mb-3">Supported file types</p>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-white/10 text-xs px-2 py-1 rounded">PDF</span>
+                    <span className="bg-white/10 text-xs px-2 py-1 rounded">JPG</span>
+                    <span className="bg-white/10 text-xs px-2 py-1 rounded">PNG</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="p-3 rounded-full bg-white/10 flex-shrink-0">
+                    <FileText size={20} style={{ color: config.accentColor }} />
+                  </div>
+                  <div className="flex-grow">
+                    <p className="font-medium text-sm">{selectedFile.name}</p>
+                    <p className="text-xs opacity-70">
+                      {(selectedFile.size / 1024).toFixed(1)} KB • {uploadSource === 'google' ? 'Google Drive' : 'Local file'}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="dark" 
+                    size="icon" 
+                    className="flex-shrink-0 h-8 w-8"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setUploadSource(null);
+                    }}
+                  >
+                    <X size={14} />
+                  </Button>
+                </div>
+                
+                {isUploading && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Uploading...</span>
+                      <span>{Math.round(uploadProgress)}%</span>
+                    </div>
+                    <Progress value={uploadProgress} className="h-2" />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          <SheetFooter className="absolute bottom-0 left-0 right-0 p-6">
+            <div className="flex gap-2 w-full">
+              <Button 
+                variant="dark" 
+                className="flex-1"
+                onClick={() => setIsInvoiceUploadOpen(false)}
+              >
+                Cancel
+              </Button>
+              
+              <Button 
+                className="flex-1 text-gray-900 font-semibold hover:text-gray-900"
+                style={{
+                  background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+                  boxShadow: `0 4px 15px ${config.accentColor}40`,
+                }}
+                disabled={!selectedFile || isUploading}
+                onClick={simulateUpload}
+              >
+                {isUploading ? 'Uploading...' : 'Upload Invoice'}
+              </Button>
+            </div>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
       {/* Invoice Detail Dialog */}
-      <Dialog open={invoiceDialogOpen} onOpenChange={setInvoiceDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog open={isInvoiceDetailOpen} onOpenChange={setIsInvoiceDetailOpen}>
+        <DialogContent 
+          className="sm:max-w-md" 
+          style={{ 
+            background: config.primaryColor, 
+            borderColor: `${config.accentColor}20` 
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Invoice {selectedInvoice?.invoice}</DialogTitle>
             <DialogDescription>
@@ -270,15 +453,30 @@ const DashboardTabs: React.FC = () => {
               </div>
               
               <div className="mt-4 bg-white/5 p-3 rounded border border-white/10">
-                <p className="text-sm opacity-70 mb-1">Payment Method</p>
-                <p className="font-medium">{selectedInvoice?.method}</p>
-                <p className="text-sm opacity-70 mt-2">Status: <span className={getStatusColor(selectedInvoice?.status || '')}>{selectedInvoice?.status}</span></p>
+                <p className="text-sm opacity-70 mb-1">Status</p>
+                <p className={`font-medium ${getStatusColor(selectedInvoice?.status || '')}`}>
+                  {selectedInvoice?.status}
+                </p>
+                
+                {selectedInvoice?.isUploaded && (
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                    <p className="text-xs text-blue-400">
+                      This invoice was uploaded by you
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
           
           <DialogFooter className="sm:justify-between">
-            <Button variant="outline" size="sm" className="gap-1">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1"
+              onClick={handleDownloadInvoice}
+            >
               <Download size={14} />
               <span>Download PDF</span>
             </Button>
