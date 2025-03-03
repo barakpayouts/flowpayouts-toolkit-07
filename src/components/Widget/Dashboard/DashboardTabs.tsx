@@ -40,6 +40,7 @@ const DashboardTabs: React.FC = () => {
   const [isUploading, setIsUploading] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [uploadSource, setUploadSource] = React.useState<'computer' | 'google' | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -88,6 +89,10 @@ const DashboardTabs: React.FC = () => {
         description: "invoice-from-drive.pdf has been selected"
       });
     }, 1500);
+  };
+
+  const openFileDialog = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -301,7 +306,7 @@ const DashboardTabs: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div 
                     className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
-                    onClick={() => document.getElementById('invoice-upload-input')?.click()}
+                    onClick={openFileDialog}
                   >
                     <div className="p-3 rounded-full bg-white/10">
                       <FileImage size={20} style={{ color: config.accentColor }} />
@@ -325,6 +330,7 @@ const DashboardTabs: React.FC = () => {
                 <input 
                   type="file"
                   id="invoice-upload-input"
+                  ref={fileInputRef}
                   className="hidden"
                   accept=".pdf,.jpg,.jpeg,.png"
                   onChange={handleFileSelect}

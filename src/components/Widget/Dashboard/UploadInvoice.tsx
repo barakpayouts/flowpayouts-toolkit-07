@@ -4,6 +4,7 @@ import { X, Upload, FileText, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { toast } from "sonner";
+import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 
 interface UploadInvoiceProps {
   onClose: () => void;
@@ -11,6 +12,7 @@ interface UploadInvoiceProps {
 
 const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
   const { config } = useWidgetConfig();
+  const { handleUploadInvoice } = usePayoutWidget();
   const [dragging, setDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
@@ -81,6 +83,9 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
           setUploading(false);
           setUploaded(true);
           
+          // Pass the file to the context handler
+          handleUploadInvoice(file);
+          
           toast.success("Invoice uploaded successfully", {
             description: "Your invoice has been uploaded and will be processed."
           });
@@ -108,6 +113,28 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
     return `${(size / (1024 * 1024)).toFixed(1)} MB`;
   };
 
+  const openFileSelector = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleGoogleDriveUpload = () => {
+    // Simulate Google Drive selection
+    toast.info("Google Drive", {
+      description: "Connecting to Google Drive...",
+    });
+    
+    // Simulate file selection after a delay
+    setTimeout(() => {
+      const mockFile = new File(["dummy content"], "invoice-from-drive.pdf", { type: "application/pdf" });
+      setFile(mockFile);
+      toast.success("File selected from Google Drive", {
+        description: "invoice-from-drive.pdf has been selected"
+      });
+    }, 1500);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div 
@@ -130,39 +157,64 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
         </div>
         
         {!file ? (
-          <div 
-            className={`invoice-upload-dropzone ${dragging ? 'dragging' : ''}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <input 
-              type="file" 
-              ref={fileInputRef}
-              className="hidden" 
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={handleFileChange}
-            />
-            <div className="flex flex-col items-center gap-3">
+          <>
+            <div className="grid grid-cols-2 gap-4 mb-4">
               <div 
-                className="w-14 h-14 rounded-full flex items-center justify-center"
-                style={{ background: `${config.accentColor}20` }}
+                className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                onClick={openFileSelector}
               >
-                <Upload 
-                  size={24} 
-                  style={{ color: config.accentColor }} 
-                />
+                <div className="p-3 rounded-full bg-white/10">
+                  <Upload size={20} style={{ color: config.accentColor }} />
+                </div>
+                <p className="font-medium text-sm">From Computer</p>
+                <p className="text-xs opacity-70">Upload from your device</p>
               </div>
-              <div>
-                <p className="font-medium mb-1">Drop your invoice here</p>
-                <p className="text-xs text-white/60">or click to browse files</p>
+              
+              <div 
+                className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                onClick={handleGoogleDriveUpload}
+              >
+                <div className="p-3 rounded-full bg-white/10">
+                  <FileText size={20} style={{ color: config.accentColor }} />
+                </div>
+                <p className="font-medium text-sm">Google Drive</p>
+                <p className="text-xs opacity-70">Import from Google Drive</p>
               </div>
-              <p className="text-xs text-white/60 mt-2">
-                Supports PDF, JPEG, PNG (max 5MB)
-              </p>
             </div>
-          </div>
+            
+            <div 
+              className={`invoice-upload-dropzone ${dragging ? 'dragging' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                className="hidden" 
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handleFileChange}
+              />
+              <div className="flex flex-col items-center gap-3">
+                <div 
+                  className="w-14 h-14 rounded-full flex items-center justify-center"
+                  style={{ background: `${config.accentColor}20` }}
+                >
+                  <Upload 
+                    size={24} 
+                    style={{ color: config.accentColor }} 
+                  />
+                </div>
+                <div>
+                  <p className="font-medium mb-1">Drop your invoice here</p>
+                  <p className="text-xs text-white/60">or click to browse files</p>
+                </div>
+                <p className="text-xs text-white/60 mt-2">
+                  Supports PDF, JPEG, PNG (max 5MB)
+                </p>
+              </div>
+            </div>
+          </>
         ) : (
           <div className="space-y-4">
             <div className="invoice-file-preview">
