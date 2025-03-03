@@ -10,7 +10,7 @@ import DigitalWallet from './PayoutMethods/DigitalWallet';
 import PushToCard from './PayoutMethods/PushToCard';
 import PrepaidCard from './PayoutMethods/PrepaidCard';
 import GiftCard from './PayoutMethods/GiftCard';
-import { Check, ChevronRight, ArrowLeft, Radio, DollarSign, Clock, FileText, Calendar, CreditCard, RefreshCw, LogOut } from 'lucide-react';
+import { Check, ChevronRight, ArrowLeft, Radio, DollarSign, Clock, FileText, Calendar, CreditCard, RefreshCw, LogOut, Upload } from 'lucide-react';
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -790,6 +790,39 @@ const PayoutWidget = () => {
             </TabsContent>
             
             <TabsContent value="invoices" className="mt-0">
+              <div className="invoice-upload-container mb-4">
+                <button
+                  onClick={() => {
+                    // Show invoice upload modal or form
+                    toast.info("Upload invoice", {
+                      description: "You can upload your invoice here",
+                      action: {
+                        label: "Upload",
+                        onClick: () => document.getElementById('invoice-upload-input')?.click()
+                      }
+                    });
+                  }}
+                  className="upload-invoice-button w-full"
+                >
+                  <Upload size={18} />
+                  <span>Upload Invoice</span>
+                </button>
+                <input 
+                  type="file"
+                  id="invoice-upload-input"
+                  className="hidden"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // Simulate upload
+                      toast.success("Invoice uploaded successfully", {
+                        description: `File ${file.name} has been uploaded.`
+                      });
+                    }
+                  }}
+                />
+              </div>
               <div className="invoices-list space-y-3">
                 {payouts.map(payout => (
                   <div key={payout.id} className="invoice-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">

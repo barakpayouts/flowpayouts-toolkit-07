@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Lock } from 'lucide-react';
+import { Lock, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 
@@ -18,7 +18,8 @@ interface VerificationLayoutProps {
   disableNext?: boolean;
   buttonText?: string;
   hideButtons?: boolean;
-  showUploadInvoice?: boolean; // New prop to control invoice upload visibility
+  showUploadInvoice?: boolean; // Prop to control invoice upload visibility
+  onUploadInvoice?: () => void; // New prop for handling invoice upload
 }
 
 const VerificationLayout: React.FC<VerificationLayoutProps> = ({
@@ -34,7 +35,8 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   disableNext = false,
   buttonText,
   hideButtons = false,
-  showUploadInvoice = false, // Default is false
+  showUploadInvoice = false,
+  onUploadInvoice,
 }) => {
   const { config } = useWidgetConfig();
 
@@ -44,6 +46,19 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         <h2 className="text-2xl font-semibold mb-2">{title}</h2>
         {description && <p className="text-white/70">{description}</p>}
       </div>
+      
+      {/* Show Upload Invoice button if enabled */}
+      {showUploadInvoice && onUploadInvoice && (
+        <div className="invoice-upload-container mb-4">
+          <button
+            onClick={onUploadInvoice}
+            className="upload-invoice-button w-full"
+          >
+            <Upload size={18} />
+            <span>Upload Invoice</span>
+          </button>
+        </div>
+      )}
       
       {children}
       

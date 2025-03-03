@@ -1,4 +1,3 @@
-
 /* Configuration panel styling */
 .config-panel {
   backdrop-filter: blur(15px);
@@ -196,8 +195,9 @@ input:checked + .toggle-slider:before {
 .upload-invoice-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   background: rgba(208, 233, 42, 0.15);
   color: var(--accent, #d0e92a);
   border-radius: 8px;
@@ -206,6 +206,7 @@ input:checked + .toggle-slider:before {
   border: 1px solid rgba(208, 233, 42, 0.3);
   margin-bottom: 16px;
   cursor: pointer;
+  width: 100%;
 }
 
 .upload-invoice-button:hover {
