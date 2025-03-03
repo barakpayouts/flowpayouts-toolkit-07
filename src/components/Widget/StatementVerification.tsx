@@ -2,14 +2,13 @@
 import React, { useState, useRef } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { motion } from 'framer-motion';
-import { FileText, AlertCircle, Upload, Check } from 'lucide-react';
+import { FileText, AlertCircle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import VerificationLayout from './VerificationLayout';
 
 const StatementVerification: React.FC = () => {
   const { config } = useWidgetConfig();
-  const [invoiceUploaded, setInvoiceUploaded] = useState(false);
+  const [statementUploaded, setStatementUploaded] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -17,35 +16,21 @@ const StatementVerification: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      handleFileUploadSuccess(file.name);
+      uploadFile(file);
     }
   };
   
-  const handleFileUploadSuccess = (fileName: string) => {
-    setUploadedFileName(fileName);
-    setInvoiceUploaded(true);
+  const uploadFile = (file: File) => {
+    setUploadedFileName(file.name);
+    setStatementUploaded(true);
     toast.success("Statement uploaded successfully", {
-      description: `${fileName} has been added to your account`
+      description: `${file.name} has been added to your account`
     });
-    // Reset file input
+    
+    // Reset file input for future uploads
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  };
-  
-  const handleGoogleDriveUpload = () => {
-    // Simulate Google Drive integration
-    toast.info("Connecting to Google Drive...");
-    setTimeout(() => {
-      toast.success("Connected to Google Drive", {
-        description: "Select a file from your Google Drive"
-      });
-      // Simulate file selection after delay
-      setTimeout(() => {
-        const fileName = "statement_may2023.pdf";
-        handleFileUploadSuccess(fileName);
-      }, 1500);
-    }, 1000);
   };
   
   const handleChooseFile = () => {
@@ -59,7 +44,8 @@ const StatementVerification: React.FC = () => {
     setIsDragging(true);
   };
   
-  const handleDragLeave = () => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
     setIsDragging(false);
   };
   
@@ -69,13 +55,12 @@ const StatementVerification: React.FC = () => {
     
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
-      const file = files[0];
-      handleFileUploadSuccess(file.name);
+      uploadFile(files[0]);
     }
   };
   
   const handleUploadAnother = () => {
-    setInvoiceUploaded(false);
+    setStatementUploaded(false);
     setUploadedFileName(null);
   };
   
@@ -86,7 +71,7 @@ const StatementVerification: React.FC = () => {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-6"
     >
-      {/* Hidden file input for statement upload */}
+      {/* Hidden file input */}
       <input
         type="file"
         ref={fileInputRef}
@@ -95,7 +80,7 @@ const StatementVerification: React.FC = () => {
         onChange={handleFileChange}
       />
       
-      {invoiceUploaded ? (
+      {statementUploaded ? (
         <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-4">
           <div className="text-center">
             <div className="mx-auto w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-3">
@@ -125,7 +110,7 @@ const StatementVerification: React.FC = () => {
         </div>
       ) : (
         <div 
-          className={`upload-container ${isDragging ? 'bg-white/10' : 'bg-white/5'} border ${isDragging ? 'border-' + config.accentColor : 'border-white/10'} rounded-xl p-10 text-center transition-all hover:bg-white/8 cursor-pointer`}
+          className={`upload-container ${isDragging ? 'bg-white/10' : 'bg-white/5'} border ${isDragging ? 'border-' + config.accentColor : 'border-white/10'} rounded-xl p-8 text-center transition-all cursor-pointer`}
           style={{ borderRadius: `${config.borderRadius}px` }}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -134,7 +119,7 @@ const StatementVerification: React.FC = () => {
         >
           <div className="mb-4">
             <motion.div 
-              whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+              whileHover={{ scale: 1.05 }}
               className="w-16 h-16 rounded-full bg-gradient-to-br from-white/10 to-white/5 mx-auto flex items-center justify-center"
               style={{
                 border: `1px solid ${config.accentColor}30`,
@@ -146,32 +131,20 @@ const StatementVerification: React.FC = () => {
               />
             </motion.div>
           </div>
-          <p className="text-white/70 mb-3">Drag & drop your statement here or</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-2">
-            <Button 
-              variant="glass"
-              size="default"
-              className="mx-auto"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleChooseFile();
-              }}
-            >
-              Choose From Computer
-            </Button>
-            
-            <Button 
-              variant="glass"
-              size="default"
-              className="mx-auto"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleGoogleDriveUpload();
-              }}
-            >
-              Import From Google Drive
-            </Button>
-          </div>
+          <p className="text-white/70 mb-3">Drag & drop your statement here</p>
+          <p className="text-white/70 mb-3">or</p>
+          <Button 
+            variant="glass"
+            size="default"
+            className="mx-auto mb-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleChooseFile();
+            }}
+          >
+            Browse Files
+          </Button>
+          
           <p className="mt-4 text-xs text-white/50">
             Supported formats: PDF, PNG, JPG (Max 10MB)
           </p>
