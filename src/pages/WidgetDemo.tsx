@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import PayoutWidget from "@/components/Widget/PayoutWidget";
 import { RecipientType, VerificationStep, PayoutMethod, useWidgetConfig } from '@/hooks/use-widget-config';
-import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid } from 'lucide-react';
+import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid, Bot } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import GlassMorphism from '@/components/ui/GlassMorphism';
+import AIStyleConfigurator from '@/components/Widget/AIStyleConfig/AIStyleConfigurator';
 
 const WidgetDemo = () => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const WidgetDemo = () => {
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [isPayoutsOnly, setIsPayoutsOnly] = useState(config.steps.length === 0);
   const [widgetKey, setWidgetKey] = useState(0);
+  const [activeTab, setActiveTab] = useState<'steps' | 'payouts' | 'styling' | 'ai'>('steps');
   
   const handleConfigureWidget = () => {
     setShowWidget(true);
@@ -249,11 +251,19 @@ const WidgetDemo = () => {
                       </Button>
                     </div>
                   </div>
-                  <Tabs defaultValue="steps" className="w-full">
-                    <TabsList className="grid grid-cols-3 mb-4 bg-white/10">
+                  <Tabs 
+                    defaultValue={activeTab} 
+                    className="w-full"
+                    onValueChange={(value) => setActiveTab(value as any)}
+                  >
+                    <TabsList className="grid grid-cols-4 mb-4 bg-white/10">
                       <TabsTrigger value="steps" className="data-[state=active]:bg-white/20">Steps</TabsTrigger>
                       <TabsTrigger value="payouts" className="data-[state=active]:bg-white/20">Payouts</TabsTrigger>
                       <TabsTrigger value="styling" className="data-[state=active]:bg-white/20">Styling</TabsTrigger>
+                      <TabsTrigger value="ai" className="data-[state=active]:bg-white/20 flex items-center gap-1">
+                        <Bot size={14} />
+                        AI Style
+                      </TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="steps" className="space-y-4 animate-fade-in">
@@ -507,6 +517,19 @@ const WidgetDemo = () => {
                           Reset to Defaults
                         </Button>
                       </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="ai" className="animate-fade-in">
+                      <div className="bg-payouts-dark/60 p-4 rounded-lg border border-white/10 mb-4">
+                        <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
+                          <Bot size={18} className="text-payouts-accent" />
+                          AI-Powered Widget Styling
+                        </h3>
+                        <p className="text-white/70 text-sm mb-4">
+                          Chat with our AI to customize the widget design based on your brand. Upload your logo or share your website, and let the AI create a style that matches your branding.
+                        </p>
+                      </div>
+                      <AIStyleConfigurator setWidgetKey={setWidgetKey} />
                     </TabsContent>
                   </Tabs>
                 </div>

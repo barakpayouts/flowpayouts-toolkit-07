@@ -1,16 +1,17 @@
 
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-md hover:shadow-lg hover:-translate-y-0.5",
+        default:
+          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:bg-destructive/90",
         outline:
@@ -21,35 +22,27 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         // Modernized button variants with improved contrast
         glass: 
-          "backdrop-blur-md bg-white/20 text-white border border-white/20 shadow-glass hover:bg-white/30 hover:border-white/30 hover:shadow-glass-lg hover:-translate-y-0.5",
-        neobrut: 
-          "bg-payouts-accent text-payouts-dark font-semibold shadow-neobrut hover:-translate-y-1 hover:shadow-none transition-all duration-300 active:translate-y-0",
-        glow: 
-          "bg-gradient-to-r from-payouts-accent to-payouts-accent-light text-payouts-dark font-semibold shadow-glow hover:shadow-accent-glow hover:-translate-y-0.5 transition-all duration-300",
-        gradient: 
-          "bg-gradient-to-r from-purple-700 via-violet-600 to-purple-700 text-white font-semibold hover:bg-gradient-to-r hover:from-purple-600 hover:via-violet-500 hover:to-purple-600 shadow-md hover:shadow-lg hover:-translate-y-0.5",
-        accent: 
-          "bg-payouts-accent text-payouts-dark font-semibold hover:bg-payouts-accent-light shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5",
-        // Adding new high contrast variants - ensuring text color is explicitly defined for each
+          "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 transition-all",
+        glassDark: 
+          "bg-black/30 backdrop-blur-sm border border-white/10 text-white hover:bg-black/40 transition-all",
+        glassAccent: 
+          "bg-accent/20 backdrop-blur-sm border border-accent/30 text-white hover:bg-accent/30 transition-all",
         purple: 
-          "bg-[#9b87f5] text-gray-900 font-medium shadow-md hover:bg-[#8B5CF6] hover:text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
+          "bg-button-purple text-white hover:bg-button-purple/90 shadow-lg shadow-button-purple/20 hover:shadow-xl hover:shadow-button-purple/30 transition-all",
         blue: 
-          "bg-[#0EA5E9] text-white font-medium shadow-md hover:bg-[#0284c7] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
+          "bg-button-blue text-white hover:bg-button-blue/90 shadow-lg shadow-button-blue/20 hover:shadow-xl hover:shadow-button-blue/30 transition-all",
         orange: 
-          "bg-[#F97316] text-white font-medium shadow-md hover:bg-[#ea580c] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
+          "bg-button-orange text-white hover:bg-button-orange/90 shadow-lg shadow-button-orange/20 hover:shadow-xl hover:shadow-button-orange/30 transition-all",
         dark: 
-          "bg-[#1A1F2C] text-white font-medium border border-white/10 shadow-md hover:bg-[#1A1F2C]/90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
+          "bg-button-dark text-white hover:bg-button-dark/90 shadow-md hover:shadow-lg transition-all border border-white/10",
+        accent: 
+          "bg-payouts-accent text-payouts-dark hover:bg-payouts-accent-light shadow-lg shadow-payouts-accent/20 hover:shadow-xl hover:shadow-payouts-accent/30 transition-all",
       },
       size: {
-        default: "h-10 px-5 py-2 rounded-md",
-        sm: "h-9 rounded-md px-4",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10 rounded-full",
-        xl: "h-12 rounded-md px-10 text-base",
-        // Size variants
-        pill: "h-10 px-6 rounded-full",
-        wide: "h-11 px-12 rounded-md",
-        compact: "h-8 px-3 text-xs rounded-md",
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3 text-xs",
+        lg: "h-10 rounded-md px-8",
+        icon: "h-9 w-9",
       },
     },
     defaultVariants: {
@@ -57,26 +50,26 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-)
+);
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
+  asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+    const Comp = asChild ? Slot : "button";
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       />
-    )
+    );
   }
-)
-Button.displayName = "Button"
+);
+Button.displayName = "Button";
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
