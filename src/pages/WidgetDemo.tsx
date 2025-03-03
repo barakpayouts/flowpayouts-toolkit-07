@@ -249,22 +249,22 @@ const WidgetDemo = () => {
                             <ChevronDown size={16} />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 bg-payouts-dark/95 border border-white/20 backdrop-blur-lg">
+                        <DropdownMenuContent className="w-56 bg-white/95 border border-gray-200 backdrop-blur-lg shadow-lg text-gray-800">
                           {recipientOptions.map((recipient) => (
                             <DropdownMenuItem 
                               key={recipient.value}
                               onClick={() => handleSelectRecipientType(recipient.value)}
-                              className="cursor-pointer py-2 px-3 focus:bg-white/10 hover:bg-white/10"
+                              className="cursor-pointer py-2 px-3 focus:bg-gray-100 hover:bg-gray-100"
                             >
                               <div className="flex flex-col">
                                 <div className="flex items-center">
                                   <span className="mr-2 text-lg">{recipient.icon}</span>
                                   <span className="font-medium">{recipient.label}</span>
                                   {config.recipientType === recipient.value && (
-                                    <Check className="ml-auto h-4 w-4 text-payouts-accent" />
+                                    <Check className="ml-auto h-4 w-4 text-green-600" />
                                   )}
                                 </div>
-                                <span className="text-xs text-muted-foreground ml-7">{recipient.description}</span>
+                                <span className="text-xs text-gray-500 ml-7">{recipient.description}</span>
                               </div>
                             </DropdownMenuItem>
                           ))}

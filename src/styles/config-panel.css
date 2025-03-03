@@ -93,3 +93,39 @@ input:checked + .toggle-slider {
 input:checked + .toggle-slider:before {
   transform: translateX(16px);
 }
+
+/* New dropdown menu styling */
+.dropdown-menu-light {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.dropdown-item-light {
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  margin: 2px;
+}
+
+.dropdown-item-light:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-item-light:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item-light .check-icon {
+  color: #4caf50;
+}
+
+.dropdown-description {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 2px;
+}
