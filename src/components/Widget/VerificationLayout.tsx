@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Lock, Upload, FileText, Check } from 'lucide-react';
@@ -19,8 +18,8 @@ interface VerificationLayoutProps {
   disableNext?: boolean;
   buttonText?: string;
   hideButtons?: boolean;
-  showUploadInvoice?: boolean; // Prop to control invoice upload visibility
-  onUploadInvoice?: () => void; // New prop for handling invoice upload
+  showUploadInvoice?: boolean;
+  onUploadInvoice?: () => void;
 }
 
 const VerificationLayout: React.FC<VerificationLayoutProps> = ({
@@ -40,14 +39,42 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   onUploadInvoice,
 }) => {
   const { config } = useWidgetConfig();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [fileUploaded, setFileUploaded] = useState(false);
   
-  // Function to handle file upload directly from the component
-  const handleUploadClick = () => {
-    if (onUploadInvoice) {
-      onUploadInvoice(); // Call the provided handler if it exists
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUploadSuccess(file.name);
     }
   };
-
+  
+  const handleFileUploadSuccess = (fileName: string) => {
+    setUploadedFileName(fileName);
+    setFileUploaded(true);
+    toast.success("Invoice uploaded successfully", {
+      description: `${fileName} has been added to your account`
+    });
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+  
+  const handleUploadClick = () => {
+    // If onUploadInvoice is provided, use that instead
+    if (onUploadInvoice) {
+      onUploadInvoice();
+      return;
+    }
+    
+    // Otherwise, trigger the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  
   return (
     <div className="py-5">
       <div className="mb-8 text-center">
@@ -55,8 +82,19 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         {description && <p className="text-white/70">{description}</p>}
       </div>
       
-      {/* If showUploadInvoice is true, render a simple button to trigger the upload UI */}
-      {showUploadInvoice && (
+      {/* Hidden file input for direct uploads */}
+      {showUploadInvoice && !onUploadInvoice && (
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+          onChange={handleFileChange}
+        />
+      )}
+      
+      {/* Show upload button if requested */}
+      {showUploadInvoice && !fileUploaded && (
         <div className="mb-6 text-center">
           <Button
             onClick={handleUploadClick}
@@ -69,9 +107,41 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         </div>
       )}
       
+      {/* Show success message if file was uploaded */}
+      {showUploadInvoice && fileUploaded && !onUploadInvoice && (
+        <div className="mb-6 text-center">
+          <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-4 mx-auto max-w-md">
+            <div className="text-center">
+              <div className="mx-auto w-10 h-10 rounded-full bg-green-500 flex items-center justify-center mb-3">
+                <Check size={20} className="text-white" />
+              </div>
+              <p className="font-medium">Invoice uploaded successfully!</p>
+              
+              {uploadedFileName && (
+                <div className="mt-4 flex justify-center">
+                  <div className="p-3 bg-white/10 rounded-lg w-full max-w-md flex items-center justify-center gap-2">
+                    <FileText size={20} className="text-white" />
+                    <span className="font-medium truncate">{uploadedFileName}</span>
+                  </div>
+                </div>
+              )}
+              
+              <Button 
+                className="mt-4 py-2 px-4"
+                variant="glass"
+                size="sm"
+                onClick={() => setFileUploaded(false)}
+              >
+                Upload Another
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {children}
       
-      {!hideButtons && ( // Only render this section if hideButtons is false
+      {!hideButtons && (
         <div className="mt-6 bg-white/5 backdrop-blur-md p-5 rounded-xl border border-white/10">
           {setIsAuthorized && (
             <div className="flex items-center gap-3 mb-4">

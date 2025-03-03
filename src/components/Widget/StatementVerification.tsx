@@ -130,6 +130,7 @@ const StatementVerification: React.FC = () => {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onClick={handleChooseFile}
         >
           <div className="mb-4">
             <motion.div 
@@ -151,7 +152,10 @@ const StatementVerification: React.FC = () => {
               variant="glass"
               size="default"
               className="mx-auto"
-              onClick={handleChooseFile}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleChooseFile();
+              }}
             >
               Choose From Computer
             </Button>
@@ -160,7 +164,10 @@ const StatementVerification: React.FC = () => {
               variant="glass"
               size="default"
               className="mx-auto"
-              onClick={handleGoogleDriveUpload}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleGoogleDriveUpload();
+              }}
             >
               Import From Google Drive
             </Button>
