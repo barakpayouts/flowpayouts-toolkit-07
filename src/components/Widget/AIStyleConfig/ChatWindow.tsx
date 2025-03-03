@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Upload, Image, Bot, User, X, RefreshCw, Loader2, Info, KeyRound, AlertTriangle } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
@@ -389,10 +390,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ onApplyStyle }) => {
       // Apply the style changes
       if (stylePreset) {
         console.log("Applying style changes:", stylePreset);
-        onApplyStyle(stylePreset);
         
-        toast.success(`Applied ${stylePreset.name} theme`, {
-          description: "The widget styling has been updated."
+        // Directly call the onApplyStyle prop with the complete style object
+        onApplyStyle({
+          primaryColor: stylePreset.primaryColor,
+          accentColor: stylePreset.accentColor,
+          backgroundColor: stylePreset.backgroundColor,
+          textColor: stylePreset.textColor,
+          borderColor: stylePreset.borderColor,
+          borderRadius: stylePreset.borderRadius,
+          name: stylePreset.name
+        });
+        
+        toast.success(`${stylePreset.name} theme suggestion ready`, {
+          description: "Click 'Apply This Style' to update your widget"
         });
       }
     } catch (error) {

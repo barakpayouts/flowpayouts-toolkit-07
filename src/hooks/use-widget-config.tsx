@@ -98,9 +98,16 @@ export const useWidgetConfig = create<WidgetConfigState>((set) => ({
   updateConfig: (updates: Partial<WidgetConfig>) => {
     console.log("useWidgetConfig: Updating config with", updates);
     
-    return set((state) => ({
-      config: { ...state.config, ...updates }
-    }));
+    // Ensure we're applying valid config updates
+    return set((state) => {
+      const newConfig = { 
+        ...state.config, 
+        ...updates 
+      };
+      
+      console.log("New widget config:", newConfig);
+      return { config: newConfig };
+    });
   },
   
   setPayoutsOnlyMode: (enabled: boolean) => 
