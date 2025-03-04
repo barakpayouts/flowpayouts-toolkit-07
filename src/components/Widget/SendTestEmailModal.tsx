@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { sendTestEmail, generateWinningsEmail } from '@/utils/email';
 import { toast } from 'sonner';
-import { Mail, Loader2 } from 'lucide-react';
+import { Mail, Loader2, AlertCircle } from 'lucide-react';
 
 interface SendTestEmailModalProps {
   open: boolean;
@@ -60,8 +60,8 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
         }
         
         setEmailSent(true);
-        toast.success('Test email sent successfully!', {
-          description: `Email sent to ${email}`
+        toast.success('Test email simulation complete!', {
+          description: `In a production environment, an email would be sent to ${email}`
         });
       } else {
         throw new Error('Failed to send email');
@@ -69,7 +69,7 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
     } catch (error) {
       console.error('Error sending email:', error);
       toast.error('Failed to send email', {
-        description: 'Please try again later'
+        description: 'Email sending failed. This is a frontend-only demo and cannot send actual emails.'
       });
     } finally {
       setIsLoading(false);
@@ -90,9 +90,16 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
           <>
             <div className="space-y-4 py-4">
               <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                <div className="flex items-center gap-2 p-2 bg-amber-500/20 rounded-lg mb-4 text-amber-200">
+                  <AlertCircle size={18} />
+                  <p className="text-sm">
+                    This is a demo feature. In a real application, emails would be sent through a backend service.
+                  </p>
+                </div>
+                
                 <p className="text-sm text-white/80 mb-4">
-                  Send a test email that simulates a tournament winnings notification from Bowl.com. 
-                  The recipient will receive an email with a button to claim their prize.
+                  This will simulate sending a tournament winnings notification email from Bowl.com. 
+                  After clicking the button, the widget will switch to "Payouts Only" mode.
                 </p>
                 
                 <div className="space-y-2">
@@ -125,12 +132,12 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending...
+                    Simulating...
                   </>
                 ) : (
                   <>
                     <Mail className="mr-2 h-4 w-4" />
-                    Send Test Email
+                    Simulate Email
                   </>
                 )}
               </Button>
@@ -142,9 +149,9 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
               <div className="w-16 h-16 bg-payouts-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail size={24} className="text-payouts-accent" />
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">Email Sent Successfully!</h3>
+              <h3 className="text-lg font-medium text-white mb-2">Email Simulation Complete!</h3>
               <p className="text-sm text-white/80 mb-4">
-                A test email has been sent to {email}. The payout widget has been configured in "Payouts Only" mode.
+                In a production environment, an email would be sent to {email}. The payout widget has been configured in "Payouts Only" mode.
               </p>
               <DialogClose asChild>
                 <Button className="mt-2" variant="dark">Close</Button>
