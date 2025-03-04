@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import PayoutWidget from "@/components/Widget/PayoutWidget";
 import { RecipientType, VerificationStep, PayoutMethod, useWidgetConfig } from '@/hooks/use-widget-config';
-import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid, Bot, Scan } from 'lucide-react';
+import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid, Bot, Scan, Mail } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import GlassMorphism from '@/components/ui/GlassMorphism';
 import AIStyleConfigurator from '@/components/Widget/AIStyleConfig/AIStyleConfigurator';
+import SendTestEmailModal from '@/components/Widget/SendTestEmailModal';
 
 const WidgetDemo = () => {
   const navigate = useNavigate();
@@ -33,7 +34,8 @@ const WidgetDemo = () => {
   const [isPayoutsOnly, setIsPayoutsOnly] = useState(config.steps.length === 0);
   const [widgetKey, setWidgetKey] = useState(0);
   const [activeTab, setActiveTab] = useState<'steps' | 'payouts' | 'styling' | 'ai'>('steps');
-  
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
   const handleSelectRecipientType = (type: RecipientType) => {
     setRecipientType(type);
     setWidgetKey(prevKey => prevKey + 1);
@@ -186,14 +188,24 @@ const WidgetDemo = () => {
             <h2 className="text-2xl bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 font-bold">
               Widget Configuration
             </h2>
-            <Button 
-              variant="dark" 
-              onClick={() => setShowConfigPanel(!showConfigPanel)}
-              className="flex items-center gap-2 text-white hover:bg-black/40"
-            >
-              <Palette size={16} />
-              {showConfigPanel ? 'Hide Configuration' : 'Configure Widget'}
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="dark" 
+                onClick={() => setShowEmailModal(true)}
+                className="flex items-center gap-2 text-white hover:bg-black/40"
+              >
+                <Mail size={16} />
+                Send Test Email
+              </Button>
+              <Button 
+                variant="dark" 
+                onClick={() => setShowConfigPanel(!showConfigPanel)}
+                className="flex items-center gap-2 text-white hover:bg-black/40"
+              >
+                <Palette size={16} />
+                {showConfigPanel ? 'Hide Configuration' : 'Configure Widget'}
+              </Button>
+            </div>
           </div>
 
           <div className={`grid ${showConfigPanel ? 'grid-cols-1 md:grid-cols-3 gap-6' : 'grid-cols-1'}`}>
@@ -535,6 +547,12 @@ const WidgetDemo = () => {
           </div>
         </GlassMorphism>
       </div>
+      
+      <SendTestEmailModal 
+        open={showEmailModal} 
+        onOpenChange={setShowEmailModal}
+        setWidgetKey={setWidgetKey}
+      />
     </div>
   );
 };
