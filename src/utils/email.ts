@@ -1,4 +1,3 @@
-
 import { toast } from 'sonner';
 
 interface SendEmailProps {
@@ -45,9 +44,7 @@ export const sendTestEmail = async ({ to, subject, html }: SendEmailProps) => {
       ],
     };
     
-    // For this demo, we'll still simulate a successful email
-    // In a production environment, uncomment and use this actual API call:
-    /*
+    // Make the actual API call to SendGrid
     const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: headers,
@@ -55,13 +52,10 @@ export const sendTestEmail = async ({ to, subject, html }: SendEmailProps) => {
     });
     
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
+      console.error('SendGrid error response:', errorData);
       throw new Error(`SendGrid API error: ${JSON.stringify(errorData)}`);
     }
-    */
-    
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
     
     // Return success
     return { success: true };
