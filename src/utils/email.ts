@@ -18,11 +18,47 @@ const SENDGRID_CONFIG = {
 
 export const sendTestEmail = async ({ to, subject, html }: SendEmailProps) => {
   try {
-    // In a real application, this would use a backend API
-    // For this demo, we'll simulate a successful email sending
     console.log('Sending email to:', to);
     console.log('Email subject:', subject);
     console.log('Email content:', html);
+    
+    // Create headers for the request
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SENDGRID_CONFIG.pass}`,
+    };
+    
+    // Create the request body
+    const emailData = {
+      personalizations: [
+        {
+          to: [{ email: to }],
+          subject: subject,
+        },
+      ],
+      from: { email: SENDGRID_CONFIG.from },
+      content: [
+        {
+          type: 'text/html',
+          value: html,
+        },
+      ],
+    };
+    
+    // For this demo, we'll still simulate a successful email
+    // In a production environment, uncomment and use this actual API call:
+    /*
+    const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(emailData),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`SendGrid API error: ${JSON.stringify(errorData)}`);
+    }
+    */
     
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1500));

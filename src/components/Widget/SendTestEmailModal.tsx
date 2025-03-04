@@ -6,7 +6,8 @@ import {
   DialogHeader, 
   DialogTitle,
   DialogFooter,
-  DialogClose
+  DialogClose,
+  DialogDescription
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -53,7 +54,7 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
 
       if (result.success) {
         // Enable payouts only mode for demo
-        if (!config.steps.length === 0) {
+        if (config.steps.length !== 0) {
           updateConfig({ steps: [] });
           setWidgetKey(prev => prev + 1);
         }
@@ -80,6 +81,9 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
       <DialogContent className="bg-payouts-dark text-white border border-white/10 max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Send Test Email</DialogTitle>
+          <DialogDescription className="text-white/70">
+            Send a test email with tournament winning notification
+          </DialogDescription>
         </DialogHeader>
         
         {!emailSent ? (
