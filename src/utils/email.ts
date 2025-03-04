@@ -1,3 +1,4 @@
+
 import { toast } from 'sonner';
 
 interface SendEmailProps {
@@ -21,17 +22,17 @@ export const sendTestEmail = async ({ to, subject, html }: SendEmailProps) => {
     console.log('Email subject:', subject);
     console.log('Email content:', html);
     
-    // In a browser environment, direct API calls to SendGrid won't work due to CORS
-    // In a real application, this would be handled by a backend service
-    // For this demo, we'll simulate a successful email sending
+    // IMPORTANT: In a browser environment, direct API calls to SendGrid won't work due to CORS
+    // This is a fundamental limitation of browser security - you cannot make direct SMTP 
+    // or third-party API calls from frontend JavaScript
     
-    // Create headers for the request (keeping this for reference)
+    // Create headers for the request
     const headers = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${SENDGRID_CONFIG.pass}`,
     };
     
-    // Create the request body (keeping this for reference)
+    // Create the request body
     const emailData = {
       personalizations: [
         {
@@ -48,24 +49,51 @@ export const sendTestEmail = async ({ to, subject, html }: SendEmailProps) => {
       ],
     };
     
-    // For demo purposes, we're simulating the email sending process
-    // In a real application, this would make a request to a backend API that handles SendGrid integration
-    console.log('Email would be sent with these details:', {
-      from: SENDGRID_CONFIG.from,
-      to,
-      subject,
-      headers,
-      emailData
-    });
+    // SIMULATION ONLY - The following would work in a Node.js backend but not in a browser
+    try {
+      // Attempt to make the API call (this will fail due to CORS in browser environments)
+      // This is left here to demonstrate what would happen in a real backend implementation
+      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(emailData),
+      });
+      
+      // In a real backend environment, we would check the response here
+      if (!response.ok) {
+        throw new Error(`SendGrid API error: ${response.status}`);
+      }
+      
+      console.log('Email sent successfully!');
+      
+    } catch (apiError) {
+      console.error('API call error (expected in browser):', apiError);
+      console.warn('CORS ISSUE DETECTED: This is expected in browser environments');
+      console.info('In a real application, this API call would be handled by a backend service');
+      
+      // Log what would have been sent
+      console.log('Email details that would be sent in a real backend implementation:', {
+        from: SENDGRID_CONFIG.from,
+        to,
+        subject,
+        headers,
+        emailData
+      });
+    }
     
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Return success
-    return { success: true };
+    // Since this is a demo, return success simulation
+    // In a real application, this would reflect the actual send status
+    return { 
+      success: true, 
+      note: "This is a simulation only. In a real application, emails would be sent through a backend service." 
+    };
   } catch (error) {
-    console.error('Failed to send email:', error);
-    return { success: false, error };
+    console.error('Failed to prepare email:', error);
+    return { 
+      success: false, 
+      error,
+      note: "To implement real email sending, you would need a backend service that makes the API calls to SendGrid." 
+    };
   }
 };
 

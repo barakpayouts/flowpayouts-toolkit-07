@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { sendTestEmail, generateWinningsEmail } from '@/utils/email';
 import { toast } from 'sonner';
-import { Mail, Loader2, AlertCircle } from 'lucide-react';
+import { Mail, Loader2, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 
 interface SendTestEmailModalProps {
   open: boolean;
@@ -45,7 +45,7 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
       // Generate email content
       const { subject, html } = generateWinningsEmail(email);
       
-      // Send the email
+      // Attempt to send the email (simulation in frontend environment)
       const result = await sendTestEmail({
         to: email,
         subject,
@@ -60,16 +60,16 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
         }
         
         setEmailSent(true);
-        toast.success('Test email simulation complete!', {
-          description: `In a production environment, an email would be sent to ${email}`
+        toast.success('Email simulation completed', {
+          description: 'This is a frontend-only simulation. No actual email was sent.'
         });
       } else {
-        throw new Error('Failed to send email');
+        throw new Error(result.note || 'Failed to send email');
       }
     } catch (error) {
-      console.error('Error sending email:', error);
-      toast.error('Failed to send email', {
-        description: 'Email sending failed. This is a frontend-only demo and cannot send actual emails.'
+      console.error('Error in email process:', error);
+      toast.error('Email simulation failed', {
+        description: 'This frontend demo cannot send actual emails. You would need a backend service for that.'
       });
     } finally {
       setIsLoading(false);
@@ -82,26 +82,35 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Send Test Email</DialogTitle>
           <DialogDescription className="text-white/70">
-            Send a test email with tournament winning notification
+            Simulate sending a tournament winning notification email
           </DialogDescription>
         </DialogHeader>
         
         {!emailSent ? (
           <>
             <div className="space-y-4 py-4">
-              <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+              <div className="bg-amber-500/10 p-4 rounded-lg border border-amber-500/30">
                 <div className="flex items-center gap-2 p-2 bg-amber-500/20 rounded-lg mb-4 text-amber-200">
-                  <AlertCircle size={18} />
-                  <p className="text-sm">
-                    This is a demo feature. In a real application, emails would be sent through a backend service.
+                  <AlertTriangle size={18} />
+                  <p className="text-sm font-medium">
+                    Frontend Email Limitation
                   </p>
                 </div>
                 
                 <p className="text-sm text-white/80 mb-4">
-                  This will simulate sending a tournament winnings notification email from Bowl.com. 
-                  After clicking the button, the widget will switch to "Payouts Only" mode.
+                  <strong>Important:</strong> This demo cannot send actual emails from your browser due to CORS security restrictions. 
+                  In a real application, email sending would be handled by a backend service.
                 </p>
                 
+                <div className="flex items-center gap-2 p-2 bg-blue-500/10 rounded-lg text-blue-200">
+                  <Info size={18} />
+                  <p className="text-sm">
+                    The API call to SendGrid will be simulated, and logs will appear in the console.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg border border-white/10">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-white">Recipient Email</Label>
                   <Input
@@ -149,12 +158,19 @@ const SendTestEmailModal: React.FC<SendTestEmailModalProps> = ({
               <div className="w-16 h-16 bg-payouts-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail size={24} className="text-payouts-accent" />
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">Email Simulation Complete!</h3>
-              <p className="text-sm text-white/80 mb-4">
-                In a production environment, an email would be sent to {email}. The payout widget has been configured in "Payouts Only" mode.
+              <h3 className="text-lg font-medium text-white mb-2">Email Simulation Complete</h3>
+              <p className="text-sm text-white/80 mb-2">
+                An email to <strong>{email}</strong> has been simulated.
+              </p>
+              <div className="bg-black/20 p-3 rounded text-left my-3 text-xs font-mono">
+                <p>⚠️ No actual email was sent due to browser limitations</p>
+                <p>✅ Check browser console for email details</p>
+              </div>
+              <p className="text-sm text-white/80">
+                The payout widget has been configured in "Payouts Only" mode.
               </p>
               <DialogClose asChild>
-                <Button className="mt-2" variant="dark">Close</Button>
+                <Button className="mt-4" variant="dark">Close</Button>
               </DialogClose>
             </div>
           </div>
