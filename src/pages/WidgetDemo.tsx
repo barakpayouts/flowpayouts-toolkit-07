@@ -84,6 +84,8 @@ const WidgetDemo = () => {
     { value: 'card', label: 'Push to Card', icon: '💲' },
     { value: 'prepaid', label: 'Prepaid Card', icon: '💰' },
     { value: 'gift', label: 'Gift Card', icon: '🎁' },
+    { value: 'advanced', label: 'Advanced Payment', icon: '🚀' },
+    { value: 'early', label: 'Early Access', icon: '⚡' },
   ];
 
   const recipientOptions: { value: RecipientType; label: string; icon: string; description: string }[] = [

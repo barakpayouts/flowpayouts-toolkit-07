@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
@@ -12,7 +11,9 @@ import PushToCard from './PayoutMethods/PushToCard';
 import PrepaidCard from './PayoutMethods/PrepaidCard';
 import GiftCard from './PayoutMethods/GiftCard';
 import AdvancedPayment from './PayoutMethods/AdvancedPayment';
+import EarlyAccess from './PayoutMethods/EarlyAccess';
 import AdvancedPaymentDetails from './PayoutSteps/MethodDetails/AdvancedPaymentDetails';
+import EarlyAccessDetails from './PayoutSteps/MethodDetails/EarlyAccessDetails';
 import { Check, ChevronRight, ArrowLeft, Radio, DollarSign, Clock, FileText, Calendar, CreditCard, RefreshCw, LogOut, Upload } from 'lucide-react';
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -85,6 +86,7 @@ const PayoutWidget: React.FC = () => {
   const renderPayoutMethods = () => {
     const payoutComponents: Record<string, React.ReactNode> = {
       advanced: <AdvancedPayment onSelect={() => handleSelectPayoutMethod('Advanced Payment')} isSelected={selectedMethod === 'Advanced Payment'} />,
+      early: <EarlyAccess onSelect={() => handleSelectPayoutMethod('Early Access')} isSelected={selectedMethod === 'Early Access'} />,
       bank: <BankTransfer onSelect={() => handleSelectPayoutMethod('Bank Transfer')} isSelected={selectedMethod === 'Bank Transfer'} />,
       crypto: <Cryptocurrency onSelect={() => handleSelectPayoutMethod('Cryptocurrency')} isSelected={selectedMethod === 'Cryptocurrency'} />,
       digital: <DigitalWallet onSelect={() => handleSelectPayoutMethod('Digital Wallet')} isSelected={selectedMethod === 'Digital Wallet'} />,
@@ -118,6 +120,8 @@ const PayoutWidget: React.FC = () => {
         return <p>Digital Wallet Details</p>;
       case 'Advanced Payment':
         return <AdvancedPaymentDetails paymentAmount={1000} />;
+      case 'Early Access':
+        return <EarlyAccessDetails paymentAmount={1500} />;
       default:
         return null;
     }

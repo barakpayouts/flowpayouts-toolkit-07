@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
 export type VerificationStep = 'profile' | 'bank' | 'tax' | 'kyc';
-export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 'gift';
+export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 'gift' | 'advanced' | 'early';
 export type ButtonStyle = 'rounded' | 'square' | 'pill';
 export type BankVerificationMethod = 'plaid' | 'statement' | 'microdeposit';
 export type TaxFormType = 'w9' | 'w8';
@@ -31,6 +31,13 @@ interface AdvancedPaymentConfig {
   };
 }
 
+interface EarlyAccessConfig {
+  enabled: boolean;
+  expeditedDays: number;
+  minimumAmount: number;
+  noFees: boolean;
+}
+
 interface WidgetConfig {
   recipientType: RecipientType;
   steps: VerificationStep[];
@@ -45,6 +52,7 @@ interface WidgetConfig {
   borderRadius: number;
   buttonStyle: ButtonStyle;
   advancedPayment: AdvancedPaymentConfig;
+  earlyAccess: EarlyAccessConfig;
 }
 
 interface WidgetConfigState {
@@ -66,7 +74,7 @@ const DEFAULT_BORDER_COLOR = '#21404d';
 const defaultConfig: WidgetConfig = {
   recipientType: 'vendor',
   steps: ['profile', 'kyc', 'bank', 'tax'],
-  payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift'],
+  payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift', 'advanced', 'early'],
   showProgressBar: true,
   showStepNumbers: true,
   primaryColor: DEFAULT_PRIMARY_COLOR,
@@ -91,6 +99,12 @@ const defaultConfig: WidgetConfig = {
       goodStanding: true,
     },
   },
+  earlyAccess: {
+    enabled: true,
+    expeditedDays: 3,
+    minimumAmount: 100,
+    noFees: true
+  }
 };
 
 export const useWidgetConfig = create<WidgetConfigState>((set) => ({
