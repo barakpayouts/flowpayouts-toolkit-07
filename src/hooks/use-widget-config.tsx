@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 
 export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
@@ -9,27 +8,35 @@ export type BankVerificationMethod = 'plaid' | 'statement' | 'microdeposit';
 export type TaxFormType = 'w9' | 'w8';
 export type KYCDocumentType = 'passport' | 'id' | 'driver_license';
 
-// Add this interface for the payout method components
 export interface PayoutMethodProps {
   onSelect: () => void;
   isSelected?: boolean;
 }
 
+interface AdvancedPaymentTier {
+  percentage: number;
+  fee: number;
+  minDays: number;
+}
+
+interface AdvancedPaymentConfig {
+  enabled: boolean;
+  tiers: AdvancedPaymentTier[];
+  maxAmount: number;
+  requiresApproval: boolean;
+  eligibilityCriteria: {
+    minTransactions: number;
+    minAccountAge: number;
+    goodStanding: boolean;
+  };
+}
+
 interface WidgetConfig {
-  // Recipient type
   recipientType: RecipientType;
-  
-  // Verification steps
   steps: VerificationStep[];
-  
-  // Payout methods
   payoutMethods: PayoutMethod[];
-  
-  // UI customization
   showProgressBar: boolean;
   showStepNumbers: boolean;
-  
-  // Theme customization
   primaryColor: string;
   accentColor: string;
   backgroundColor: string;
@@ -37,6 +44,7 @@ interface WidgetConfig {
   borderColor: string;
   borderRadius: number;
   buttonStyle: ButtonStyle;
+  advancedPayment: AdvancedPaymentConfig;
 }
 
 interface WidgetConfigState {
@@ -49,17 +57,15 @@ interface WidgetConfigState {
   resetConfig: () => void;
 }
 
-// Default theme values based on Payouts.com brand guidelines
 const DEFAULT_PRIMARY_COLOR = '#0f2a35';
 const DEFAULT_ACCENT_COLOR = '#d0e92a';
 const DEFAULT_BACKGROUND_COLOR = '#143745';
 const DEFAULT_TEXT_COLOR = '#ffffff';
 const DEFAULT_BORDER_COLOR = '#21404d';
 
-// Default config
 const defaultConfig: WidgetConfig = {
   recipientType: 'vendor',
-  steps: ['profile', 'kyc', 'bank', 'tax'], // Changed order to put 'kyc' before bank
+  steps: ['profile', 'kyc', 'bank', 'tax'],
   payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift'],
   showProgressBar: true,
   showStepNumbers: true,
@@ -70,6 +76,21 @@ const defaultConfig: WidgetConfig = {
   borderColor: DEFAULT_BORDER_COLOR,
   borderRadius: 8,
   buttonStyle: 'rounded',
+  advancedPayment: {
+    enabled: true,
+    tiers: [
+      { percentage: 70, fee: 1, minDays: 1 },
+      { percentage: 85, fee: 2, minDays: 0 },
+      { percentage: 100, fee: 3, minDays: 0 },
+    ],
+    maxAmount: 50000,
+    requiresApproval: true,
+    eligibilityCriteria: {
+      minTransactions: 3,
+      minAccountAge: 30,
+      goodStanding: true,
+    },
+  },
 };
 
 export const useWidgetConfig = create<WidgetConfigState>((set) => ({
@@ -99,7 +120,6 @@ export const useWidgetConfig = create<WidgetConfigState>((set) => ({
   updateConfig: (updates: Partial<WidgetConfig>) => {
     console.log("useWidgetConfig: Updating config with", updates);
     
-    // Ensure we're applying valid config updates
     return set((state) => {
       const newConfig = { 
         ...state.config, 
