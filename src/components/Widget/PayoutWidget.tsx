@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
@@ -25,21 +26,55 @@ const PayoutWidget: React.FC = () => {
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
   };
+  
+  const handleNext = () => {
+    if (activeStep < config.steps.length - 1) {
+      setActiveStep(activeStep + 1);
+    } else {
+      toast.success("All steps completed!", {
+        description: "You've finished all the required steps."
+      });
+    }
+  };
+
+  const handleBack = () => {
+    if (activeStep > 0) {
+      setActiveStep(activeStep - 1);
+    }
+  };
 
   const renderStepContent = () => {
     if (config.steps.length === 0) {
       return renderPayoutMethods();
     }
 
+    const isLastStep = activeStep === config.steps.length - 1;
+    
     switch (activeStep) {
       case 0:
-        return <ProfileInfo />;
+        return <ProfileInfo 
+          onNext={handleNext} 
+          onBack={handleBack} 
+          isLastStep={isLastStep} 
+        />;
       case 1:
-        return <BankVerification />;
+        return <BankVerification 
+          onNext={handleNext} 
+          onBack={handleBack} 
+          isLastStep={isLastStep} 
+        />;
       case 2:
-        return <TaxForm />;
+        return <TaxForm 
+          onNext={handleNext} 
+          onBack={handleBack} 
+          isLastStep={isLastStep} 
+        />;
       case 3:
-        return <KYCVerification />;
+        return <KYCVerification 
+          onNext={handleNext} 
+          onBack={handleBack} 
+          isLastStep={isLastStep} 
+        />;
       case 4:
         return renderPayoutMethods();
       default:
@@ -81,26 +116,10 @@ const PayoutWidget: React.FC = () => {
         return <p>Cryptocurrency Details</p>;
       case 'Digital Wallet':
         return <p>Digital Wallet Details</p>;
-        case 'Advanced Payment':
-          return <AdvancedPaymentDetails paymentAmount={1000} />;
+      case 'Advanced Payment':
+        return <AdvancedPaymentDetails paymentAmount={1000} />;
       default:
         return null;
-    }
-  };
-
-  const handleNext = () => {
-    if (activeStep < config.steps.length) {
-      setActiveStep(activeStep + 1);
-    } else {
-      toast.success("All steps completed!", {
-        description: "You've finished all the required steps."
-      });
-    }
-  };
-
-  const handleBack = () => {
-    if (activeStep > 0) {
-      setActiveStep(activeStep - 1);
     }
   };
 
