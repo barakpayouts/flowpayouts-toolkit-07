@@ -30,12 +30,13 @@ const PayoutWidget: React.FC = () => {
   const { config } = useWidgetConfig();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
-  const [bankVerificationRequired, setBankVerificationRequired] = useState(false);
+  // This flag will be used to determine if bank verification should be added to steps
+  const [requiresBankVerification, setRequiresBankVerification] = useState(false);
 
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
-    // Set bank verification as required only if Bank Transfer is selected
-    setBankVerificationRequired(method === 'Bank Transfer');
+    // Only require bank verification if Bank Transfer is selected
+    setRequiresBankVerification(method === 'Bank Transfer');
   };
   
   const handleNext = () => {
@@ -56,23 +57,25 @@ const PayoutWidget: React.FC = () => {
   
   // Get dynamic steps based on selected payout method
   const getSteps = () => {
-    // Start with basic steps
-    const steps = [...config.steps];
+    // Start with basic steps from config
+    const baseSteps = [...config.steps];
     
-    // Ensure 'payout' step is always included
-    if (!steps.includes('payout')) {
-      steps.push('payout');
-    }
+    // Create a new array to store our final steps
+    let steps = [...baseSteps];
     
-    // Add bank verification step after payout step if Bank Transfer was selected
-    if (bankVerificationRequired && selectedMethod) {
-      // Find index of payout step
-      const payoutIndex = steps.indexOf('payout');
+    // Find the index of the payout step
+    const payoutIndex = steps.findIndex(step => step === 'payout');
+    
+    // If Bank Transfer is selected and bank verification is required, 
+    // add the bank verification step AFTER the payout step
+    if (requiresBankVerification && selectedMethod && payoutIndex !== -1) {
+      // Create a new array with bank verification inserted after payout
+      const stepsBeforePayout = steps.slice(0, payoutIndex + 1);
+      const stepsAfterPayout = steps.slice(payoutIndex + 1);
       
-      // If payout step exists and bank verification isn't already in the steps
-      if (payoutIndex !== -1 && !steps.includes('bank')) {
-        // Insert bank verification after payout
-        steps.splice(payoutIndex + 1, 0, 'bank');
+      // Only add bank if it's not already in the steps
+      if (!steps.includes('bank')) {
+        steps = [...stepsBeforePayout, 'bank', ...stepsAfterPayout];
       }
     }
     
