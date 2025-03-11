@@ -8,23 +8,27 @@ import CardPaymentDetails from './CardPaymentDetails';
 import PrepaidCardDetails from './PrepaidCardDetails';
 import GiftCardDetails from './GiftCardDetails';
 
-const MethodDetails: React.FC = () => {
+interface MethodDetailsProps {
+  onBack: () => void;
+}
+
+const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
   const { selectedMethod } = usePayoutWidget();
   
   // Render the appropriate form based on the selected method
   switch (selectedMethod) {
     case 'Bank Transfer':
-      return <BankTransferDetails />;
+      return <BankTransferDetails onBack={onBack} />;
     case 'Cryptocurrency':
-      return <CryptocurrencyDetails />;
+      return <CryptocurrencyDetails onBack={onBack} />;
     case 'Digital Wallet':
-      return <DigitalWalletDetails />;
+      return <DigitalWalletDetails onBack={onBack} />;
     case 'Card Payment':
-      return <CardPaymentDetails />;
+      return <CardPaymentDetails onBack={onBack} />;
     case 'Prepaid Card':
-      return <PrepaidCardDetails />;
+      return <PrepaidCardDetails onBack={onBack} />;
     case 'Gift Card':
-      return <GiftCardDetails />;
+      return <GiftCardDetails onBack={onBack} />;
     default:
       return null;
   }
