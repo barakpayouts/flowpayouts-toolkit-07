@@ -40,9 +40,14 @@ const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
     return 3;
   };
   
+  // This function ensures direct navigation to the dashboard
   const handleCompleteProcess = () => {
-    setShowDashboard(true);
-    setOnboardingCompleted(true);
+    console.log("MethodDetails: handleCompleteProcess called - navigating to dashboard");
+    // Use setTimeout with 0 delay to ensure this executes after current render cycle
+    setTimeout(() => {
+      setShowDashboard(true);
+      setOnboardingCompleted(true);
+    }, 0);
   };
   
   // For Advanced Payment with prepaid card selection stage

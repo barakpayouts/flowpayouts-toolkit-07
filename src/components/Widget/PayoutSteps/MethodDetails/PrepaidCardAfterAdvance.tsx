@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,7 @@ interface PrepaidCardAfterAdvanceProps {
   advancePercentage: number;
   feePercentage: number;
   onBack: () => void;
-  onComplete: () => void;
+  onComplete?: () => void;
 }
 
 type CardType = 'Visa' | 'Mastercard';
@@ -25,7 +24,13 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
   onComplete,
 }) => {
   const { config } = useWidgetConfig();
-  const { setPrepaidCardEmail, setSelectedAdvanceTier, setShowDashboard, setOnboardingCompleted } = usePayoutWidget();
+  const { 
+    setPrepaidCardEmail, 
+    setSelectedAdvanceTier, 
+    setShowDashboard, 
+    setOnboardingCompleted 
+  } = usePayoutWidget();
+  
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedCardType, setSelectedCardType] = useState<CardType>('Visa');
   const [email, setEmail] = useState('');
@@ -57,7 +62,8 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
     // Save the email to context
     setPrepaidCardEmail(email);
     
-    // Make sure the tier is set
+    // Make sure the tier is set based on percentage
+    console.log("Setting advance tier with percentage:", advancePercentage);
     if (advancePercentage === 70) {
       setSelectedAdvanceTier('70%');
     } else if (advancePercentage === 85) {
@@ -66,22 +72,22 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
       setSelectedAdvanceTier('100%');
     }
     
-    // Simulate processing
+    // Directly navigate to dashboard immediately rather than in timeout
+    setShowDashboard(true);
+    setOnboardingCompleted(true);
+    
+    // Simulate processing but don't delay navigation
     setTimeout(() => {
       setIsProcessing(false);
       toast.success("Prepaid card confirmed", {
         description: `Your ${advancePercentage}% advance will be sent to your ${selectedCardType} prepaid card. Details will be sent to ${email}`,
       });
       
-      // Ensure we're properly navigating to the dashboard
-      setShowDashboard(true);
-      setOnboardingCompleted(true);
-      
-      // Call the onComplete function from props
+      // Call the onComplete function from props if provided
       if (onComplete) {
         onComplete();
       }
-    }, 1000);
+    }, 500);
   };
 
   return (

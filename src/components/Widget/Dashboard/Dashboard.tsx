@@ -12,6 +12,8 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
   const { handleBackStep } = usePayoutWidget();
   
+  console.log("Dashboard component rendering");
+  
   return (
     <div className="dashboard-container">
       <DashboardHeader />

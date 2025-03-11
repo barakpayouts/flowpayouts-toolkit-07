@@ -12,13 +12,21 @@ const CurrentMethodCard: React.FC = () => {
     prepaidCardEmail
   } = usePayoutWidget();
   
+  console.log("CurrentMethodCard rendering with:", {
+    selectedMethod,
+    selectedAdvanceTier,
+    prepaidCardEmail
+  });
+  
   const getDisplayMethod = () => {
     if (selectedMethod === 'Advanced Payment' && selectedAdvanceTier) {
-      return `Advanced Payment (${selectedAdvanceTier})${prepaidCardEmail ? ' - Visa Prepaid' : ''}`;
+      const cardType = prepaidCardEmail ? ' - Visa Prepaid' : '';
+      return `Advanced Payment (${selectedAdvanceTier})${cardType}`;
     } else if (selectedMethod === 'Early Access') {
-      return `Early Access${prepaidCardEmail ? ' - Mastercard Prepaid' : ''}`;
+      const cardType = prepaidCardEmail ? ' - Mastercard Prepaid' : '';
+      return `Early Access${cardType}`;
     } else {
-      return `${selectedMethod}${selectedDetailOption ? ` (${selectedDetailOption})` : ''}`;
+      return `${selectedMethod || ""}${selectedDetailOption ? ` (${selectedDetailOption})` : ''}`;
     }
   };
   
