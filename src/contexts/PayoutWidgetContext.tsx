@@ -108,7 +108,9 @@ export const PayoutWidgetProvider: React.FC<{
     earlyAccessActivated?: boolean,
     setEarlyAccessActivated?: (activated: boolean) => void,
     handleLogin?: () => void,
-    handleStartOnboarding?: () => void
+    handleStartOnboarding?: () => void,
+    prepaidCardEmail?: string,
+    setPrepaidCardEmail?: (email: string) => void
   } 
 }> = ({ children, value }) => {
   const steps = ['profile', 'payout', 'details', 'bank', 'tax'];
@@ -122,7 +124,7 @@ export const PayoutWidgetProvider: React.FC<{
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [onboardingCompleted, setOnboardingCompleted] = useState(value?.onboardingCompleted || false);
   const [isLoggedIn, setIsLoggedIn] = useState(value?.isLoggedIn || false);
-  const [prepaidCardEmail, setPrepaidCardEmail] = useState("");
+  const [prepaidCardEmail, setPrepaidCardEmail] = useState(value?.prepaidCardEmail || "");
   
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(value?.advancedPaymentStage || false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<AdvanceTier>(value?.selectedAdvanceTier as AdvanceTier || null);
@@ -161,6 +163,10 @@ export const PayoutWidgetProvider: React.FC<{
     if (value?.earlyAccessActivated !== undefined) {
       setEarlyAccessActivated(value.earlyAccessActivated);
     }
+    
+    if (value?.prepaidCardEmail !== undefined) {
+      setPrepaidCardEmail(value.prepaidCardEmail);
+    }
   }, [
     value?.selectedMethod, 
     value?.showDashboard, 
@@ -168,7 +174,8 @@ export const PayoutWidgetProvider: React.FC<{
     value?.isLoggedIn,
     value?.advancedPaymentStage,
     value?.selectedAdvanceTier,
-    value?.earlyAccessActivated
+    value?.earlyAccessActivated,
+    value?.prepaidCardEmail
   ]);
 
   const payouts = [

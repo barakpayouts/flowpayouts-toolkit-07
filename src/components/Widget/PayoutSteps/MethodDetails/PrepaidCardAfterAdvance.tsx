@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { CreditCard, ArrowLeft, Check, Mail } from 'lucide-react';
+import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 
 interface PrepaidCardAfterAdvanceProps {
   paymentAmount: number;
@@ -24,6 +25,7 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
   onComplete,
 }) => {
   const { config } = useWidgetConfig();
+  const { setPrepaidCardEmail } = usePayoutWidget();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedCardType, setSelectedCardType] = useState<CardType>('Visa');
   const [email, setEmail] = useState('');
@@ -51,6 +53,9 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
     
     setEmailError('');
     setIsProcessing(true);
+    
+    // Save the email to context
+    setPrepaidCardEmail(email);
     
     // Simulate processing
     setTimeout(() => {

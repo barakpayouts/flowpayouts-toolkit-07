@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { PayoutWidgetProvider } from '@/contexts/PayoutWidgetContext';
@@ -34,11 +33,21 @@ const PayoutWidget: React.FC = () => {
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<string | null>(null);
   const [earlyAccessActivated, setEarlyAccessActivated] = useState(false);
+  const [prepaidCardEmail, setPrepaidCardEmail] = useState('');
 
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
     setRequiresBankVerification(method === 'Bank Transfer');
     setShowMethodDetails(true);
+    
+    if (method !== 'Advanced Payment') {
+      setAdvancedPaymentStage(false);
+      setSelectedAdvanceTier(null);
+    }
+    
+    if (method !== 'Early Access') {
+      setEarlyAccessActivated(false);
+    }
   };
   
   const handleNext = () => {
@@ -317,7 +326,9 @@ const PayoutWidget: React.FC = () => {
       earlyAccessActivated,
       setEarlyAccessActivated,
       handleLogin,
-      handleStartOnboarding
+      handleStartOnboarding,
+      prepaidCardEmail,
+      setPrepaidCardEmail
     }}>
       <div className="widget-frame">
         {!showLoginScreen && renderHeader()}
