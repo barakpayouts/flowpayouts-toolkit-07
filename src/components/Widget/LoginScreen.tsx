@@ -33,8 +33,8 @@ const LoginScreen: React.FC = () => {
           onClick={handleStartOnboarding}
           className="py-3 px-4 rounded-lg font-medium"
           style={{
-            backgroundColor: config.accentColor,
-            color: config.primaryColor,
+            backgroundColor: config.accentColor || "#8B5CF6",
+            color: config.primaryColor || "#ffffff",
           }}
         >
           Create Account

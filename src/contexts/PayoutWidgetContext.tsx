@@ -75,6 +75,8 @@ interface PayoutWidgetContextType {
   handleUploadInvoice: (file: File) => void;
   handleViewInvoice: (invoice: InvoiceData) => void;
   handleDownloadInvoice: () => void;
+  prepaidCardEmail: string;
+  setPrepaidCardEmail: (email: string) => void;
 }
 
 const PayoutWidgetContext = createContext<PayoutWidgetContextType | undefined>(undefined);
@@ -96,7 +98,17 @@ export const PayoutWidgetProvider: React.FC<{
     setShowDashboard?: (show: boolean) => void,
     onboardingCompleted?: boolean,
     setOnboardingCompleted?: (completed: boolean) => void,
-    handleNext?: () => void
+    handleNext?: () => void,
+    isLoggedIn?: boolean,
+    setIsLoggedIn?: (loggedIn: boolean) => void,
+    advancedPaymentStage?: boolean,
+    setAdvancedPaymentStage?: (stage: boolean) => void,
+    selectedAdvanceTier?: string | null,
+    setSelectedAdvanceTier?: (tier: string | null) => void,
+    earlyAccessActivated?: boolean,
+    setEarlyAccessActivated?: (activated: boolean) => void,
+    handleLogin?: () => void,
+    handleStartOnboarding?: () => void
   } 
 }> = ({ children, value }) => {
   const steps = ['profile', 'payout', 'details', 'bank', 'tax'];
@@ -109,11 +121,12 @@ export const PayoutWidgetProvider: React.FC<{
   const [showDashboard, setShowDashboard] = useState(value?.showDashboard || false);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [onboardingCompleted, setOnboardingCompleted] = useState(value?.onboardingCompleted || false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(value?.isLoggedIn || false);
+  const [prepaidCardEmail, setPrepaidCardEmail] = useState("");
   
-  const [advancedPaymentStage, setAdvancedPaymentStage] = useState(false);
-  const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<AdvanceTier>(null);
-  const [earlyAccessActivated, setEarlyAccessActivated] = useState(false);
+  const [advancedPaymentStage, setAdvancedPaymentStage] = useState(value?.advancedPaymentStage || false);
+  const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<AdvanceTier>(value?.selectedAdvanceTier as AdvanceTier || null);
+  const [earlyAccessActivated, setEarlyAccessActivated] = useState(value?.earlyAccessActivated || false);
   
   const [isInvoiceUploadOpen, setIsInvoiceUploadOpen] = useState(false);
   const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false);
@@ -132,7 +145,31 @@ export const PayoutWidgetProvider: React.FC<{
     if (value?.onboardingCompleted !== undefined) {
       setOnboardingCompleted(value.onboardingCompleted);
     }
-  }, [value?.selectedMethod, value?.showDashboard, value?.onboardingCompleted]);
+    
+    if (value?.isLoggedIn !== undefined) {
+      setIsLoggedIn(value.isLoggedIn);
+    }
+    
+    if (value?.advancedPaymentStage !== undefined) {
+      setAdvancedPaymentStage(value.advancedPaymentStage);
+    }
+    
+    if (value?.selectedAdvanceTier !== undefined) {
+      setSelectedAdvanceTier(value.selectedAdvanceTier as AdvanceTier);
+    }
+    
+    if (value?.earlyAccessActivated !== undefined) {
+      setEarlyAccessActivated(value.earlyAccessActivated);
+    }
+  }, [
+    value?.selectedMethod, 
+    value?.showDashboard, 
+    value?.onboardingCompleted,
+    value?.isLoggedIn,
+    value?.advancedPaymentStage,
+    value?.selectedAdvanceTier,
+    value?.earlyAccessActivated
+  ]);
 
   const payouts = [
     { 
@@ -288,6 +325,11 @@ export const PayoutWidgetProvider: React.FC<{
   };
   
   const handleStartOnboarding = () => {
+    if (value?.handleStartOnboarding) {
+      value.handleStartOnboarding();
+      return;
+    }
+    
     setCurrentStep(0);
     setOnboardingCompleted(false);
     setShowSuccess(false);
@@ -296,6 +338,11 @@ export const PayoutWidgetProvider: React.FC<{
   };
   
   const handleLogin = () => {
+    if (value?.handleLogin) {
+      value.handleLogin();
+      return;
+    }
+    
     setIsLoggedIn(true);
     setOnboardingCompleted(true);
     setSelectedMethod('Digital Wallet');
@@ -397,6 +444,8 @@ export const PayoutWidgetProvider: React.FC<{
     setSelectedInvoice,
     uploadedInvoices,
     setUploadedInvoices,
+    prepaidCardEmail,
+    setPrepaidCardEmail,
     handleNextStep,
     handleBackStep,
     handleSelectPayoutMethod,

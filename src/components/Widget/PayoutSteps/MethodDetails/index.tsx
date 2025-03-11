@@ -16,16 +16,28 @@ interface MethodDetailsProps {
 }
 
 const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
-  const { selectedMethod, advancedPaymentStage, earlyAccessActivated } = usePayoutWidget();
+  const { selectedMethod, advancedPaymentStage, earlyAccessActivated, selectedAdvanceTier } = usePayoutWidget();
   
   // For Advanced Payment with prepaid card selection stage
   if (advancedPaymentStage && selectedMethod === 'Advanced Payment') {
-    return <PrepaidCardAfterAdvance onBack={onBack} />;
+    return <PrepaidCardAfterAdvance 
+      onBack={onBack}
+      paymentAmount={1000}
+      advancePercentage={selectedAdvanceTier || "70%"}
+      feePercentage={selectedAdvanceTier === "70%" ? "1%" : selectedAdvanceTier === "85%" ? "2%" : "3%"}
+      onComplete={() => {}}
+    />;
   }
   
   // For Early Access with prepaid card selection stage
   if (earlyAccessActivated && selectedMethod === 'Early Access') {
-    return <PrepaidCardAfterAdvance onBack={onBack} />;
+    return <PrepaidCardAfterAdvance 
+      onBack={onBack}
+      paymentAmount={1500}
+      advancePercentage="100%"
+      feePercentage="3%"
+      onComplete={() => {}}
+    />;
   }
   
   // Render the appropriate form based on the selected method

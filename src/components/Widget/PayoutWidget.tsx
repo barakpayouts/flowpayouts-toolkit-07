@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { PayoutWidgetProvider } from '@/contexts/PayoutWidgetContext';
@@ -15,6 +16,7 @@ import AdvancedPayment from './PayoutMethods/AdvancedPayment';
 import EarlyAccess from './PayoutMethods/EarlyAccess';
 import MethodDetails from './PayoutSteps/MethodDetails';
 import Dashboard from './Dashboard/Dashboard';
+import LoginScreen from './LoginScreen';
 import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -27,6 +29,11 @@ const PayoutWidget: React.FC = () => {
   const [requiresBankVerification, setRequiresBankVerification] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  const [showLoginScreen, setShowLoginScreen] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [advancedPaymentStage, setAdvancedPaymentStage] = useState(false);
+  const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<string | null>(null);
+  const [earlyAccessActivated, setEarlyAccessActivated] = useState(false);
 
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
@@ -61,6 +68,25 @@ const PayoutWidget: React.FC = () => {
       setActiveStep(activeStep - 1);
     }
   };
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setShowLoginScreen(false);
+    setOnboardingCompleted(true);
+    setSelectedMethod('Digital Wallet');
+    setShowDashboard(true);
+    toast.success("Welcome back!", {
+      description: "You've been logged in successfully."
+    });
+  };
+  
+  const handleStartOnboarding = () => {
+    setShowLoginScreen(false);
+    setActiveStep(0);
+    setOnboardingCompleted(false);
+    setShowDashboard(false);
+    setIsLoggedIn(true);
+  };
   
   const getSteps = () => {
     const baseSteps = [...config.steps];
@@ -85,6 +111,10 @@ const PayoutWidget: React.FC = () => {
   };
 
   const renderStepContent = () => {
+    if (showLoginScreen) {
+      return <LoginScreen />;
+    }
+    
     if (showDashboard) {
       return <Dashboard onBack={() => setShowDashboard(false)} />;
     }
@@ -277,18 +307,28 @@ const PayoutWidget: React.FC = () => {
       setShowDashboard,
       onboardingCompleted, 
       setOnboardingCompleted,
-      handleNext: handleNext
+      handleNext: handleNext,
+      isLoggedIn,
+      setIsLoggedIn,
+      advancedPaymentStage,
+      setAdvancedPaymentStage,
+      selectedAdvanceTier,
+      setSelectedAdvanceTier,
+      earlyAccessActivated,
+      setEarlyAccessActivated,
+      handleLogin,
+      handleStartOnboarding
     }}>
       <div className="widget-frame">
-        {renderHeader()}
+        {!showLoginScreen && renderHeader()}
         
-        {renderStepCircles()}
+        {!showLoginScreen && renderStepCircles()}
         
         <div className="widget-content">
           {renderStepContent()}
         </div>
         
-        {renderFooter()}
+        {!showLoginScreen && !showDashboard && renderFooter()}
       </div>
     </PayoutWidgetProvider>
   );
