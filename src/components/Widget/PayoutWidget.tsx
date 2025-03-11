@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
@@ -20,15 +21,15 @@ import DigitalWalletDetails from './PayoutSteps/MethodDetails/DigitalWalletDetai
 import CardPaymentDetails from './PayoutSteps/MethodDetails/CardPaymentDetails';
 import PrepaidCardDetails from './PayoutSteps/MethodDetails/PrepaidCardDetails';
 import GiftCardDetails from './PayoutSteps/MethodDetails/GiftCardDetails';
-import { Check, ChevronRight, ArrowLeft, Radio, DollarSign, Clock, FileText, Calendar, CreditCard, RefreshCw, LogOut, Upload } from 'lucide-react';
+import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 const PayoutWidget: React.FC = () => {
   const { config } = useWidgetConfig();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
+  const [showMethodDetails, setShowMethodDetails] = useState<boolean>(false);
   // This flag will be used to determine if bank verification should be added to steps
   const [requiresBankVerification, setRequiresBankVerification] = useState(false);
 
@@ -36,6 +37,12 @@ const PayoutWidget: React.FC = () => {
     setSelectedMethod(method);
     // Only require bank verification if Bank Transfer is selected
     setRequiresBankVerification(method === 'Bank Transfer');
+    
+    // Instead of showing details right away, we prepare to move to next step
+    if (method) {
+      setActiveStep(activeStep + 1);
+      setShowMethodDetails(true);
+    }
   };
   
   const handleNext = () => {
@@ -49,6 +56,13 @@ const PayoutWidget: React.FC = () => {
   };
 
   const handleBack = () => {
+    if (showMethodDetails) {
+      setShowMethodDetails(false);
+      // Go back to method selection
+      setActiveStep(activeStep - 1);
+      return;
+    }
+    
     if (activeStep > 0) {
       setActiveStep(activeStep - 1);
     }
@@ -62,13 +76,18 @@ const PayoutWidget: React.FC = () => {
     // Create a new array to store our final steps
     let steps = [...baseSteps];
     
+    // Always include payout step if not already included
+    if (!steps.includes('payout')) {
+      steps.push('payout');
+    }
+    
     // Find the index of the payout step
     const payoutIndex = steps.findIndex(step => step === 'payout');
     
     // If Bank Transfer is selected and bank verification is required, 
     // add the bank verification step IMMEDIATELY AFTER the payout step
     if (requiresBankVerification && selectedMethod && payoutIndex !== -1) {
-      // Make sure we're inserting at the right position - right after payout but before tax
+      // Make sure we're inserting at the right position - right after payout
       const beforePayout = steps.slice(0, payoutIndex + 1);
       const afterPayout = steps.slice(payoutIndex + 1);
       
@@ -117,6 +136,9 @@ const PayoutWidget: React.FC = () => {
           isLastStep={isLastStep} 
         />;
       case 'payout':
+        if (showMethodDetails && selectedMethod) {
+          return renderPayoutMethodDetails();
+        }
         return renderPayoutMethods();
       default:
         return null;
@@ -139,6 +161,19 @@ const PayoutWidget: React.FC = () => {
       <div>
         <h2 className="text-xl font-semibold mb-4">Select Payout Method</h2>
         <p className="text-sm mb-4 opacity-70">Choose how you'd like to receive your funds (select one)</p>
+        
+        {/* Balance Info Card */}
+        <div className="mb-6 p-4 rounded-lg border border-white/20 bg-white/5">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm opacity-70">Available Balance</span>
+            <span className="font-semibold text-lg">{config.payoutAmount || "$1,250.00"}</span>
+          </div>
+          <div className="flex justify-between items-center text-xs">
+            <span className="opacity-70">From: {config.companyName || "Acme Inc."}</span>
+            <span className="opacity-70">Currency: {config.currency || "USD"}</span>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 gap-3 mt-4">
           {config.payoutMethods.map((method) => (
             <div key={method}>
@@ -146,46 +181,30 @@ const PayoutWidget: React.FC = () => {
             </div>
           ))}
         </div>
-        
-        {selectedMethod && (
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">Method Details</h3>
-            {renderPayoutMethodDetails()}
-            
-            <button 
-              onClick={handleNext}
-              className="w-full mt-4 p-3 rounded-lg font-medium transition-all"
-              style={{
-                backgroundColor: config.accentColor,
-                color: config.primaryColor,
-              }}
-            >
-              Continue with {selectedMethod}
-            </button>
-          </div>
-        )}
       </div>
     );
   };
 
   const renderPayoutMethodDetails = () => {
+    const detailsProps = { onBack: handleBack };
+    
     switch (selectedMethod) {
       case 'Bank Transfer':
-        return <BankTransferDetails />;
+        return <BankTransferDetails onBack={handleBack} />;
       case 'Cryptocurrency':
-        return <CryptocurrencyDetails />;
+        return <CryptocurrencyDetails onBack={handleBack} />;
       case 'Digital Wallet':
-        return <DigitalWalletDetails />;
+        return <DigitalWalletDetails onBack={handleBack} />;
       case 'Card Payment':
-        return <CardPaymentDetails />;
+        return <CardPaymentDetails onBack={handleBack} />;
       case 'Prepaid Card':
-        return <PrepaidCardDetails />;
+        return <PrepaidCardDetails onBack={handleBack} />;
       case 'Gift Card':
-        return <GiftCardDetails />;
+        return <GiftCardDetails onBack={handleBack} />;
       case 'Advanced Payment':
-        return <AdvancedPaymentDetails paymentAmount={1000} />;
+        return <AdvancedPaymentDetails paymentAmount={1000} onBack={handleBack} />;
       case 'Early Access':
-        return <EarlyAccessDetails paymentAmount={1500} />;
+        return <EarlyAccessDetails paymentAmount={1500} onBack={handleBack} />;
       default:
         return null;
     }
@@ -263,7 +282,7 @@ const PayoutWidget: React.FC = () => {
       <div className="widget-footer">
         <button 
           onClick={handleBack} 
-          disabled={activeStep === 0} 
+          disabled={activeStep === 0 && !showMethodDetails} 
           className="step-nav-button"
         >
           <ArrowLeft size={16} />
@@ -278,7 +297,7 @@ const PayoutWidget: React.FC = () => {
           onClick={handleNext} 
           className="primary-button"
           // Disable next button on payout method step if no method is selected
-          disabled={currentStep === 'payout' && !selectedMethod}
+          disabled={(currentStep === 'payout' && !selectedMethod && !showMethodDetails)}
         >
           Next
         </button>
