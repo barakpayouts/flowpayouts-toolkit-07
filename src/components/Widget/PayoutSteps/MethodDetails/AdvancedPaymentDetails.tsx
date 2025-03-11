@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
   Table,
@@ -12,6 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Calculator, Clock, Rocket, ArrowLeft } from 'lucide-react';
+import PrepaidCardAfterAdvance from './PrepaidCardAfterAdvance';
 
 interface AdvancedPaymentDetailsProps {
   paymentAmount: number;
@@ -25,6 +27,8 @@ const AdvancedPaymentDetails: React.FC<AdvancedPaymentDetailsProps> = ({
   const { config } = useWidgetConfig();
   const { advancedPayment } = config;
   const [selectedTier, setSelectedTier] = useState(advancedPayment.tiers[0]);
+  const [showPrepaidCardSelection, setShowPrepaidCardSelection] = useState(false);
+  const [processingAdvance, setProcessingAdvance] = useState(false);
 
   const handleTierSelect = (tier: typeof selectedTier) => {
     setSelectedTier(tier);
@@ -36,6 +40,39 @@ const AdvancedPaymentDetails: React.FC<AdvancedPaymentDetailsProps> = ({
   const calculateFeeAmount = (amount: number, feePercentage: number) => {
     return (amount * feePercentage) / 100;
   };
+
+  const handleContinue = () => {
+    setProcessingAdvance(true);
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      setProcessingAdvance(false);
+      setShowPrepaidCardSelection(true);
+    }, 500);
+  };
+
+  const handleBackToTiers = () => {
+    setShowPrepaidCardSelection(false);
+  };
+
+  const handleCompleteProcess = () => {
+    toast.success("Advanced payment confirmed!", {
+      description: `Your ${selectedTier.percentage}% advance will be sent to your prepaid card shortly.`,
+    });
+    onBack();
+  };
+
+  if (showPrepaidCardSelection) {
+    return (
+      <PrepaidCardAfterAdvance 
+        paymentAmount={paymentAmount}
+        advancePercentage={selectedTier.percentage}
+        feePercentage={selectedTier.fee}
+        onBack={handleBackToTiers}
+        onComplete={handleCompleteProcess}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -114,6 +151,18 @@ const AdvancedPaymentDetails: React.FC<AdvancedPaymentDetailsProps> = ({
           </p>
         </div>
       </div>
+      
+      <Button 
+        onClick={handleContinue}
+        className="w-full"
+        disabled={processingAdvance}
+        style={{
+          backgroundColor: config.accentColor,
+          color: config.backgroundColor
+        }}
+      >
+        {processingAdvance ? "Processing..." : "Continue with Selected Advance"}
+      </Button>
     </div>
   );
 };

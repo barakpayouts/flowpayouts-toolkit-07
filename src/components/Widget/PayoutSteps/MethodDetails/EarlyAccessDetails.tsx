@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Zap, Clock, Calendar, Shield, ArrowLeft } from 'lucide-react';
+import { Zap, Clock, Calendar, Shield, ArrowLeft, CreditCard, Check } from 'lucide-react';
 
 interface EarlyAccessDetailsProps {
   paymentAmount: number;
@@ -24,12 +24,38 @@ const EarlyAccessDetails: React.FC<EarlyAccessDetailsProps> = ({
 }) => {
   const { config } = useWidgetConfig();
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [showPrepaidOption, setShowPrepaidOption] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleEnroll = () => {
-    setIsEnrolled(true);
-    toast.success("Early Access activated", {
-      description: "You'll now receive all eligible payments 2-3 days earlier",
-    });
+    setIsProcessing(true);
+    
+    // Simulate processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      setIsEnrolled(true);
+      toast.success("Early Access activated", {
+        description: "You'll now receive all eligible payments 2-3 days earlier",
+      });
+      setShowPrepaidOption(true);
+    }, 1000);
+  };
+
+  const handleConfirmPrepaidCard = () => {
+    setIsProcessing(true);
+    
+    // Simulate processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      toast.success("Prepaid card confirmed", {
+        description: "Your early access payments will be sent to your prepaid card",
+      });
+      onBack();
+    }, 1000);
+  };
+
+  const handleBackToEnrollment = () => {
+    setShowPrepaidOption(false);
   };
 
   const estimatedDate = new Date();
@@ -40,6 +66,88 @@ const EarlyAccessDetails: React.FC<EarlyAccessDetailsProps> = ({
     month: 'short', 
     day: 'numeric'
   });
+
+  if (showPrepaidOption) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <button 
+            onClick={handleBackToEnrollment}
+            className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+          >
+            <ArrowLeft size={16} />
+            Back to Early Access
+          </button>
+          <h2 className="text-xl font-semibold">Select Payout Method</h2>
+        </div>
+        
+        <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+          <h3 className="text-lg font-medium mb-2">Early Access Activated</h3>
+          <p className="text-sm text-white/70 mb-3">
+            You'll receive your payment on {formattedDate}
+          </p>
+          
+          <div className="flex items-center gap-4 mt-4 bg-black/20 p-3 rounded-lg">
+            <Zap size={24} className="text-white/70" />
+            <div>
+              <p className="font-medium">Next Eligible Payment</p>
+              <p className="text-2xl font-bold">${paymentAmount.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <p className="text-sm opacity-80">Please select how you want to receive your early access payment:</p>
+          
+          <div 
+            className={`p-4 rounded-lg border-2 cursor-pointer transition-all bg-white/10 border-${config.accentColor}60`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{
+                    backgroundColor: `${config.accentColor}20`,
+                  }}
+                >
+                  <CreditCard 
+                    size={20} 
+                    style={{ color: config.accentColor }}
+                  />
+                </div>
+                <div>
+                  <h3 className="font-medium">Prepaid Card</h3>
+                  <p className="text-sm opacity-70">Receive your funds on a prepaid card</p>
+                </div>
+              </div>
+              <div 
+                className="w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: config.accentColor }}
+              >
+                <Check size={14} className="text-black" />
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <p className="text-xs opacity-70 mt-2 text-center">
+          Your prepaid card will be issued immediately after confirmation
+        </p>
+        
+        <Button 
+          onClick={handleConfirmPrepaidCard}
+          className="w-full"
+          disabled={isProcessing}
+          style={{
+            backgroundColor: config.accentColor,
+            color: config.backgroundColor
+          }}
+        >
+          {isProcessing ? "Processing..." : "Confirm Prepaid Card"}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -107,13 +215,14 @@ const EarlyAccessDetails: React.FC<EarlyAccessDetailsProps> = ({
         <Button 
           onClick={handleEnroll}
           className="w-full"
+          disabled={isProcessing}
           style={{
             backgroundColor: config.accentColor,
             color: config.backgroundColor
           }}
         >
           <Zap size={16} className="mr-2" />
-          Activate Early Access Payments
+          {isProcessing ? "Processing..." : "Activate Early Access Payments"}
         </Button>
       ) : (
         <div className="bg-white/10 p-4 rounded-lg text-center">
