@@ -74,8 +74,9 @@ const DEFAULT_BORDER_COLOR = '#21404d';
 
 const defaultConfig: WidgetConfig = {
   recipientType: 'vendor',
-  // Remove bank from initial steps - it will be added dynamically when needed
-  steps: ['profile', 'kyc', 'tax', 'payout'],
+  // Correct order: profile, kyc, payout, then tax at the end
+  // Bank verification is not included by default and will be added dynamically when needed
+  steps: ['profile', 'kyc', 'payout', 'tax'],
   payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift', 'advanced', 'early'],
   showProgressBar: true,
   showStepNumbers: true,

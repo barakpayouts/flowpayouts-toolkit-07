@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
@@ -67,15 +66,15 @@ const PayoutWidget: React.FC = () => {
     const payoutIndex = steps.findIndex(step => step === 'payout');
     
     // If Bank Transfer is selected and bank verification is required, 
-    // add the bank verification step AFTER the payout step
+    // add the bank verification step IMMEDIATELY AFTER the payout step
     if (requiresBankVerification && selectedMethod && payoutIndex !== -1) {
-      // Create a new array with bank verification inserted after payout
-      const stepsBeforePayout = steps.slice(0, payoutIndex + 1);
-      const stepsAfterPayout = steps.slice(payoutIndex + 1);
+      // Make sure we're inserting at the right position - right after payout but before tax
+      const beforePayout = steps.slice(0, payoutIndex + 1);
+      const afterPayout = steps.slice(payoutIndex + 1);
       
       // Only add bank if it's not already in the steps
       if (!steps.includes('bank')) {
-        steps = [...stepsBeforePayout, 'bank', ...stepsAfterPayout];
+        steps = [...beforePayout, 'bank', ...afterPayout];
       }
     }
     
