@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 
@@ -31,7 +30,7 @@ interface PayoutWidgetContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;
   selectedMethod: PayoutMethod;
-  setSelectedMethod: (method: PayoutMethod) => void;
+  setSelectedMethod: (method: PayoutMethod | null) => void;
   selectedDetailOption: DetailOption;
   setSelectedDetailOption: (option: DetailOption) => void;
   showMethodDetails: boolean;
@@ -79,11 +78,14 @@ export const usePayoutWidget = () => {
   return context;
 };
 
-export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const PayoutWidgetProvider: React.FC<{ 
+  children: React.ReactNode, 
+  value?: { selectedMethod: string | null, setSelectedMethod: (method: string | null) => void } 
+}> = ({ children, value }) => {
   const steps = ['profile', 'payout', 'details', 'bank', 'tax'];
   
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedMethod, setSelectedMethod] = useState<PayoutMethod>(null);
+  const [selectedMethod, setSelectedMethod] = useState<PayoutMethod>(value?.selectedMethod as PayoutMethod || null);
   const [selectedDetailOption, setSelectedDetailOption] = useState<DetailOption>(null);
   const [showMethodDetails, setShowMethodDetails] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -95,6 +97,12 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(null);
   const [uploadedInvoices, setUploadedInvoices] = useState<InvoiceData[]>([]);
   
+  React.useEffect(() => {
+    if (value?.selectedMethod !== undefined) {
+      setSelectedMethod(value.selectedMethod as PayoutMethod);
+    }
+  }, [value?.selectedMethod]);
+
   const payouts = [
     { 
       id: 'p1', 
@@ -228,6 +236,9 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const handleSelectPayoutMethod = (method: PayoutMethod) => {
     setSelectedMethod(method);
     setSelectedDetailOption(null);
+    if (value?.setSelectedMethod) {
+      value.setSelectedMethod(method);
+    }
   };
   
   const handleSelectDetailOption = (option: DetailOption) => {
@@ -278,7 +289,7 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  const value = {
+  const contextValue = {
     currentStep,
     setCurrentStep,
     selectedMethod,
@@ -321,7 +332,7 @@ export const PayoutWidgetProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   return (
-    <PayoutWidgetContext.Provider value={value}>
+    <PayoutWidgetContext.Provider value={contextValue}>
       {children}
     </PayoutWidgetContext.Provider>
   );

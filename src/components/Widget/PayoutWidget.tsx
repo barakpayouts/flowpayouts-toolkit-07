@@ -28,8 +28,6 @@ const PayoutWidget: React.FC = () => {
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
     setRequiresBankVerification(method === 'Bank Transfer');
-    
-    // Always show method details when a method is selected
     setShowMethodDetails(true);
   };
   
@@ -116,7 +114,7 @@ const PayoutWidget: React.FC = () => {
         />;
       case 'payout':
         if (showMethodDetails && selectedMethod) {
-          return <MethodDetails onBack={handleBack} />;
+          return <MethodDetails onBack={() => setShowMethodDetails(false)} />;
         }
         return renderPayoutMethods();
       default:
@@ -258,7 +256,7 @@ const PayoutWidget: React.FC = () => {
   };
 
   return (
-    <PayoutWidgetProvider>
+    <PayoutWidgetProvider value={{ selectedMethod, setSelectedMethod }}>
       <div className="widget-frame">
         {renderHeader()}
         
