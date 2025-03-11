@@ -12,14 +12,7 @@ import PrepaidCard from './PayoutMethods/PrepaidCard';
 import GiftCard from './PayoutMethods/GiftCard';
 import AdvancedPayment from './PayoutMethods/AdvancedPayment';
 import EarlyAccess from './PayoutMethods/EarlyAccess';
-import AdvancedPaymentDetails from './PayoutSteps/MethodDetails/AdvancedPaymentDetails';
-import EarlyAccessDetails from './PayoutSteps/MethodDetails/EarlyAccessDetails';
-import BankTransferDetails from './PayoutSteps/MethodDetails/BankTransferDetails';
-import CryptocurrencyDetails from './PayoutSteps/MethodDetails/CryptocurrencyDetails';
-import DigitalWalletDetails from './PayoutSteps/MethodDetails/DigitalWalletDetails';
-import CardPaymentDetails from './PayoutSteps/MethodDetails/CardPaymentDetails';
-import PrepaidCardDetails from './PayoutSteps/MethodDetails/PrepaidCardDetails';
-import GiftCardDetails from './PayoutSteps/MethodDetails/GiftCardDetails';
+import MethodDetails from './PayoutSteps/MethodDetails';
 import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -36,7 +29,6 @@ const PayoutWidget: React.FC = () => {
     setRequiresBankVerification(method === 'Bank Transfer');
     
     if (method) {
-      setActiveStep(activeStep + 1);
       setShowMethodDetails(true);
     }
   };
@@ -54,7 +46,6 @@ const PayoutWidget: React.FC = () => {
   const handleBack = () => {
     if (showMethodDetails) {
       setShowMethodDetails(false);
-      setActiveStep(activeStep - 1);
       return;
     }
     
@@ -122,7 +113,7 @@ const PayoutWidget: React.FC = () => {
         />;
       case 'payout':
         if (showMethodDetails && selectedMethod) {
-          return renderPayoutMethodDetails();
+          return <MethodDetails onBack={handleBack} />;
         }
         return renderPayoutMethods();
       default:
@@ -167,29 +158,6 @@ const PayoutWidget: React.FC = () => {
         </div>
       </div>
     );
-  };
-
-  const renderPayoutMethodDetails = () => {
-    switch (selectedMethod) {
-      case 'Bank Transfer':
-        return <BankTransferDetails onBack={handleBack} />;
-      case 'Cryptocurrency':
-        return <CryptocurrencyDetails onBack={handleBack} />;
-      case 'Digital Wallet':
-        return <DigitalWalletDetails onBack={handleBack} />;
-      case 'Card Payment':
-        return <CardPaymentDetails onBack={handleBack} />;
-      case 'Prepaid Card':
-        return <PrepaidCardDetails onBack={handleBack} />;
-      case 'Gift Card':
-        return <GiftCardDetails onBack={handleBack} />;
-      case 'Advanced Payment':
-        return <AdvancedPaymentDetails paymentAmount={1000} onBack={handleBack} />;
-      case 'Early Access':
-        return <EarlyAccessDetails paymentAmount={1500} onBack={handleBack} />;
-      default:
-        return null;
-    }
   };
 
   const steps = getSteps();
