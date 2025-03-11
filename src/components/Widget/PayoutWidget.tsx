@@ -52,9 +52,6 @@ const PayoutWidget: React.FC = () => {
       setSelectedAdvanceTier(null);
     }
     
-    if (method !== 'Early Access') {
-      setEarlyAccessActivated(false);
-    }
   };
   
   const handleNext = () => {
