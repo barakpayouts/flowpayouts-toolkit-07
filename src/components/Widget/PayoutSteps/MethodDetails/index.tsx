@@ -9,13 +9,24 @@ import PrepaidCardDetails from './PrepaidCardDetails';
 import GiftCardDetails from './GiftCardDetails';
 import AdvancedPaymentDetails from './AdvancedPaymentDetails';
 import EarlyAccessDetails from './EarlyAccessDetails';
+import PrepaidCardAfterAdvance from './PrepaidCardAfterAdvance';
 
 interface MethodDetailsProps {
   onBack: () => void;
 }
 
 const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
-  const { selectedMethod } = usePayoutWidget();
+  const { selectedMethod, advancedPaymentStage, earlyAccessActivated } = usePayoutWidget();
+  
+  // For Advanced Payment with prepaid card selection stage
+  if (advancedPaymentStage && selectedMethod === 'Advanced Payment') {
+    return <PrepaidCardAfterAdvance onBack={onBack} />;
+  }
+  
+  // For Early Access with prepaid card selection stage
+  if (earlyAccessActivated && selectedMethod === 'Early Access') {
+    return <PrepaidCardAfterAdvance onBack={onBack} />;
+  }
   
   // Render the appropriate form based on the selected method
   switch (selectedMethod) {

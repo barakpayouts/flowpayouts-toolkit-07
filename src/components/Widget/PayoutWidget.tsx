@@ -14,6 +14,7 @@ import GiftCard from './PayoutMethods/GiftCard';
 import AdvancedPayment from './PayoutMethods/AdvancedPayment';
 import EarlyAccess from './PayoutMethods/EarlyAccess';
 import MethodDetails from './PayoutSteps/MethodDetails';
+import Dashboard from './Dashboard/Dashboard';
 import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,8 @@ const PayoutWidget: React.FC = () => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [showMethodDetails, setShowMethodDetails] = useState<boolean>(false);
   const [requiresBankVerification, setRequiresBankVerification] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
 
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
@@ -35,6 +38,8 @@ const PayoutWidget: React.FC = () => {
     if (activeStep < getSteps().length - 1) {
       setActiveStep(activeStep + 1);
     } else {
+      setOnboardingCompleted(true);
+      setShowDashboard(true);
       toast.success("All steps completed!", {
         description: "You've finished all the required steps."
       });
@@ -42,6 +47,11 @@ const PayoutWidget: React.FC = () => {
   };
 
   const handleBack = () => {
+    if (showDashboard) {
+      setShowDashboard(false);
+      return;
+    }
+    
     if (showMethodDetails) {
       setShowMethodDetails(false);
       return;
@@ -75,6 +85,10 @@ const PayoutWidget: React.FC = () => {
   };
 
   const renderStepContent = () => {
+    if (showDashboard) {
+      return <Dashboard onBack={() => setShowDashboard(false)} />;
+    }
+    
     const steps = getSteps();
     
     if (steps.length === 0) {
@@ -202,7 +216,7 @@ const PayoutWidget: React.FC = () => {
   };
   
   const renderStepCircles = () => {
-    if (steps.length === 0) return null;
+    if (steps.length === 0 || showDashboard) return null;
     
     return (
       <div className="step-circles">
@@ -227,7 +241,7 @@ const PayoutWidget: React.FC = () => {
   };
   
   const renderFooter = () => {
-    if (steps.length === 0) return null;
+    if (steps.length === 0 || showDashboard) return null;
     
     return (
       <div className="widget-footer">
@@ -256,7 +270,15 @@ const PayoutWidget: React.FC = () => {
   };
 
   return (
-    <PayoutWidgetProvider value={{ selectedMethod, setSelectedMethod }}>
+    <PayoutWidgetProvider value={{ 
+      selectedMethod,
+      setSelectedMethod,
+      showDashboard,
+      setShowDashboard,
+      onboardingCompleted, 
+      setOnboardingCompleted,
+      handleNext: handleNext
+    }}>
       <div className="widget-frame">
         {renderHeader()}
         

@@ -11,7 +11,7 @@ type CardOption = 'Visa Prepaid' | 'Mastercard Prepaid';
 
 const PrepaidCardDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { config } = useWidgetConfig();
-  const { handleSelectDetailOption } = usePayoutWidget();
+  const { handleSelectDetailOption, handleNextStep } = usePayoutWidget();
   const [selectedOption, setSelectedOption] = useState<CardOption | null>(null);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -55,9 +55,8 @@ const PrepaidCardDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         description: `Your ${selectedOption} details will be sent to ${email}`
       });
       
-      // This would normally trigger the next step in the flow
-      // For now, we'll just log the selection
-      console.log(`Selected ${selectedOption}, email: ${email}`);
+      // Trigger the next step in the flow to show the dashboard
+      handleNextStep();
     }, 1000);
   };
   
