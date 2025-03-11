@@ -25,7 +25,7 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
   onComplete,
 }) => {
   const { config } = useWidgetConfig();
-  const { setPrepaidCardEmail, setSelectedAdvanceTier } = usePayoutWidget();
+  const { setPrepaidCardEmail, setSelectedAdvanceTier, setShowDashboard, setOnboardingCompleted } = usePayoutWidget();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedCardType, setSelectedCardType] = useState<CardType>('Visa');
   const [email, setEmail] = useState('');
@@ -72,7 +72,15 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
       toast.success("Prepaid card confirmed", {
         description: `Your ${advancePercentage}% advance will be sent to your ${selectedCardType} prepaid card. Details will be sent to ${email}`,
       });
-      onComplete();
+      
+      // Ensure we're properly navigating to the dashboard
+      setShowDashboard(true);
+      setOnboardingCompleted(true);
+      
+      // Call the onComplete function from props
+      if (onComplete) {
+        onComplete();
+      }
     }, 1000);
   };
 
