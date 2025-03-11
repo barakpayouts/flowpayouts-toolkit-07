@@ -320,7 +320,7 @@ const PayoutWidget: React.FC = () => {
       setShowDashboard,
       onboardingCompleted, 
       setOnboardingCompleted,
-      handleNext: handleNext,
+      handleNext,
       isLoggedIn,
       setIsLoggedIn,
       advancedPaymentStage,
@@ -328,7 +328,9 @@ const PayoutWidget: React.FC = () => {
       selectedAdvanceTier,
       setSelectedAdvanceTier,
       prepaidCardEmail,
-      setPrepaidCardEmail
+      setPrepaidCardEmail,
+      handleLogin,
+      handleStartOnboarding
     }}>
       <div className="widget-frame">
         {!showLoginScreen && renderHeader()}

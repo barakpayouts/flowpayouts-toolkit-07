@@ -1,11 +1,9 @@
 
 import React from 'react';
 import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
-import { useWidgetConfig } from '@/hooks/use-widget-config';
 
 const LoginScreen: React.FC = () => {
   const { handleLogin, handleStartOnboarding } = usePayoutWidget();
-  const { config } = useWidgetConfig();
   
   return (
     <div className="login-container text-center">
@@ -14,7 +12,7 @@ const LoginScreen: React.FC = () => {
       
       <div className="flex flex-col gap-4">
         <button
-          onClick={handleLogin}
+          onClick={() => handleLogin()}
           className="py-3 px-4 rounded-lg font-medium bg-white/10 hover:bg-white/20 transition-colors"
         >
           Login (Simulation)
@@ -30,12 +28,8 @@ const LoginScreen: React.FC = () => {
         </div>
         
         <button
-          onClick={handleStartOnboarding}
-          className="py-3 px-4 rounded-lg font-medium"
-          style={{
-            backgroundColor: config.accentColor || "#8B5CF6",
-            color: config.primaryColor || "#ffffff",
-          }}
+          onClick={() => handleStartOnboarding()}
+          className="py-3 px-4 rounded-lg font-medium bg-payouts-accent text-payouts-dark hover:bg-payouts-accent/90 transition-colors"
         >
           Create Account
         </button>
