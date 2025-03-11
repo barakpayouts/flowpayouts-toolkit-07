@@ -1,7 +1,8 @@
+
 import { create } from 'zustand';
 
 export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
-export type VerificationStep = 'profile' | 'bank' | 'tax' | 'kyc';
+export type VerificationStep = 'profile' | 'bank' | 'tax' | 'kyc' | 'payout';
 export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 'gift' | 'advanced' | 'early';
 export type ButtonStyle = 'rounded' | 'square' | 'pill';
 export type BankVerificationMethod = 'plaid' | 'statement' | 'microdeposit';
