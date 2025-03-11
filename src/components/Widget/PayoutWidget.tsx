@@ -29,6 +29,7 @@ const PayoutWidget: React.FC = () => {
     setSelectedMethod(method);
     setRequiresBankVerification(method === 'Bank Transfer');
     
+    // Always show method details when a method is selected
     setShowMethodDetails(true);
   };
   
@@ -79,6 +80,9 @@ const PayoutWidget: React.FC = () => {
     const steps = getSteps();
     
     if (steps.length === 0) {
+      if (showMethodDetails && selectedMethod) {
+        return <MethodDetails onBack={() => setShowMethodDetails(false)} />;
+      }
       return renderPayoutMethods();
     }
 

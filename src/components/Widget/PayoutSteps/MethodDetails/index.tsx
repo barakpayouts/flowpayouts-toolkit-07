@@ -36,7 +36,18 @@ const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
     case 'Early Access':
       return <EarlyAccessDetails paymentAmount={1500} onBack={onBack} />;
     default:
-      return null;
+      return (
+        <div className="p-4 rounded-lg bg-white/10 border border-white/20">
+          <h3 className="text-xl mb-4">Method Details</h3>
+          <p>No method selected or unknown method type.</p>
+          <button 
+            onClick={onBack}
+            className="mt-4 flex items-center gap-2 text-sm bg-white/10 px-4 py-2 rounded hover:bg-white/20 transition-colors"
+          >
+            Back to methods
+          </button>
+        </div>
+      );
   }
 };
 
