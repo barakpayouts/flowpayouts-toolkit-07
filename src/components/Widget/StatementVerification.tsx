@@ -2,27 +2,36 @@
 import React, { useState, useRef } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { motion } from 'framer-motion';
-import { FileText, AlertCircle, Check } from 'lucide-react';
+import { FileText, AlertCircle, Check, FileImage, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
 
 const StatementVerification: React.FC = () => {
   const { config } = useWidgetConfig();
   const [statementUploaded, setStatementUploaded] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadSource, setUploadSource] = useState<'computer' | 'google' | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      uploadFile(file);
+      setSelectedFile(file);
+      setUploadSource('computer');
     }
   };
   
   const uploadFile = (file: File) => {
     setUploadedFileName(file.name);
     setStatementUploaded(true);
+    setUploadDialogOpen(false);
     toast.success("Statement uploaded successfully", {
       description: `${file.name} has been added to your account`
     });
@@ -31,6 +40,12 @@ const StatementVerification: React.FC = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    
+    // Reset upload state
+    setSelectedFile(null);
+    setUploadSource(null);
+    setUploadProgress(0);
+    setIsUploading(false);
   };
   
   const handleChooseFile = () => {
@@ -62,6 +77,44 @@ const StatementVerification: React.FC = () => {
   const handleUploadAnother = () => {
     setStatementUploaded(false);
     setUploadedFileName(null);
+  };
+  
+  const handleGoogleDriveUpload = () => {
+    // Simulate Google Drive selection
+    setUploadSource('google');
+    toast.info("Google Drive", {
+      description: "Connecting to Google Drive...",
+    });
+    
+    // Simulate file selection after a delay
+    setTimeout(() => {
+      const mockFile = new File(["dummy content"], "invoice-from-drive.pdf", { type: "application/pdf" });
+      setSelectedFile(mockFile);
+      toast.success("File selected from Google Drive", {
+        description: "invoice-from-drive.pdf has been selected"
+      });
+    }, 1500);
+  };
+  
+  const simulateUpload = () => {
+    if (!selectedFile) return;
+    
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        const newProgress = prev + Math.random() * 20;
+        if (newProgress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            uploadFile(selectedFile);
+          }, 500);
+          return 100;
+        }
+        return newProgress;
+      });
+    }, 300);
   };
   
   return (
@@ -139,7 +192,7 @@ const StatementVerification: React.FC = () => {
             className="mx-auto mb-2"
             onClick={(e) => {
               e.stopPropagation();
-              handleChooseFile();
+              setUploadDialogOpen(true);
             }}
           >
             Browse Files
@@ -166,6 +219,122 @@ const StatementVerification: React.FC = () => {
           </div>
         </div>
       )}
+      
+      {/* Invoice Upload Dialog */}
+      <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+        <DialogContent 
+          className="sm:max-w-md" 
+          style={{ 
+            background: config.primaryColor, 
+            borderColor: `${config.accentColor}20`
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Upload Invoice</DialogTitle>
+            <DialogDescription>
+              Upload an invoice from your computer or Google Drive
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-6 space-y-4">
+            {!selectedFile ? (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div 
+                    className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                    onClick={handleChooseFile}
+                  >
+                    <div className="p-3 rounded-full bg-white/10">
+                      <FileImage size={20} style={{ color: config.accentColor }} />
+                    </div>
+                    <p className="font-medium text-sm">From Computer</p>
+                    <p className="text-xs opacity-70">Upload from your device</p>
+                  </div>
+                  
+                  <div 
+                    className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                    onClick={handleGoogleDriveUpload}
+                  >
+                    <div className="p-3 rounded-full bg-white/10">
+                      <FileText size={20} style={{ color: config.accentColor }} />
+                    </div>
+                    <p className="font-medium text-sm">Google Drive</p>
+                    <p className="text-xs opacity-70">Import from Google Drive</p>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10 mt-6">
+                  <p className="text-sm opacity-80 mb-3">Supported file types</p>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-white/10 text-xs px-2 py-1 rounded">PDF</span>
+                    <span className="bg-white/10 text-xs px-2 py-1 rounded">JPG</span>
+                    <span className="bg-white/10 text-xs px-2 py-1 rounded">PNG</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="p-3 rounded-full bg-white/10 flex-shrink-0">
+                    <FileText size={20} style={{ color: config.accentColor }} />
+                  </div>
+                  <div className="flex-grow">
+                    <p className="font-medium text-sm">{selectedFile.name}</p>
+                    <p className="text-xs opacity-70">
+                      {(selectedFile.size / 1024).toFixed(1)} KB • {uploadSource === 'google' ? 'Google Drive' : 'Local file'}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="dark" 
+                    size="icon" 
+                    className="flex-shrink-0 h-8 w-8"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setUploadSource(null);
+                    }}
+                  >
+                    <X size={14} />
+                  </Button>
+                </div>
+                
+                {isUploading && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Uploading...</span>
+                      <span>{Math.round(uploadProgress)}%</span>
+                    </div>
+                    <Progress value={uploadProgress} className="h-2" />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter className="mt-6">
+            <div className="flex gap-2 w-full">
+              <Button 
+                variant="dark" 
+                className="flex-1"
+                onClick={() => setUploadDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              
+              <Button 
+                className="flex-1 text-gray-900 font-semibold hover:text-gray-900"
+                style={{
+                  background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+                  boxShadow: `0 4px 15px ${config.accentColor}40`,
+                }}
+                disabled={!selectedFile || isUploading}
+                onClick={simulateUpload}
+              >
+                {isUploading ? 'Uploading...' : 'Upload Invoice'}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };
