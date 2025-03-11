@@ -1,3 +1,4 @@
+
 /* Widget styling */
 .widget-container {
   background-color: var(--bg-color, #143745);
@@ -6,6 +7,8 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
   transition: all 0.3s ease-in-out;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .progress-track {

@@ -129,66 +129,115 @@ const PayoutWidget: React.FC = () => {
   };
 
   const currentStep = config.steps.length > 0 ? config.steps[activeStep] : 'payout';
+  
+  const renderHeader = () => {
+    return (
+      <div className="widget-header">
+        <div className="widget-header-pills">
+          {config.recipientType && (
+            <span className="widget-header-pill">
+              {config.recipientType === 'vendor' && '🏢'}
+              {config.recipientType === 'insured' && '🛡️'}
+              {config.recipientType === 'individual' && '👤'}
+              {config.recipientType === 'business' && '💼'}
+              {config.recipientType === 'contractor' && '🔧'}
+              <span className="capitalize">{config.recipientType}</span>
+            </span>
+          )}
+          
+          {config.steps.length > 0 && config.steps.includes('profile') && (
+            <span className="widget-header-pill">Profile</span>
+          )}
+          
+          {config.steps.length > 0 && config.steps.includes('kyc') && (
+            <span className="widget-header-pill">KYC</span>
+          )}
+          
+          {config.steps.length > 0 && config.steps.includes('bank') && (
+            <span className="widget-header-pill">Bank</span>
+          )}
+          
+          {config.steps.length > 0 && config.steps.includes('tax') && (
+            <span className="widget-header-pill">Tax</span>
+          )}
+          
+          <span className="widget-header-pill">Methods: {config.payoutMethods.length}</span>
+        </div>
+      </div>
+    );
+  };
+  
+  const renderStepCircles = () => {
+    if (config.steps.length === 0) return null;
+    
+    return (
+      <div className="step-circles">
+        {config.steps.map((_, index) => (
+          <div
+            key={index}
+            className={cn(
+              "step-circle",
+              index === activeStep && "active",
+              index < activeStep && "completed"
+            )}
+          >
+            {index < activeStep ? (
+              <Check size={14} />
+            ) : (
+              <span>{index + 1}</span>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
+  const renderFooter = () => {
+    if (config.steps.length === 0) return null;
+    
+    return (
+      <div className="widget-footer">
+        <button 
+          onClick={handleBack} 
+          disabled={activeStep === 0} 
+          className="step-nav-button"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </button>
+        
+        <div className="text-xs opacity-60">
+          Step {activeStep + 1} of {config.steps.length}
+        </div>
+        
+        <button 
+          onClick={handleNext} 
+          className="primary-button"
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
 
   return (
-    <div className="p-4 rounded-lg max-w-md mx-auto">
-      {config.showProgressBar && config.steps.length > 0 && (
-        <div className="mb-4 flex justify-center">
-          <div className="flex space-x-2">
-            {config.steps.map((_, index) => (
-              <div
-                key={index}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
-                  index <= activeStep 
-                    ? 'bg-payouts-accent text-payouts-dark' 
-                    : 'bg-white/10 text-white/60'
-                }`}
-              >
-                {index < activeStep ? (
-                  <Check size={14} />
-                ) : (
-                  <span>{index + 1}</span>
-                )}
-              </div>
-            ))}
+    <div className="widget-frame">
+      {renderHeader()}
+      
+      {renderStepCircles()}
+      
+      <div className="widget-content">
+        {renderStepContent()}
+
+        {selectedMethod && (
+          <div className="mt-4">
+            <h2 className="text-xl font-semibold mb-4">Method Details</h2>
+            {renderPayoutMethodDetails()}
           </div>
-        </div>
-      )}
-
-      {config.showStepNumbers && config.steps.length > 0 && (
-        <div className="flex items-center justify-between mb-4">
-          <button 
-            onClick={handleBack} 
-            disabled={activeStep === 0} 
-            className={`text-sm flex items-center ${
-              activeStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:underline'
-            }`}
-          >
-            <ArrowLeft size={16} className="mr-1" />
-            Back
-          </button>
-          <span className="text-xs opacity-70">Step {activeStep + 1} of {config.steps.length}</span>
-          <button 
-            onClick={handleNext} 
-            disabled={activeStep === config.steps.length - 1} 
-            className={`text-sm flex items-center ${
-              activeStep === config.steps.length - 1 ? 'opacity-50 cursor-not-allowed' : 'hover:underline'
-            }`}
-          >
-            Next
-            <ChevronRight size={16} className="ml-1" />
-          </button>
-        </div>
-      )}
-
-      {renderStepContent()}
-
-      {selectedMethod && (
-        <div className="mt-4">
-          <h2 className="text-xl font-semibold mb-4">Method Details</h2>
-          {renderPayoutMethodDetails()}
-        </div>
-      )}
+        )}
+      </div>
+      
+      {renderFooter()}
     </div>
   );
 };
