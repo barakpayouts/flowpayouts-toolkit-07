@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 
 export type PayoutMethod = 'Bank Transfer' | 'Cryptocurrency' | 'Digital Wallet' | 'Card Payment' | 'Prepaid Card' | 'Gift Card' | 'Advanced Payment' | 'Early Access' | null;
-export type DetailOption = 'PayPal' | 'Venmo' | 'Payoneer' | 'Visa Prepaid' | 'Amazon' | 'Walmart' | 'Target' | null;
+export type DetailOption = 'PayPal' | 'Venmo' | 'Payoneer' | 'Visa Prepaid' | 'Mastercard Prepaid' | 'Amazon' | 'Walmart' | 'Target' | null;
 export type PayoutStatus = 'Completed' | 'Pending' | 'Awaiting Approval';
 
 export interface PayoutRecord {
@@ -148,6 +148,24 @@ export const PayoutWidgetProvider: React.FC<{
       method: 'Digital Wallet (PayPal)',
       invoice: 'INV-2023-09-01',
       description: 'August commission payment'
+    },
+    { 
+      id: 'p6', 
+      amount: '$700.00', 
+      date: 'Oct 5, 2023', 
+      status: 'Completed' as PayoutStatus, 
+      method: 'Advanced Payment (70%) - Visa Prepaid',
+      invoice: 'INV-2023-10-01',
+      description: 'September commission advance'
+    },
+    { 
+      id: 'p7', 
+      amount: '$1,200.00', 
+      date: 'Oct 20, 2023', 
+      status: 'Pending' as PayoutStatus, 
+      method: 'Early Access - Mastercard Prepaid',
+      invoice: 'INV-2023-10-02',
+      description: 'October early payment'
     },
   ];
 

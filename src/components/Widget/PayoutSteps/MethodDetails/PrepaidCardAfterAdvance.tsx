@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { CreditCard, ArrowLeft, Check } from 'lucide-react';
+import { CreditCard, ArrowLeft, Check, Mail } from 'lucide-react';
 
 interface PrepaidCardAfterAdvanceProps {
   paymentAmount: number;
@@ -13,6 +14,8 @@ interface PrepaidCardAfterAdvanceProps {
   onComplete: () => void;
 }
 
+type CardType = 'Visa' | 'Mastercard';
+
 const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
   paymentAmount,
   advancePercentage,
@@ -21,21 +24,39 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
   onComplete,
 }) => {
   const { config } = useWidgetConfig();
-  const [isSelected, setIsSelected] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedCardType, setSelectedCardType] = useState<CardType>('Visa');
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
 
   const advanceAmount = (paymentAmount * advancePercentage) / 100;
   const feeAmount = (advanceAmount * feePercentage) / 100;
   const netAmount = advanceAmount - feeAmount;
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleConfirm = () => {
+    if (!email) {
+      setEmailError('Email is required');
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    
+    setEmailError('');
     setIsProcessing(true);
     
     // Simulate processing
     setTimeout(() => {
       setIsProcessing(false);
-      toast.success("Prepaid card selected", {
-        description: `Your ${advancePercentage}% advance will be sent to a prepaid card`,
+      toast.success("Prepaid card confirmed", {
+        description: `Your ${advancePercentage}% advance will be sent to your ${selectedCardType} prepaid card. Details will be sent to ${email}`,
       });
       onComplete();
     }, 1000);
@@ -79,13 +100,10 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
       <div className="space-y-4">
         <p className="text-sm opacity-80">Please select how you want to receive your advance:</p>
         
-        <div 
-          className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-            isSelected ? 'bg-white/10 border-' + config.accentColor + '60' : 'bg-white/5 border-white/10'
-          }`}
-          onClick={() => setIsSelected(true)}
-        >
-          <div className="flex items-center justify-between">
+        <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+          <div 
+            className="flex items-center justify-between"
+          >
             <div className="flex items-center gap-3">
               <div 
                 className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -103,18 +121,80 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
                 <p className="text-sm opacity-70">Receive your funds on a prepaid card</p>
               </div>
             </div>
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-              isSelected ? 'bg-' + config.accentColor : 'bg-white/10'
-            }`}>
-              {isSelected && <Check size={14} className="text-black" />}
+          </div>
+        </div>
+        
+        <div className="space-y-3">
+          <div className="mt-4">
+            <p className="text-sm mb-2">Select Card Provider:</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div 
+                className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                  selectedCardType === 'Visa' 
+                    ? 'bg-white/10 border-' + config.accentColor + '60' 
+                    : 'bg-white/5 border-white/10'
+                }`}
+                onClick={() => setSelectedCardType('Visa')}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm">Visa</span>
+                  </div>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                    selectedCardType === 'Visa' ? 'bg-' + config.accentColor : 'bg-white/10'
+                  }`}>
+                    {selectedCardType === 'Visa' && <Check size={12} className="text-black" />}
+                  </div>
+                </div>
+              </div>
+              
+              <div 
+                className={`p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                  selectedCardType === 'Mastercard' 
+                    ? 'bg-white/10 border-' + config.accentColor + '60' 
+                    : 'bg-white/5 border-white/10'
+                }`}
+                onClick={() => setSelectedCardType('Mastercard')}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-sm">Mastercard</span>
+                  </div>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                    selectedCardType === 'Mastercard' ? 'bg-' + config.accentColor : 'bg-white/10'
+                  }`}>
+                    {selectedCardType === 'Mastercard' && <Check size={12} className="text-black" />}
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Mail size={16} className="text-white/60" />
+              <label htmlFor="email" className="text-sm">Email for card details:</label>
+            </div>
+            <Input 
+              id="email"
+              type="email"
+              placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError('');
+              }}
+              className={`bg-white/10 border-white/20 text-white ${emailError ? 'border-red-500' : ''}`}
+            />
+            {emailError && (
+              <p className="text-xs text-red-400">{emailError}</p>
+            )}
+            <p className="text-xs opacity-70">
+              Card details and activation instructions will be sent to this email
+            </p>
           </div>
         </div>
       </div>
-      
-      <p className="text-xs opacity-70 mt-2 text-center">
-        Your prepaid card will be issued immediately after confirmation
-      </p>
       
       <Button 
         onClick={handleConfirm}
