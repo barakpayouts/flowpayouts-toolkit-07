@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
@@ -130,23 +131,52 @@ const PayoutWidget: React.FC = () => {
   const currentStep = config.steps.length > 0 ? config.steps[activeStep] : 'payout';
 
   return (
-    <div className="p-6 rounded-lg">
-      {config.showProgressBar && (
-        <div className="mb-4">
-          <progress className="progress w-full" value={(activeStep / config.steps.length) * 100} max="100"></progress>
+    <div className="p-4 rounded-lg max-w-md mx-auto">
+      {config.showProgressBar && config.steps.length > 0 && (
+        <div className="mb-4 flex justify-center">
+          <div className="flex space-x-2">
+            {config.steps.map((_, index) => (
+              <div
+                key={index}
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all ${
+                  index <= activeStep 
+                    ? 'bg-payouts-accent text-payouts-dark' 
+                    : 'bg-white/10 text-white/60'
+                }`}
+              >
+                {index < activeStep ? (
+                  <Check size={14} />
+                ) : (
+                  <span>{index + 1}</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {config.showStepNumbers && config.steps.length > 0 && (
         <div className="flex items-center justify-between mb-4">
-          <button onClick={handleBack} disabled={activeStep === 0} className="btn btn-sm btn-ghost">
-            <ArrowLeft size={16} />
+          <button 
+            onClick={handleBack} 
+            disabled={activeStep === 0} 
+            className={`text-sm flex items-center ${
+              activeStep === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:underline'
+            }`}
+          >
+            <ArrowLeft size={16} className="mr-1" />
             Back
           </button>
-          <span className="text-sm opacity-70">Step {activeStep + 1} of {config.steps.length}</span>
-          <button onClick={handleNext} disabled={activeStep === config.steps.length - 1} className="btn btn-sm btn-primary">
+          <span className="text-xs opacity-70">Step {activeStep + 1} of {config.steps.length}</span>
+          <button 
+            onClick={handleNext} 
+            disabled={activeStep === config.steps.length - 1} 
+            className={`text-sm flex items-center ${
+              activeStep === config.steps.length - 1 ? 'opacity-50 cursor-not-allowed' : 'hover:underline'
+            }`}
+          >
             Next
-            <ChevronRight size={16} />
+            <ChevronRight size={16} className="ml-1" />
           </button>
         </div>
       )}
