@@ -11,14 +11,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Zap, Clock, Calendar, Shield } from 'lucide-react';
+import { Zap, Clock, Calendar, Shield, ArrowLeft } from 'lucide-react';
 
 interface EarlyAccessDetailsProps {
   paymentAmount: number;
+  onBack: () => void;
 }
 
 const EarlyAccessDetails: React.FC<EarlyAccessDetailsProps> = ({
   paymentAmount = 1000, // Default value for demo
+  onBack,
 }) => {
   const { config } = useWidgetConfig();
   const [isEnrolled, setIsEnrolled] = useState(false);
@@ -41,6 +43,17 @@ const EarlyAccessDetails: React.FC<EarlyAccessDetailsProps> = ({
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <button 
+          onClick={onBack}
+          className="flex items-center gap-2 text-sm opacity-70 hover:opacity-100 transition-opacity"
+        >
+          <ArrowLeft size={16} />
+          Back to methods
+        </button>
+        <h2 className="text-xl font-semibold">Early Access Payments</h2>
+      </div>
+      
       <div className="bg-white/5 p-4 rounded-lg border border-white/10">
         <h3 className="text-lg font-medium mb-2">Early Access Payments</h3>
         <p className="text-sm text-white/70 mb-3">

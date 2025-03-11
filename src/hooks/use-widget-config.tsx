@@ -54,6 +54,10 @@ interface WidgetConfig {
   buttonStyle: ButtonStyle;
   advancedPayment: AdvancedPaymentConfig;
   earlyAccess: EarlyAccessConfig;
+  // Add missing properties
+  payoutAmount?: string;
+  companyName?: string;
+  currency?: string;
 }
 
 interface WidgetConfigState {

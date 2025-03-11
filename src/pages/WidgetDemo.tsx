@@ -30,6 +30,15 @@ const WidgetDemo = () => {
     setPayoutsOnlyMode,
     resetConfig
   } = useWidgetConfig();
+  
+  useEffect(() => {
+    updateConfig({
+      payoutAmount: "$1,250.00",
+      companyName: "Acme Inc.",
+      currency: "USD"
+    });
+  }, []);
+
   const [showConfigPanel, setShowConfigPanel] = useState(true);
   const [isPayoutsOnly, setIsPayoutsOnly] = useState(config.steps.length === 0);
   const [widgetKey, setWidgetKey] = useState(0);

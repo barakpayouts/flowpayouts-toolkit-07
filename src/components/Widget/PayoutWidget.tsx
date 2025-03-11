@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import ProfileInfo from './ProfileInfo';
@@ -30,15 +29,12 @@ const PayoutWidget: React.FC = () => {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [showMethodDetails, setShowMethodDetails] = useState<boolean>(false);
-  // This flag will be used to determine if bank verification should be added to steps
   const [requiresBankVerification, setRequiresBankVerification] = useState(false);
 
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
-    // Only require bank verification if Bank Transfer is selected
     setRequiresBankVerification(method === 'Bank Transfer');
     
-    // Instead of showing details right away, we prepare to move to next step
     if (method) {
       setActiveStep(activeStep + 1);
       setShowMethodDetails(true);
@@ -58,7 +54,6 @@ const PayoutWidget: React.FC = () => {
   const handleBack = () => {
     if (showMethodDetails) {
       setShowMethodDetails(false);
-      // Go back to method selection
       setActiveStep(activeStep - 1);
       return;
     }
@@ -68,30 +63,20 @@ const PayoutWidget: React.FC = () => {
     }
   };
   
-  // Get dynamic steps based on selected payout method
   const getSteps = () => {
-    // Start with basic steps from config
     const baseSteps = [...config.steps];
-    
-    // Create a new array to store our final steps
     let steps = [...baseSteps];
     
-    // Always include payout step if not already included
     if (!steps.includes('payout')) {
       steps.push('payout');
     }
     
-    // Find the index of the payout step
     const payoutIndex = steps.findIndex(step => step === 'payout');
     
-    // If Bank Transfer is selected and bank verification is required, 
-    // add the bank verification step IMMEDIATELY AFTER the payout step
     if (requiresBankVerification && selectedMethod && payoutIndex !== -1) {
-      // Make sure we're inserting at the right position - right after payout
       const beforePayout = steps.slice(0, payoutIndex + 1);
       const afterPayout = steps.slice(payoutIndex + 1);
       
-      // Only add bank if it's not already in the steps
       if (!steps.includes('bank')) {
         steps = [...beforePayout, 'bank', ...afterPayout];
       }
@@ -162,7 +147,6 @@ const PayoutWidget: React.FC = () => {
         <h2 className="text-xl font-semibold mb-4">Select Payout Method</h2>
         <p className="text-sm mb-4 opacity-70">Choose how you'd like to receive your funds (select one)</p>
         
-        {/* Balance Info Card */}
         <div className="mb-6 p-4 rounded-lg border border-white/20 bg-white/5">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm opacity-70">Available Balance</span>
@@ -186,8 +170,6 @@ const PayoutWidget: React.FC = () => {
   };
 
   const renderPayoutMethodDetails = () => {
-    const detailsProps = { onBack: handleBack };
-    
     switch (selectedMethod) {
       case 'Bank Transfer':
         return <BankTransferDetails onBack={handleBack} />;
@@ -296,7 +278,6 @@ const PayoutWidget: React.FC = () => {
         <button 
           onClick={handleNext} 
           className="primary-button"
-          // Disable next button on payout method step if no method is selected
           disabled={(currentStep === 'payout' && !selectedMethod && !showMethodDetails)}
         >
           Next
