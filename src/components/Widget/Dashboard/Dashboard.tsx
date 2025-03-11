@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import DashboardHeader from './DashboardHeader';
 import CurrentMethodCard from './CurrentMethodCard';
 import DashboardTabs from './DashboardTabs';
@@ -10,9 +10,12 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
-  const { handleBackStep } = usePayoutWidget();
+  const { handleBackStep, showDashboard } = usePayoutWidget();
   
-  console.log("Dashboard component rendering");
+  // Log when Dashboard renders to confirm it's being shown
+  useEffect(() => {
+    console.log("Dashboard component mounted, showDashboard:", showDashboard);
+  }, [showDashboard]);
   
   return (
     <div className="dashboard-container">

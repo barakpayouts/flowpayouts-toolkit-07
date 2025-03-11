@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,17 +29,38 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
     setPrepaidCardEmail, 
     setSelectedAdvanceTier, 
     setShowDashboard, 
-    setOnboardingCompleted 
+    setOnboardingCompleted,
+    showDashboard
   } = usePayoutWidget();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedCardType, setSelectedCardType] = useState<CardType>('Visa');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [navigateToDashboard, setNavigateToDashboard] = useState(false);
 
   const advanceAmount = (paymentAmount * advancePercentage) / 100;
   const feeAmount = (advanceAmount * feePercentage) / 100;
   const netAmount = advanceAmount - feeAmount;
+
+  // Effect to handle navigation after state is updated
+  useEffect(() => {
+    if (navigateToDashboard) {
+      console.log("PrepaidCardAfterAdvance: Attempting to navigate to dashboard");
+      // Force navigation to dashboard
+      setShowDashboard(true);
+      setOnboardingCompleted(true);
+      
+      // Reset the flag
+      setNavigateToDashboard(false);
+      
+      // Call the onComplete callback
+      if (onComplete) {
+        console.log("PrepaidCardAfterAdvance: Calling onComplete callback");
+        onComplete();
+      }
+    }
+  }, [navigateToDashboard, setShowDashboard, setOnboardingCompleted, onComplete]);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,22 +94,20 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
       setSelectedAdvanceTier('100%');
     }
     
-    // Directly navigate to dashboard immediately rather than in timeout
+    // First attempt to navigate directly
     setShowDashboard(true);
     setOnboardingCompleted(true);
     
-    // Simulate processing but don't delay navigation
-    setTimeout(() => {
-      setIsProcessing(false);
-      toast.success("Prepaid card confirmed", {
-        description: `Your ${advancePercentage}% advance will be sent to your ${selectedCardType} prepaid card. Details will be sent to ${email}`,
-      });
-      
-      // Call the onComplete function from props if provided
-      if (onComplete) {
-        onComplete();
-      }
-    }, 500);
+    // Set flag to trigger the useEffect for a second attempt at navigation
+    setNavigateToDashboard(true);
+    
+    // Show success toast but don't delay navigation
+    toast.success("Prepaid card confirmed", {
+      description: `Your ${advancePercentage}% advance will be sent to your ${selectedCardType} prepaid card. Details will be sent to ${email}`,
+    });
+    
+    console.log("handleConfirm: Navigation attempts completed, dashboard should show");
+    setIsProcessing(false);
   };
 
   return (

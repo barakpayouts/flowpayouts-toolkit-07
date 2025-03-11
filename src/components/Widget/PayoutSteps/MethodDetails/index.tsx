@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 import BankTransferDetails from './BankTransferDetails';
 import CryptocurrencyDetails from './CryptocurrencyDetails';
@@ -22,8 +22,14 @@ const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
     earlyAccessActivated, 
     selectedAdvanceTier, 
     setShowDashboard, 
-    setOnboardingCompleted 
+    setOnboardingCompleted,
+    showDashboard 
   } = usePayoutWidget();
+  
+  // Log when the component renders and the showDashboard state
+  useEffect(() => {
+    console.log("MethodDetails rendered, showDashboard:", showDashboard);
+  }, [showDashboard]);
   
   // Parse the advance percentage to a number
   const getAdvancePercentage = (tier: string | null): number => {
@@ -40,11 +46,17 @@ const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
     return 3;
   };
   
-  // This function ensures direct navigation to the dashboard
+  // This function forces navigation to the dashboard with multiple approaches
   const handleCompleteProcess = () => {
     console.log("MethodDetails: handleCompleteProcess called - navigating to dashboard");
-    // Use setTimeout with 0 delay to ensure this executes after current render cycle
+    
+    // Direct approach - immediately set the state
+    setShowDashboard(true);
+    setOnboardingCompleted(true);
+    
+    // Backup approach - set state again in the next tick
     setTimeout(() => {
+      console.log("MethodDetails: Inside timeout - setting dashboard state again");
       setShowDashboard(true);
       setOnboardingCompleted(true);
     }, 0);

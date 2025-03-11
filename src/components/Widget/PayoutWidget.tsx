@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { PayoutWidgetProvider } from '@/contexts/PayoutWidgetContext';
 import ProfileInfo from './ProfileInfo';
@@ -34,6 +34,15 @@ const PayoutWidget: React.FC = () => {
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<string | null>(null);
   const [earlyAccessActivated, setEarlyAccessActivated] = useState(false);
   const [prepaidCardEmail, setPrepaidCardEmail] = useState('');
+
+  useEffect(() => {
+    console.log("PayoutWidget state updated:", { 
+      showDashboard, 
+      onboardingCompleted, 
+      selectedMethod,
+      prepaidCardEmail
+    });
+  }, [showDashboard, onboardingCompleted, selectedMethod, prepaidCardEmail]);
 
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
@@ -125,6 +134,7 @@ const PayoutWidget: React.FC = () => {
     }
     
     if (showDashboard) {
+      console.log("PayoutWidget: Rendering Dashboard component");
       return <Dashboard onBack={() => setShowDashboard(false)} />;
     }
     

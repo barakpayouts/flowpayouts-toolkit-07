@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 
@@ -9,14 +9,19 @@ const CurrentMethodCard: React.FC = () => {
     selectedDetailOption, 
     handleChangePayoutMethod, 
     selectedAdvanceTier,
-    prepaidCardEmail
+    prepaidCardEmail,
+    showDashboard
   } = usePayoutWidget();
   
-  console.log("CurrentMethodCard rendering with:", {
-    selectedMethod,
-    selectedAdvanceTier,
-    prepaidCardEmail
-  });
+  // Log component render and current state
+  useEffect(() => {
+    console.log("CurrentMethodCard mounted with data:", {
+      showDashboard,
+      selectedMethod,
+      selectedAdvanceTier,
+      prepaidCardEmail
+    });
+  }, [showDashboard, selectedMethod, selectedAdvanceTier, prepaidCardEmail]);
   
   const getDisplayMethod = () => {
     if (selectedMethod === 'Advanced Payment' && selectedAdvanceTier) {
