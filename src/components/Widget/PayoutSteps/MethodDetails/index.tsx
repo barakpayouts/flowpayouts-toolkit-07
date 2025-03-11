@@ -16,7 +16,14 @@ interface MethodDetailsProps {
 }
 
 const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
-  const { selectedMethod, advancedPaymentStage, earlyAccessActivated, selectedAdvanceTier, setShowDashboard, setOnboardingCompleted } = usePayoutWidget();
+  const { 
+    selectedMethod, 
+    advancedPaymentStage, 
+    earlyAccessActivated, 
+    selectedAdvanceTier, 
+    setShowDashboard, 
+    setOnboardingCompleted 
+  } = usePayoutWidget();
   
   // Parse the advance percentage to a number
   const getAdvancePercentage = (tier: string | null): number => {

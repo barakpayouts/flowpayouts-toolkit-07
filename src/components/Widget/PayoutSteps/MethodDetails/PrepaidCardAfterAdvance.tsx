@@ -25,7 +25,7 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
   onComplete,
 }) => {
   const { config } = useWidgetConfig();
-  const { setPrepaidCardEmail } = usePayoutWidget();
+  const { setPrepaidCardEmail, setSelectedAdvanceTier } = usePayoutWidget();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedCardType, setSelectedCardType] = useState<CardType>('Visa');
   const [email, setEmail] = useState('');
@@ -56,6 +56,15 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
     
     // Save the email to context
     setPrepaidCardEmail(email);
+    
+    // Make sure the tier is set
+    if (advancePercentage === 70) {
+      setSelectedAdvanceTier('70%');
+    } else if (advancePercentage === 85) {
+      setSelectedAdvanceTier('85%');
+    } else if (advancePercentage === 100) {
+      setSelectedAdvanceTier('100%');
+    }
     
     // Simulate processing
     setTimeout(() => {
