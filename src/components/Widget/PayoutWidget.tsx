@@ -15,6 +15,12 @@ import AdvancedPayment from './PayoutMethods/AdvancedPayment';
 import EarlyAccess from './PayoutMethods/EarlyAccess';
 import AdvancedPaymentDetails from './PayoutSteps/MethodDetails/AdvancedPaymentDetails';
 import EarlyAccessDetails from './PayoutSteps/MethodDetails/EarlyAccessDetails';
+import BankTransferDetails from './PayoutSteps/MethodDetails/BankTransferDetails';
+import CryptocurrencyDetails from './PayoutSteps/MethodDetails/CryptocurrencyDetails';
+import DigitalWalletDetails from './PayoutSteps/MethodDetails/DigitalWalletDetails';
+import CardPaymentDetails from './PayoutSteps/MethodDetails/CardPaymentDetails';
+import PrepaidCardDetails from './PayoutSteps/MethodDetails/PrepaidCardDetails';
+import GiftCardDetails from './PayoutSteps/MethodDetails/GiftCardDetails';
 import { Check, ChevronRight, ArrowLeft, Radio, DollarSign, Clock, FileText, Calendar, CreditCard, RefreshCw, LogOut, Upload } from 'lucide-react';
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -24,13 +30,16 @@ const PayoutWidget: React.FC = () => {
   const { config } = useWidgetConfig();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState<number>(0);
+  const [bankVerificationRequired, setBankVerificationRequired] = useState(false);
 
   const handleSelectPayoutMethod = (method: string) => {
     setSelectedMethod(method);
+    // Set bank verification as required only if Bank Transfer is selected
+    setBankVerificationRequired(method === 'Bank Transfer');
   };
   
   const handleNext = () => {
-    if (activeStep < config.steps.length - 1) {
+    if (activeStep < getSteps().length - 1) {
       setActiveStep(activeStep + 1);
     } else {
       toast.success("All steps completed!", {
@@ -44,40 +53,68 @@ const PayoutWidget: React.FC = () => {
       setActiveStep(activeStep - 1);
     }
   };
+  
+  // Get dynamic steps based on selected payout method
+  const getSteps = () => {
+    // Start with basic steps
+    const steps = [...config.steps];
+    
+    // Ensure 'payout' step is always included
+    if (!steps.includes('payout')) {
+      steps.push('payout');
+    }
+    
+    // Add bank verification step after payout step if Bank Transfer was selected
+    if (bankVerificationRequired && selectedMethod) {
+      // Find index of payout step
+      const payoutIndex = steps.indexOf('payout');
+      
+      // If payout step exists and bank verification isn't already in the steps
+      if (payoutIndex !== -1 && !steps.includes('bank')) {
+        // Insert bank verification after payout
+        steps.splice(payoutIndex + 1, 0, 'bank');
+      }
+    }
+    
+    return steps;
+  };
 
   const renderStepContent = () => {
-    if (config.steps.length === 0) {
+    const steps = getSteps();
+    
+    if (steps.length === 0) {
       return renderPayoutMethods();
     }
 
-    const isLastStep = activeStep === config.steps.length - 1;
+    const currentStep = steps[activeStep];
+    const isLastStep = activeStep === steps.length - 1;
     
-    switch (activeStep) {
-      case 0:
+    switch (currentStep) {
+      case 'profile':
         return <ProfileInfo 
           onNext={handleNext} 
           onBack={handleBack} 
           isLastStep={isLastStep} 
         />;
-      case 1:
+      case 'bank':
         return <BankVerification 
           onNext={handleNext} 
           onBack={handleBack} 
           isLastStep={isLastStep} 
         />;
-      case 2:
+      case 'tax':
         return <TaxForm 
           onNext={handleNext} 
           onBack={handleBack} 
           isLastStep={isLastStep} 
         />;
-      case 3:
+      case 'kyc':
         return <KYCVerification 
           onNext={handleNext} 
           onBack={handleBack} 
           isLastStep={isLastStep} 
         />;
-      case 4:
+      case 'payout':
         return renderPayoutMethods();
       default:
         return null;
@@ -107,6 +144,24 @@ const PayoutWidget: React.FC = () => {
             </div>
           ))}
         </div>
+        
+        {selectedMethod && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-3">Method Details</h3>
+            {renderPayoutMethodDetails()}
+            
+            <button 
+              onClick={handleNext}
+              className="w-full mt-4 p-3 rounded-lg font-medium transition-all"
+              style={{
+                backgroundColor: config.accentColor,
+                color: config.primaryColor,
+              }}
+            >
+              Continue with {selectedMethod}
+            </button>
+          </div>
+        )}
       </div>
     );
   };
@@ -114,11 +169,17 @@ const PayoutWidget: React.FC = () => {
   const renderPayoutMethodDetails = () => {
     switch (selectedMethod) {
       case 'Bank Transfer':
-        return <p>Bank Transfer Details</p>;
+        return <BankTransferDetails />;
       case 'Cryptocurrency':
-        return <p>Cryptocurrency Details</p>;
+        return <CryptocurrencyDetails />;
       case 'Digital Wallet':
-        return <p>Digital Wallet Details</p>;
+        return <DigitalWalletDetails />;
+      case 'Card Payment':
+        return <CardPaymentDetails />;
+      case 'Prepaid Card':
+        return <PrepaidCardDetails />;
+      case 'Gift Card':
+        return <GiftCardDetails />;
       case 'Advanced Payment':
         return <AdvancedPaymentDetails paymentAmount={1000} />;
       case 'Early Access':
@@ -128,7 +189,8 @@ const PayoutWidget: React.FC = () => {
     }
   };
 
-  const currentStep = config.steps.length > 0 ? config.steps[activeStep] : 'payout';
+  const steps = getSteps();
+  const currentStep = steps.length > 0 ? steps[activeStep] : 'payout';
   
   const renderHeader = () => {
     return (
@@ -145,19 +207,19 @@ const PayoutWidget: React.FC = () => {
             </span>
           )}
           
-          {config.steps.length > 0 && config.steps.includes('profile') && (
+          {steps.length > 0 && steps.includes('profile') && (
             <span className="widget-header-pill">Profile</span>
           )}
           
-          {config.steps.length > 0 && config.steps.includes('kyc') && (
+          {steps.length > 0 && steps.includes('kyc') && (
             <span className="widget-header-pill">KYC</span>
           )}
           
-          {config.steps.length > 0 && config.steps.includes('bank') && (
+          {steps.length > 0 && steps.includes('bank') && (
             <span className="widget-header-pill">Bank</span>
           )}
           
-          {config.steps.length > 0 && config.steps.includes('tax') && (
+          {steps.length > 0 && steps.includes('tax') && (
             <span className="widget-header-pill">Tax</span>
           )}
           
@@ -168,11 +230,11 @@ const PayoutWidget: React.FC = () => {
   };
   
   const renderStepCircles = () => {
-    if (config.steps.length === 0) return null;
+    if (steps.length === 0) return null;
     
     return (
       <div className="step-circles">
-        {config.steps.map((_, index) => (
+        {steps.map((step, index) => (
           <div
             key={index}
             className={cn(
@@ -193,7 +255,7 @@ const PayoutWidget: React.FC = () => {
   };
   
   const renderFooter = () => {
-    if (config.steps.length === 0) return null;
+    if (steps.length === 0) return null;
     
     return (
       <div className="widget-footer">
@@ -207,12 +269,14 @@ const PayoutWidget: React.FC = () => {
         </button>
         
         <div className="text-xs opacity-60">
-          Step {activeStep + 1} of {config.steps.length}
+          Step {activeStep + 1} of {steps.length}
         </div>
         
         <button 
           onClick={handleNext} 
           className="primary-button"
+          // Disable next button on payout method step if no method is selected
+          disabled={currentStep === 'payout' && !selectedMethod}
         >
           Next
         </button>
@@ -228,13 +292,6 @@ const PayoutWidget: React.FC = () => {
       
       <div className="widget-content">
         {renderStepContent()}
-
-        {selectedMethod && (
-          <div className="mt-4">
-            <h2 className="text-xl font-semibold mb-4">Method Details</h2>
-            {renderPayoutMethodDetails()}
-          </div>
-        )}
       </div>
       
       {renderFooter()}
