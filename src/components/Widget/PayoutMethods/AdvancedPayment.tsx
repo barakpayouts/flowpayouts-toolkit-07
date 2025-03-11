@@ -2,7 +2,7 @@
 import React from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { PayoutMethodProps } from '@/hooks/use-widget-config';
-import { Rocket, Clock, Shield, ChevronRight } from 'lucide-react';
+import { Rocket, Clock, Shield, ChevronRight, FileText, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const AdvancedPayment: React.FC<PayoutMethodProps> = ({ onSelect, isSelected }) => {
@@ -17,15 +17,26 @@ const AdvancedPayment: React.FC<PayoutMethodProps> = ({ onSelect, isSelected }) 
     <div
       onClick={onSelect}
       className={cn(
-        "payout-method-card",
+        "payout-method-card relative overflow-hidden",
         "flex items-start gap-4 group transition-all",
-        isSelected && "selected"
+        isSelected && "selected",
+        "border-2 border-white/20" // Add thicker border to make it stand out
       )}
+      style={{
+        background: isSelected 
+          ? `linear-gradient(135deg, ${config.accentColor}30, ${config.accentColor}50)` 
+          : `linear-gradient(135deg, ${config.accentColor}10, ${config.accentColor}30)`
+      }}
     >
+      {/* Premium badge */}
+      <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-amber-300 text-black text-xs font-bold py-1 px-3 transform rotate-45 translate-x-[30%] translate-y-[-30%]">
+        PREMIUM
+      </div>
+
       <div
         className="method-icon"
         style={{
-          background: `linear-gradient(135deg, ${config.accentColor}20, ${config.accentColor}40)`,
+          background: `linear-gradient(135deg, ${config.accentColor}30, ${config.accentColor}50)`,
         }}
       >
         <Rocket
@@ -41,7 +52,7 @@ const AdvancedPayment: React.FC<PayoutMethodProps> = ({ onSelect, isSelected }) 
 
       <div className="flex-1">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-medium">Advanced Payment</h3>
+          <h3 className="font-medium text-lg">Advanced Payment</h3>
           <ChevronRight 
             size={16} 
             className={cn(
@@ -55,7 +66,15 @@ const AdvancedPayment: React.FC<PayoutMethodProps> = ({ onSelect, isSelected }) 
           Get up to {maxPercentage}% of your funds instantly
         </p>
 
-        <div className="grid grid-cols-3 gap-2 text-xs">
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="flex items-center gap-1 text-white/60">
+            <FileText size={12} />
+            <span>Invoice Factoring</span>
+          </div>
+          <div className="flex items-center gap-1 text-white/60">
+            <Wallet size={12} />
+            <span>Direct Advances</span>
+          </div>
           <div className="flex items-center gap-1 text-white/60">
             <Clock size={12} />
             <span>Instant Access</span>

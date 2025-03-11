@@ -10,7 +10,8 @@ const CurrentMethodCard: React.FC = () => {
     handleChangePayoutMethod, 
     selectedAdvanceTier,
     prepaidCardEmail,
-    showDashboard
+    showDashboard,
+    advanceType
   } = usePayoutWidget();
   
   // Log component render and current state
@@ -19,17 +20,16 @@ const CurrentMethodCard: React.FC = () => {
       showDashboard,
       selectedMethod,
       selectedAdvanceTier,
-      prepaidCardEmail
+      prepaidCardEmail,
+      advanceType
     });
-  }, [showDashboard, selectedMethod, selectedAdvanceTier, prepaidCardEmail]);
+  }, [showDashboard, selectedMethod, selectedAdvanceTier, prepaidCardEmail, advanceType]);
   
   const getDisplayMethod = () => {
     if (selectedMethod === 'Advanced Payment' && selectedAdvanceTier) {
       const cardType = prepaidCardEmail ? ' - Visa Prepaid' : '';
-      return `Advanced Payment (${selectedAdvanceTier})${cardType}`;
-    } else if (selectedMethod === 'Early Access') {
-      const cardType = prepaidCardEmail ? ' - Mastercard Prepaid' : '';
-      return `Early Access${cardType}`;
+      const advanceTypeDisplay = advanceType === 'invoice' ? 'Invoice Factoring' : 'Direct Advance';
+      return `Advanced Payment (${selectedAdvanceTier}, ${advanceTypeDisplay})${cardType}`;
     } else {
       return `${selectedMethod || ""}${selectedDetailOption ? ` (${selectedDetailOption})` : ''}`;
     }

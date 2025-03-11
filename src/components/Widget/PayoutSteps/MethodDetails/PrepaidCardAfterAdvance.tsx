@@ -11,6 +11,7 @@ interface PrepaidCardAfterAdvanceProps {
   paymentAmount: number;
   advancePercentage: number;
   feePercentage: number;
+  advanceType?: 'invoice' | 'direct';
   onBack: () => void;
   onComplete?: () => void;
 }
@@ -21,6 +22,7 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
   paymentAmount,
   advancePercentage,
   feePercentage,
+  advanceType = 'direct',
   onBack,
   onComplete,
 }) => {
@@ -28,6 +30,7 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
   const { 
     setPrepaidCardEmail, 
     setSelectedAdvanceTier, 
+    setAdvanceType,
     setShowDashboard, 
     setOnboardingCompleted,
     showDashboard
@@ -84,6 +87,9 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
     // Save the email to context
     setPrepaidCardEmail(email);
     
+    // Save the advance type
+    setAdvanceType(advanceType);
+    
     // Make sure the tier is set based on percentage
     console.log("Setting advance tier with percentage:", advancePercentage);
     if (advancePercentage === 70) {
@@ -102,8 +108,9 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
     setNavigateToDashboard(true);
     
     // Show success toast but don't delay navigation
+    const advanceTypeLabel = advanceType === 'invoice' ? 'invoice factoring' : 'direct advance';
     toast.success("Prepaid card confirmed", {
-      description: `Your ${advancePercentage}% advance will be sent to your ${selectedCardType} prepaid card. Details will be sent to ${email}`,
+      description: `Your ${advancePercentage}% ${advanceTypeLabel} will be sent to your ${selectedCardType} prepaid card. Details will be sent to ${email}`,
     });
     
     console.log("handleConfirm: Navigation attempts completed, dashboard should show");
@@ -125,6 +132,11 @@ const PrepaidCardAfterAdvance: React.FC<PrepaidCardAfterAdvanceProps> = ({
       
       <div className="bg-white/5 p-4 rounded-lg border border-white/10">
         <h3 className="text-lg font-medium mb-2">Advanced Payment Summary</h3>
+        <p className="text-sm text-white/70 mb-3">
+          {advanceType === 'invoice' 
+            ? 'Invoice Factoring: We purchase your outstanding invoice at a discount' 
+            : 'Direct Advance: Advance on your upcoming payouts'}
+        </p>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-white/60">Selected Advance</p>

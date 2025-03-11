@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 
@@ -5,6 +6,7 @@ export type PayoutMethod = 'Bank Transfer' | 'Cryptocurrency' | 'Digital Wallet'
 export type DetailOption = 'PayPal' | 'Venmo' | 'Payoneer' | 'Visa Prepaid' | 'Mastercard Prepaid' | 'Amazon' | 'Walmart' | 'Target' | null;
 export type PayoutStatus = 'Completed' | 'Pending' | 'Awaiting Approval';
 export type AdvanceTier = '70%' | '85%' | '100%' | null;
+export type AdvanceType = 'invoice' | 'direct' | null;
 
 export interface PayoutRecord {
   id: string;
@@ -50,6 +52,8 @@ interface PayoutWidgetContextType {
   setAdvancedPaymentStage: (stage: boolean) => void;
   selectedAdvanceTier: AdvanceTier;
   setSelectedAdvanceTier: (tier: AdvanceTier) => void;
+  advanceType: AdvanceType;
+  setAdvanceType: (type: AdvanceType) => void;
   earlyAccessActivated: boolean;
   setEarlyAccessActivated: (activated: boolean) => void;
   steps: string[];
@@ -110,7 +114,9 @@ export const PayoutWidgetProvider: React.FC<{
     handleLogin?: () => void,
     handleStartOnboarding?: () => void,
     prepaidCardEmail?: string,
-    setPrepaidCardEmail?: (email: string) => void
+    setPrepaidCardEmail?: (email: string) => void,
+    advanceType?: AdvanceType,
+    setAdvanceType?: (type: AdvanceType) => void
   } 
 }> = ({ children, value }) => {
   const steps = ['profile', 'payout', 'details', 'bank', 'tax'];
@@ -128,6 +134,7 @@ export const PayoutWidgetProvider: React.FC<{
   
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(value?.advancedPaymentStage || false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<AdvanceTier>(value?.selectedAdvanceTier as AdvanceTier || null);
+  const [advanceType, setAdvanceType] = useState<AdvanceType>(value?.advanceType || null);
   const [earlyAccessActivated, setEarlyAccessActivated] = useState(value?.earlyAccessActivated || false);
   
   const [isInvoiceUploadOpen, setIsInvoiceUploadOpen] = useState(false);
@@ -167,6 +174,10 @@ export const PayoutWidgetProvider: React.FC<{
     if (value?.prepaidCardEmail !== undefined) {
       setPrepaidCardEmail(value.prepaidCardEmail);
     }
+    
+    if (value?.advanceType !== undefined) {
+      setAdvanceType(value.advanceType);
+    }
   }, [
     value?.selectedMethod, 
     value?.showDashboard, 
@@ -175,7 +186,8 @@ export const PayoutWidgetProvider: React.FC<{
     value?.advancedPaymentStage,
     value?.selectedAdvanceTier,
     value?.earlyAccessActivated,
-    value?.prepaidCardEmail
+    value?.prepaidCardEmail,
+    value?.advanceType
   ]);
 
   const payouts = [
@@ -439,6 +451,8 @@ export const PayoutWidgetProvider: React.FC<{
     setAdvancedPaymentStage,
     selectedAdvanceTier,
     setSelectedAdvanceTier,
+    advanceType,
+    setAdvanceType,
     earlyAccessActivated,
     setEarlyAccessActivated,
     steps,
@@ -474,3 +488,4 @@ export const PayoutWidgetProvider: React.FC<{
     </PayoutWidgetContext.Provider>
   );
 };
+

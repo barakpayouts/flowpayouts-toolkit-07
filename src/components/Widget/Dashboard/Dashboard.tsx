@@ -10,12 +10,15 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
-  const { handleBackStep, showDashboard } = usePayoutWidget();
+  const { handleBackStep, showDashboard, advanceType } = usePayoutWidget();
   
   // Log when Dashboard renders to confirm it's being shown
   useEffect(() => {
     console.log("Dashboard component mounted, showDashboard:", showDashboard);
-  }, [showDashboard]);
+    if (advanceType) {
+      console.log("Advance type:", advanceType);
+    }
+  }, [showDashboard, advanceType]);
   
   return (
     <div className="dashboard-container">

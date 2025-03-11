@@ -8,7 +8,6 @@ import CardPaymentDetails from './CardPaymentDetails';
 import PrepaidCardDetails from './PrepaidCardDetails';
 import GiftCardDetails from './GiftCardDetails';
 import AdvancedPaymentDetails from './AdvancedPaymentDetails';
-import EarlyAccessDetails from './EarlyAccessDetails';
 import PrepaidCardAfterAdvance from './PrepaidCardAfterAdvance';
 
 interface MethodDetailsProps {
@@ -19,17 +18,20 @@ const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
   const { 
     selectedMethod, 
     advancedPaymentStage, 
-    earlyAccessActivated, 
     selectedAdvanceTier, 
     setShowDashboard, 
     setOnboardingCompleted,
+    advanceType,
     showDashboard 
   } = usePayoutWidget();
   
   // Log when the component renders and the showDashboard state
   useEffect(() => {
     console.log("MethodDetails rendered, showDashboard:", showDashboard);
-  }, [showDashboard]);
+    if (advanceType) {
+      console.log("Advance type:", advanceType);
+    }
+  }, [showDashboard, advanceType]);
   
   // Parse the advance percentage to a number
   const getAdvancePercentage = (tier: string | null): number => {
@@ -69,17 +71,7 @@ const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
       paymentAmount={1000}
       advancePercentage={getAdvancePercentage(selectedAdvanceTier)}
       feePercentage={getFeePercentage(selectedAdvanceTier)}
-      onComplete={handleCompleteProcess}
-    />;
-  }
-  
-  // For Early Access with prepaid card selection stage
-  if (earlyAccessActivated && selectedMethod === 'Early Access') {
-    return <PrepaidCardAfterAdvance 
-      onBack={onBack}
-      paymentAmount={1500}
-      advancePercentage={100}
-      feePercentage={3}
+      advanceType={advanceType || 'direct'}
       onComplete={handleCompleteProcess}
     />;
   }
@@ -100,8 +92,6 @@ const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
       return <GiftCardDetails onBack={onBack} />;
     case 'Advanced Payment':
       return <AdvancedPaymentDetails paymentAmount={1000} onBack={onBack} />;
-    case 'Early Access':
-      return <EarlyAccessDetails paymentAmount={1500} onBack={onBack} />;
     default:
       return (
         <div className="p-4 rounded-lg bg-white/10 border border-white/20">
