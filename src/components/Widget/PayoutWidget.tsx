@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { PayoutWidgetProvider } from '@/contexts/PayoutWidgetContext';
@@ -30,9 +29,7 @@ const PayoutWidget: React.FC = () => {
     setSelectedMethod(method);
     setRequiresBankVerification(method === 'Bank Transfer');
     
-    if (method) {
-      setShowMethodDetails(true);
-    }
+    setShowMethodDetails(true);
   };
   
   const handleNext = () => {

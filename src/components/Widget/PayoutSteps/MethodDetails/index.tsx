@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { usePayoutWidget, PayoutMethod } from '@/contexts/PayoutWidgetContext';
+import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 import BankTransferDetails from './BankTransferDetails';
 import CryptocurrencyDetails from './CryptocurrencyDetails';
 import DigitalWalletDetails from './DigitalWalletDetails';
