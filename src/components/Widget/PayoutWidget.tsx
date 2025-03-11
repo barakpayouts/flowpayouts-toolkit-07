@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
+import { PayoutWidgetProvider } from '@/contexts/PayoutWidgetContext';
 import ProfileInfo from './ProfileInfo';
 import BankVerification from './BankVerification';
 import TaxForm from './TaxForm';
@@ -255,17 +257,19 @@ const PayoutWidget: React.FC = () => {
   };
 
   return (
-    <div className="widget-frame">
-      {renderHeader()}
-      
-      {renderStepCircles()}
-      
-      <div className="widget-content">
-        {renderStepContent()}
+    <PayoutWidgetProvider>
+      <div className="widget-frame">
+        {renderHeader()}
+        
+        {renderStepCircles()}
+        
+        <div className="widget-content">
+          {renderStepContent()}
+        </div>
+        
+        {renderFooter()}
       </div>
-      
-      {renderFooter()}
-    </div>
+    </PayoutWidgetProvider>
   );
 };
 

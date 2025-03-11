@@ -1,7 +1,8 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 
-export type PayoutMethod = 'Bank Transfer' | 'Cryptocurrency' | 'Digital Wallet' | 'Card Payment' | 'Prepaid Card' | 'Gift Card' | null;
+export type PayoutMethod = 'Bank Transfer' | 'Cryptocurrency' | 'Digital Wallet' | 'Card Payment' | 'Prepaid Card' | 'Gift Card' | 'Advanced Payment' | 'Early Access' | null;
 export type DetailOption = 'PayPal' | 'Venmo' | 'Visa Prepaid' | 'Amazon' | 'Walmart' | 'Target' | null;
 export type PayoutStatus = 'Completed' | 'Pending' | 'Awaiting Approval';
 
