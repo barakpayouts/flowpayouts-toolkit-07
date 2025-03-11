@@ -66,6 +66,21 @@ const DigitalWalletDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
           </div>
         </div>
+
+        <div 
+          className={`wallet-option p-4 rounded-lg ${selectedOption === 'Payoneer' ? 'bg-white/10 border-2 border-' + config.accentColor + '60' : 'bg-white/5 border border-white/10'} hover:bg-white/10 transition-colors cursor-pointer`}
+          onClick={() => handleSelectOption('Payoneer')}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">Payoneer</h3>
+              <p className="text-sm opacity-70">Global payment platform for freelancers and businesses</p>
+            </div>
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${selectedOption === 'Payoneer' ? 'bg-' + config.accentColor : 'bg-white/10'}`}>
+              {selectedOption === 'Payoneer' && <Check size={14} className="text-black" />}
+            </div>
+          </div>
+        </div>
       </div>
       
       <p className="text-xs opacity-70 mt-6 text-center">
