@@ -1,8 +1,7 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 
-export type PayoutMethod = 'Bank Transfer' | 'Cryptocurrency' | 'Digital Wallet' | 'Card Payment' | 'Prepaid Card' | 'Gift Card' | 'Advanced Payment' | 'Early Access' | null;
+export type PayoutMethod = 'Bank Transfer' | 'Cryptocurrency' | 'Digital Wallet' | 'Card Payment' | 'Prepaid Card' | 'Gift Card' | 'Advanced Payment' | null;
 export type DetailOption = 'PayPal' | 'Venmo' | 'Payoneer' | 'Visa Prepaid' | 'Mastercard Prepaid' | 'Amazon' | 'Walmart' | 'Target' | null;
 export type PayoutStatus = 'Completed' | 'Pending' | 'Awaiting Approval';
 export type AdvanceTier = '70%' | '85%' | '100%' | null;
@@ -54,8 +53,6 @@ interface PayoutWidgetContextType {
   setSelectedAdvanceTier: (tier: AdvanceTier) => void;
   advanceType: AdvanceType;
   setAdvanceType: (type: AdvanceType) => void;
-  earlyAccessActivated: boolean;
-  setEarlyAccessActivated: (activated: boolean) => void;
   steps: string[];
   payouts: PayoutRecord[];
   isInvoiceUploadOpen: boolean;
@@ -109,8 +106,6 @@ export const PayoutWidgetProvider: React.FC<{
     setAdvancedPaymentStage?: (stage: boolean) => void,
     selectedAdvanceTier?: string | null,
     setSelectedAdvanceTier?: (tier: string | null) => void,
-    earlyAccessActivated?: boolean,
-    setEarlyAccessActivated?: (activated: boolean) => void,
     handleLogin?: () => void,
     handleStartOnboarding?: () => void,
     prepaidCardEmail?: string,
@@ -135,7 +130,6 @@ export const PayoutWidgetProvider: React.FC<{
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(value?.advancedPaymentStage || false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<AdvanceTier>(value?.selectedAdvanceTier as AdvanceTier || null);
   const [advanceType, setAdvanceType] = useState<AdvanceType>(value?.advanceType || null);
-  const [earlyAccessActivated, setEarlyAccessActivated] = useState(value?.earlyAccessActivated || false);
   
   const [isInvoiceUploadOpen, setIsInvoiceUploadOpen] = useState(false);
   const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false);
@@ -167,10 +161,6 @@ export const PayoutWidgetProvider: React.FC<{
       setSelectedAdvanceTier(value.selectedAdvanceTier as AdvanceTier);
     }
     
-    if (value?.earlyAccessActivated !== undefined) {
-      setEarlyAccessActivated(value.earlyAccessActivated);
-    }
-    
     if (value?.prepaidCardEmail !== undefined) {
       setPrepaidCardEmail(value.prepaidCardEmail);
     }
@@ -185,11 +175,11 @@ export const PayoutWidgetProvider: React.FC<{
     value?.isLoggedIn,
     value?.advancedPaymentStage,
     value?.selectedAdvanceTier,
-    value?.earlyAccessActivated,
     value?.prepaidCardEmail,
     value?.advanceType
   ]);
 
+  // Update the payouts array to remove Early Access entries
   const payouts = [
     { 
       id: 'p1', 
@@ -244,16 +234,7 @@ export const PayoutWidgetProvider: React.FC<{
       method: 'Advanced Payment (70%) - Visa Prepaid',
       invoice: 'INV-2023-10-01',
       description: 'September commission advance'
-    },
-    { 
-      id: 'p7', 
-      amount: '$1,200.00', 
-      date: 'Oct 20, 2023', 
-      status: 'Pending' as PayoutStatus, 
-      method: 'Early Access - Mastercard Prepaid',
-      invoice: 'INV-2023-10-02',
-      description: 'October early payment'
-    },
+    }
   ];
 
   const handleNextStep = () => {
@@ -310,11 +291,6 @@ export const PayoutWidgetProvider: React.FC<{
     
     if (advancedPaymentStage) {
       setAdvancedPaymentStage(false);
-      return;
-    }
-    
-    if (earlyAccessActivated) {
-      setEarlyAccessActivated(false);
       return;
     }
     
@@ -453,8 +429,6 @@ export const PayoutWidgetProvider: React.FC<{
     setSelectedAdvanceTier,
     advanceType,
     setAdvanceType,
-    earlyAccessActivated,
-    setEarlyAccessActivated,
     steps,
     payouts,
     isInvoiceUploadOpen,
@@ -488,4 +462,3 @@ export const PayoutWidgetProvider: React.FC<{
     </PayoutWidgetContext.Provider>
   );
 };
-

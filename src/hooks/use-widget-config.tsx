@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
 export type VerificationStep = 'profile' | 'bank' | 'tax' | 'kyc' | 'payout';
-export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 'gift' | 'advanced' | 'early';
+export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 'gift' | 'advanced';
 export type ButtonStyle = 'rounded' | 'square' | 'pill';
 export type BankVerificationMethod = 'plaid' | 'statement' | 'microdeposit';
 export type TaxFormType = 'w9' | 'w8';
@@ -81,7 +81,7 @@ const defaultConfig: WidgetConfig = {
   // Correct order: profile, kyc, payout, then tax at the end
   // Bank verification is not included by default and will be added dynamically when needed
   steps: ['profile', 'kyc', 'payout', 'tax'],
-  payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift', 'advanced', 'early'],
+  payoutMethods: ['bank', 'crypto', 'digital', 'card', 'prepaid', 'gift', 'advanced'],
   showProgressBar: true,
   showStepNumbers: true,
   primaryColor: DEFAULT_PRIMARY_COLOR,

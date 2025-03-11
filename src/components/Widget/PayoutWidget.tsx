@@ -12,7 +12,6 @@ import PushToCard from './PayoutMethods/PushToCard';
 import PrepaidCard from './PayoutMethods/PrepaidCard';
 import GiftCard from './PayoutMethods/GiftCard';
 import AdvancedPayment from './PayoutMethods/AdvancedPayment';
-import EarlyAccess from './PayoutMethods/EarlyAccess';
 import MethodDetails from './PayoutSteps/MethodDetails';
 import Dashboard from './Dashboard/Dashboard';
 import LoginScreen from './LoginScreen';
@@ -32,7 +31,6 @@ const PayoutWidget: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<string | null>(null);
-  const [earlyAccessActivated, setEarlyAccessActivated] = useState(false);
   const [prepaidCardEmail, setPrepaidCardEmail] = useState('');
 
   useEffect(() => {
@@ -188,7 +186,6 @@ const PayoutWidget: React.FC = () => {
   const renderPayoutMethods = () => {
     const payoutComponents: Record<string, React.ReactNode> = {
       advanced: <AdvancedPayment onSelect={() => handleSelectPayoutMethod('Advanced Payment')} isSelected={selectedMethod === 'Advanced Payment'} />,
-      early: <EarlyAccess onSelect={() => handleSelectPayoutMethod('Early Access')} isSelected={selectedMethod === 'Early Access'} />,
       bank: <BankTransfer onSelect={() => handleSelectPayoutMethod('Bank Transfer')} isSelected={selectedMethod === 'Bank Transfer'} />,
       crypto: <Cryptocurrency onSelect={() => handleSelectPayoutMethod('Cryptocurrency')} isSelected={selectedMethod === 'Cryptocurrency'} />,
       digital: <DigitalWallet onSelect={() => handleSelectPayoutMethod('Digital Wallet')} isSelected={selectedMethod === 'Digital Wallet'} />,
@@ -333,10 +330,6 @@ const PayoutWidget: React.FC = () => {
       setAdvancedPaymentStage,
       selectedAdvanceTier,
       setSelectedAdvanceTier,
-      earlyAccessActivated,
-      setEarlyAccessActivated,
-      handleLogin,
-      handleStartOnboarding,
       prepaidCardEmail,
       setPrepaidCardEmail
     }}>
