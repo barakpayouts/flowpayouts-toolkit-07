@@ -4,6 +4,7 @@ import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import UploadInvoice from './UploadInvoice';
+import { toast } from "sonner";
 
 interface Invoice {
   id: string;
@@ -55,6 +56,20 @@ const PayoutList = () => {
   const { config } = useWidgetConfig();
   const [showUploadModal, setShowUploadModal] = useState(false);
   
+  const handleUploadSuccess = (fileName: string) => {
+    setShowUploadModal(false);
+    toast.success('Invoice Uploaded', {
+      description: `Your invoice "${fileName}" has been successfully uploaded and is awaiting review.`,
+      position: 'top-center',
+      duration: 4000,
+      style: {
+        backgroundColor: `${config.accentColor}10`,
+        border: `1px solid ${config.accentColor}40`,
+        color: config.textColor,
+      },
+    });
+  };
+  
   return (
     <div className="space-y-4">
       {/* Upload Invoice Button - Always visible */}
@@ -76,7 +91,9 @@ const PayoutList = () => {
       {/* Invoice Upload Modal */}
       {showUploadModal && (
         <UploadInvoice 
+          isOpen={showUploadModal}
           onClose={() => setShowUploadModal(false)} 
+          onSuccess={handleUploadSuccess}
         />
       )}
       
