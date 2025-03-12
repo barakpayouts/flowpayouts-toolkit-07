@@ -61,9 +61,9 @@ const NotificationsPanel: React.FC = () => {
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-black/80 backdrop-blur-md border border-white/20 rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] bg-black/80 backdrop-blur-md border border-white/20 rounded-lg shadow-lg z-50">
           <div className="p-3 border-b border-white/10 flex items-center justify-between">
-            <h3 className="font-medium">Notifications</h3>
+            <h3 className="text-sm font-medium">Notifications</h3>
             <button 
               onClick={handleMarkAllAsRead}
               className="text-xs flex items-center gap-1 text-blue-400 hover:text-blue-300"
@@ -73,7 +73,7 @@ const NotificationsPanel: React.FC = () => {
             </button>
           </div>
           
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[280px] overflow-y-auto">
             {notifications && notifications.length > 0 ? (
               <div className="divide-y divide-white/10">
                 {notifications.map((notification) => (
@@ -88,7 +88,7 @@ const NotificationsPanel: React.FC = () => {
                     <div className="flex justify-between items-start">
                       <h4 className="font-medium text-sm">{notification.title}</h4>
                       {!notification.read && (
-                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
                       )}
                     </div>
                     <p className="text-xs text-white/70 mt-1">{notification.message}</p>
@@ -103,7 +103,7 @@ const NotificationsPanel: React.FC = () => {
             )}
           </div>
           
-          <div className="p-2 border-t border-white/10 text-center">
+          <div className="p-2 border-t border-white/10">
             <button className="text-xs text-blue-400 hover:text-blue-300 w-full py-1">
               View all notifications
             </button>
