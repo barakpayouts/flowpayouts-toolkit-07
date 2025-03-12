@@ -601,33 +601,49 @@
   transform: scaleX(-1);
 }
 
-/* Dialog styling for widget - Fix dialog positioning and styling */
+/* Dialog positioning and styling for widget - Fix dialog positioning and styling */
+.widget-container .fixed,
+.widget-frame .fixed {
+  position: fixed !important;
+}
+
+/* Ensures the dialog is positioned correctly */
 .widget-container [role="dialog"],
 .widget-frame [role="dialog"] {
   position: fixed !important;
-  inset: 0 !important;
   z-index: 999 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.widget-container [role="dialog"] .fixed.inset-0,
-.widget-frame [role="dialog"] .fixed.inset-0 {
+/* Ensures the backdrop shows properly */
+.widget-container [role="dialog"] [class*="Overlay"],
+.widget-frame [role="dialog"] [class*="Overlay"] {
   position: fixed !important;
+  z-index: 999 !important;
+  inset: 0 !important;
   background-color: rgba(0, 0, 0, 0.75) !important;
   backdrop-filter: blur(2px) !important;
 }
 
-.widget-container [role="dialog"] .fixed.left-\\[50\\%\\].top-\\[50\\%\\],
-.widget-frame [role="dialog"] .fixed.left-\\[50\\%\\].top-\\[50\\%\\] {
+/* Position the dialog content properly */
+.widget-container [role="dialog"] [class*="Content"],
+.widget-frame [role="dialog"] [class*="Content"] {
   position: fixed !important;
-  width: 90% !important;
-  max-width: 400px !important;
-  background-color: var(--bg-color, #143745) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
   z-index: 1000 !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  background-color: var(--bg-color, #143745) !important;
+  max-width: 90% !important;
+  width: auto !important;
+  margin: 0 !important;
+  color: var(--text-color, white) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
 }
 

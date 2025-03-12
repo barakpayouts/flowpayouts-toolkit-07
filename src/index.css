@@ -25,30 +25,4 @@
   height: 100%;
 }
 
-/* Dialog positioning within widget - fix positioning issues */
-.widget-frame [role="dialog"] {
-  position: fixed !important; /* Changed from absolute to fixed */
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 50;
-}
-
-/* Dialog overlay within widget */
-.widget-frame [role="dialog"] [data-radix-popper-content-wrapper] {
-  position: fixed !important; /* Changed from absolute to fixed */
-  left: 50% !important;
-  top: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: auto !important;
-  max-width: 90% !important;
-}
-
-/* Ensure dialog content has good contrast against dark backgrounds */
-.widget-frame [role="dialog"] [data-radix-dialog-content] {
-  background-color: var(--primary-bg, #143745) !important;
-  color: var(--text-color, white) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  z-index: 100 !important;
-}
+/* Remove any custom dialog styling from the index.css file */
