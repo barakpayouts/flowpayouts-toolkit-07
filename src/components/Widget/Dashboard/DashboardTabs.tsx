@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage, Eye, FilePlus } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -36,7 +35,8 @@ const DashboardTabs: React.FC = () => {
     isInvoiceUploadOpen,
     setIsInvoiceUploadOpen,
     isInvoiceGeneratorOpen,
-    setIsInvoiceGeneratorOpen
+    setIsInvoiceGeneratorOpen,
+    companyName
   } = usePayoutWidget();
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -685,7 +685,7 @@ const DashboardTabs: React.FC = () => {
                         "$0.00"}
                     </p>
                   </div>
-                  <div className="flex justify-between py-2">
+                  <div className="flex justify-between py-2 border-b border-white/10">
                     <p className="text-white/80">Withholding (5%)</p>
                     <p className="text-white">
                       {selectedInvoice?.amount ? 
