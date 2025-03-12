@@ -846,11 +846,11 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-.widget-dialog-content .text-white/70 {
+.widget-dialog-content .text-white\/70 {
   color: rgba(255, 255, 255, 0.7) !important;
 }
 
-.widget-dialog-content .text-white/80 {
+.widget-dialog-content .text-white\/80 {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 
@@ -872,3 +872,4 @@
 .widget-dialog-content button.bg-white\/10:hover {
   background-color: rgba(255, 255, 255, 0.2) !important;
 }
+
