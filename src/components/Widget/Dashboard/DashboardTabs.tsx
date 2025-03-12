@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage } from 'lucide-react';
+import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage, Eye } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { usePayoutWidget, PayoutRecord, InvoiceData } from '@/contexts/PayoutWidgetContext';
@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from "@/components/ui/sheet";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -38,6 +39,7 @@ const DashboardTabs: React.FC = () => {
   const [isUploading, setIsUploading] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [uploadSource, setUploadSource] = React.useState<'computer' | 'google' | null>(null);
+  const [showInvoicePreview, setShowInvoicePreview] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +104,13 @@ const DashboardTabs: React.FC = () => {
       method: payout.method
     };
     handleViewInvoice(invoice);
+  };
+
+  const handleViewInvoicePreview = () => {
+    setShowInvoicePreview(true);
+    toast.info("Opening invoice preview", {
+      description: "Loading invoice preview..."
+    });
   };
 
   return (
@@ -489,16 +498,28 @@ const DashboardTabs: React.FC = () => {
             </div>
           </div>
           
-          <DialogFooter className="sm:justify-between">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-1 text-white border-white/20 hover:bg-white/10"
-              onClick={handleDownloadInvoice}
-            >
-              <Download size={14} />
-              <span>Download PDF</span>
-            </Button>
+          <DialogFooter className="flex sm:justify-between">
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1 text-white border-white/20 hover:bg-white/10"
+                onClick={handleDownloadInvoice}
+              >
+                <Download size={14} />
+                <span>Download PDF</span>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1 text-white border-white/20 hover:bg-white/10"
+                onClick={handleViewInvoicePreview}
+              >
+                <Eye size={14} />
+                <span>View Invoice</span>
+              </Button>
+            </div>
             <DialogClose asChild>
               <Button 
                 variant="outline" 
@@ -508,6 +529,145 @@ const DashboardTabs: React.FC = () => {
                 Close
               </Button>
             </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showInvoicePreview} onOpenChange={setShowInvoicePreview}>
+        <DialogContent 
+          className="sm:max-w-3xl h-[80vh] max-h-[80vh] flex flex-col" 
+          style={{ 
+            background: "white",
+            borderColor: `${config.accentColor}20` 
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-gray-900">
+              Invoice Preview: {selectedInvoice?.invoice}
+            </DialogTitle>
+            <DialogDescription className="text-gray-500">
+              Full preview of invoice document
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-grow overflow-auto mt-2 border border-gray-200 rounded-lg">
+            <div className="p-8 min-h-full bg-white text-black">
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">INVOICE</h2>
+                  <p className="text-gray-600 text-lg">{selectedInvoice?.invoice}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-gray-500 mb-1">Date Issued</p>
+                  <p className="text-gray-900 font-medium">{selectedInvoice?.date}</p>
+                  <div className="mt-2 py-1 px-3 inline-block rounded-md" style={{
+                    backgroundColor: selectedInvoice?.status === 'Completed' 
+                      ? '#dcfce7' 
+                      : selectedInvoice?.status === 'Pending' 
+                        ? '#fef9c3' 
+                        : '#dbeafe',
+                    color: selectedInvoice?.status === 'Completed' 
+                      ? '#166534' 
+                      : selectedInvoice?.status === 'Pending' 
+                        ? '#854d0e' 
+                        : '#1e40af',
+                  }}>
+                    {selectedInvoice?.status}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-8 mb-8">
+                <div>
+                  <h3 className="text-gray-500 font-medium mb-2">From</h3>
+                  <p className="font-medium text-gray-900">Your Company Name</p>
+                  <p className="text-gray-700">123 Business Street</p>
+                  <p className="text-gray-700">City, State 12345</p>
+                  <p className="text-gray-700">contact@yourcompany.com</p>
+                </div>
+                <div>
+                  <h3 className="text-gray-500 font-medium mb-2">To</h3>
+                  <p className="font-medium text-gray-900">Client Company</p>
+                  <p className="text-gray-700">456 Client Avenue</p>
+                  <p className="text-gray-700">Client City, State 67890</p>
+                  <p className="text-gray-700">billing@clientcompany.com</p>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <h3 className="text-gray-700 font-medium mb-3">Description</h3>
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-50 text-gray-700">
+                      <tr>
+                        <th className="py-3 px-4">Item</th>
+                        <th className="py-3 px-4">Quantity</th>
+                        <th className="py-3 px-4">Rate</th>
+                        <th className="py-3 px-4 text-right">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      <tr>
+                        <td className="py-3 px-4 text-gray-900">{selectedInvoice?.description}</td>
+                        <td className="py-3 px-4 text-gray-700">1</td>
+                        <td className="py-3 px-4 text-gray-700">{selectedInvoice?.amount}</td>
+                        <td className="py-3 px-4 text-gray-900 text-right">{selectedInvoice?.amount}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <div className="w-64">
+                  <div className="flex justify-between py-2">
+                    <p className="text-gray-600">Subtotal</p>
+                    <p className="text-gray-900">{selectedInvoice?.amount}</p>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <p className="text-gray-600">Tax (0%)</p>
+                    <p className="text-gray-900">$0.00</p>
+                  </div>
+                  <div className="flex justify-between py-2 border-t border-gray-200 font-medium">
+                    <p className="text-gray-800">Total</p>
+                    <p className="text-gray-900">{selectedInvoice?.amount}</p>
+                  </div>
+                </div>
+              </div>
+
+              {selectedInvoice?.method && (
+                <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-gray-700 font-medium">Payment Method</p>
+                  <p className="text-gray-900">{selectedInvoice?.method}</p>
+                </div>
+              )}
+
+              <div className="mt-8 text-center text-gray-500 text-sm">
+                <p>Thank you for your business!</p>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="mt-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleDownloadInvoice}
+              className="gap-1"
+            >
+              <Download size={14} />
+              <span>Download PDF</span>
+            </Button>
+            <Button 
+              onClick={() => setShowInvoicePreview(false)}
+              style={{
+                backgroundColor: config.accentColor,
+                color: "black"
+              }}
+              size="sm"
+            >
+              Close Preview
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
