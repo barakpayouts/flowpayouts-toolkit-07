@@ -460,5 +460,26 @@ export const PayoutWidgetProvider: React.FC<{
     prepaidCardEmail,
     setPrepaidCardEmail,
     companyName,
-   
+    notifications,
+    setNotifications,
+    handleNextStep,
+    handleBackStep,
+    handleSelectPayoutMethod,
+    handleSelectDetailOption,
+    handleFormChange,
+    handleStartOnboarding,
+    handleLogin,
+    handleLogout,
+    handleChangePayoutMethod,
+    getStatusColor,
+    handleUploadInvoice,
+    handleViewInvoice,
+    handleDownloadInvoice
+  };
 
+  return (
+    <PayoutWidgetContext.Provider value={contextValue}>
+      {children}
+    </PayoutWidgetContext.Provider>
+  );
+};
