@@ -8,6 +8,8 @@
   transition: all 0.3s ease-in-out;
   max-width: 400px;
   margin: 0 auto;
+  position: relative;
+  overflow: hidden;
 }
 
 .progress-track {
@@ -614,6 +616,7 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
+  z-index: 50;
 }
 
 .widget-dialog-content {

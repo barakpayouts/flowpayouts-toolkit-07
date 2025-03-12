@@ -17,7 +17,7 @@
 
 /* Widget dialog styling - IMPORTANT: this makes dialogs display correctly inside the widget */
 .widget-frame .widget-dialog-content {
-  position: absolute;
+  position: absolute !important;
   max-width: 90%;
   width: 90%;
   left: 50%;
@@ -31,7 +31,7 @@
 }
 
 .widget-frame .widget-dialog-overlay {
-  position: absolute;
+  position: absolute !important;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
@@ -57,5 +57,5 @@
 
 /* Override fixed positioning for dialog components inside widget */
 .widget-frame .fixed {
-  position: absolute;
+  position: absolute !important;
 }

@@ -54,6 +54,7 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
     if (onUploadInvoice) {
       onUploadInvoice();
     } else {
+      console.log("Opening upload dialog");
       setShowUploadDialog(true);
     }
   };
@@ -161,10 +162,10 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
       
       {/* Upload Invoice Dialog */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent className="widget-dialog-content">
+        <DialogContent className="bg-payouts-dark border-white/10 text-white">
           <DialogHeader>
             <DialogTitle>Upload Invoice</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-white/70">
               Select an invoice document to upload for processing
             </DialogDescription>
           </DialogHeader>

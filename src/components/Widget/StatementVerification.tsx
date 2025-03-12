@@ -164,7 +164,10 @@ const StatementVerification: React.FC = () => {
       ) : (
         <div className="text-center">
           <Button
-            onClick={() => setUploadDialogOpen(true)}
+            onClick={() => {
+              console.log("Opening statement upload dialog");
+              setUploadDialogOpen(true);
+            }}
             className="flex items-center gap-2"
             variant="glass"
           >
@@ -197,12 +200,7 @@ const StatementVerification: React.FC = () => {
       {/* Upload Dialog */}
       <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
         <DialogContent 
-          className="sm:max-w-md widget-dialog-content" 
-          style={{ 
-            background: config.primaryColor, 
-            borderColor: `${config.accentColor}20`,
-            color: "white"
-          }}
+          className="sm:max-w-md bg-payouts-dark border-white/10 text-white"
         >
           <DialogHeader>
             <DialogTitle className="text-white">Upload Statement</DialogTitle>
@@ -241,7 +239,11 @@ const StatementVerification: React.FC = () => {
                   variant="glass"
                   size="default"
                   className="mx-auto"
-                  onClick={handleChooseFile}
+                  onClick={() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.click();
+                    }
+                  }}
                 >
                   Choose File
                 </Button>
