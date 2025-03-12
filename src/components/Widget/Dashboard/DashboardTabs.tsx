@@ -304,7 +304,7 @@ const DashboardTabs: React.FC = () => {
 
       <Dialog open={isInvoiceUploadOpen} onOpenChange={setIsInvoiceUploadOpen}>
         <DialogContent 
-          className="sm:max-w-md widget-dialog-content" 
+          className="w-[90%] max-w-[360px] widget-dialog-content" 
           style={{ 
             background: config.primaryColor, 
             borderColor: `${config.accentColor}20` 
@@ -428,7 +428,7 @@ const DashboardTabs: React.FC = () => {
 
       <Dialog open={isInvoiceDetailOpen} onOpenChange={setIsInvoiceDetailOpen}>
         <DialogContent 
-          className="sm:max-w-md widget-dialog-content" 
+          className="w-[90%] max-w-[360px] widget-dialog-content" 
           style={{ 
             background: config.primaryColor, 
             borderColor: `${config.accentColor}20` 
@@ -540,7 +540,7 @@ const DashboardTabs: React.FC = () => {
 
       <Dialog open={showInvoicePreview} onOpenChange={setShowInvoicePreview}>
         <DialogContent 
-          className="sm:max-w-3xl h-[80vh] max-h-[80vh] flex flex-col widget-dialog-content" 
+          className="w-[90%] max-w-[360px] h-[80vh] max-h-[600px] flex flex-col widget-dialog-content" 
           style={{ 
             background: config.primaryColor,
             borderColor: `${config.accentColor}20` 

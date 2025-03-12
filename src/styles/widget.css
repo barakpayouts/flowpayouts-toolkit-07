@@ -608,6 +608,28 @@
   position: fixed !important;
 }
 
+/* Ensures the dialog is positioned correctly within the widget frame */
+.widget-dialog-content {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+
+/* Make sure dialogs stay within the widget boundaries */
+.widget-container [role="dialog"],
+.widget-frame [role="dialog"] {
+  position: absolute !important;
+  overflow: hidden !important;
+}
+
+/* Adjust backdrop for widget frame */
+.widget-container [role="dialog"] [class*="Overlay"],
+.widget-frame [role="dialog"] [class*="Overlay"] {
+  position: absolute !important;
+}
+
 /* Ensures the dialog is positioned correctly */
 .widget-container [role="dialog"],
 .widget-frame [role="dialog"] {
@@ -735,4 +757,3 @@
 .file-preview-remove:hover {
   background-color: rgba(255, 0, 0, 0.2);
 }
-
