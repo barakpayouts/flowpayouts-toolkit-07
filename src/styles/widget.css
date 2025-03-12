@@ -660,31 +660,50 @@
   color: #FFFFFF !important;
 }
 
-.widget-dialog-content h2,
-.widget-dialog-content h3,
-.widget-dialog-content p,
-.widget-dialog-content label,
-.widget-dialog-content span:not([class*="text-payouts-dark"]):not([class*="text-gray"]) {
-  color: #FFFFFF !important;
-}
-
-.widget-dialog-content button:not([style*="background"]) {
+/* Invoice generator specific styles */
+.invoice-generator {
   color: #FFFFFF;
 }
 
-.invoice-details,
-.invoice-preview,
-.file-preview,
-.upload-option {
+.invoice-item {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.invoice-summary {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 0.375rem;
+  padding: 1rem;
+}
+
+.invoice-form label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.invoice-form input {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #FFFFFF;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  width: 100%;
 }
 
-.upload-option p {
-  color: #FFFFFF !important;
+.invoice-form input:focus {
+  outline: none;
+  border-color: var(--accent, #d0e92a);
+  box-shadow: 0 0 0 2px rgba(208, 233, 42, 0.2);
 }
 
-.upload-option .text-xs {
-  color: rgba(255, 255, 255, 0.7) !important;
+.invoice-form input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Fix for Upload dialog */
@@ -742,4 +761,3 @@
 .file-preview-remove:hover {
   background-color: rgba(255, 0, 0, 0.2);
 }
-

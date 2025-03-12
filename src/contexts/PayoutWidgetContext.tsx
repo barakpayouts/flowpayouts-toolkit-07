@@ -30,6 +30,25 @@ export interface InvoiceData {
   method?: string;
 }
 
+export interface InvoiceItemData {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  tax: number;
+  total: number;
+}
+
+export interface InvoiceFormData {
+  invoiceNumber: string;
+  issueDate: string;
+  dueDate: string;
+  taxRate: number;
+  withholdingTax: number;
+  notes: string;
+  items: InvoiceItemData[];
+}
+
 interface PayoutWidgetContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;
@@ -65,6 +84,10 @@ interface PayoutWidgetContextType {
   setSelectedInvoice: (invoice: InvoiceData | null) => void;
   uploadedInvoices: InvoiceData[];
   setUploadedInvoices: (invoices: InvoiceData[]) => void;
+  isInvoiceGeneratorOpen: boolean;
+  setIsInvoiceGeneratorOpen: (open: boolean) => void;
+  invoiceFormData: InvoiceFormData;
+  setInvoiceFormData: (data: InvoiceFormData) => void;
   handleNextStep: () => void;
   handleBackStep: () => void;
   handleSelectPayoutMethod: (method: PayoutMethod) => void;
@@ -78,6 +101,7 @@ interface PayoutWidgetContextType {
   handleUploadInvoice: (file: File) => void;
   handleViewInvoice: (invoice: InvoiceData) => void;
   handleDownloadInvoice: () => void;
+  handleGenerateInvoice: () => void;
   prepaidCardEmail: string;
   setPrepaidCardEmail: (email: string) => void;
   companyName: string;
@@ -158,6 +182,26 @@ export const PayoutWidgetProvider: React.FC<{
   const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(null);
   const [uploadedInvoices, setUploadedInvoices] = useState<InvoiceData[]>([]);
+  
+  const [isInvoiceGeneratorOpen, setIsInvoiceGeneratorOpen] = useState(false);
+  const [invoiceFormData, setInvoiceFormData] = useState<InvoiceFormData>({
+    invoiceNumber: `INV-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 1000)}`,
+    issueDate: new Date().toISOString().split('T')[0],
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    taxRate: 10,
+    withholdingTax: 0,
+    notes: "",
+    items: [
+      {
+        id: "1",
+        description: "",
+        quantity: 1,
+        unitPrice: 0,
+        tax: 0,
+        total: 0
+      }
+    ]
+  });
   
   React.useEffect(() => {
     if (value?.selectedMethod !== undefined) {
@@ -422,6 +466,36 @@ export const PayoutWidgetProvider: React.FC<{
     });
   };
 
+  const handleGenerateInvoice = () => {
+    const items = invoiceFormData.items.map(item => ({
+      ...item,
+      tax: (item.quantity * item.unitPrice * invoiceFormData.taxRate / 100),
+      total: (item.quantity * item.unitPrice) + (item.quantity * item.unitPrice * invoiceFormData.taxRate / 100)
+    }));
+    
+    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    const taxTotal = items.reduce((sum, item) => sum + item.tax, 0);
+    const withholdingAmount = subtotal * (invoiceFormData.withholdingTax / 100);
+    const total = subtotal + taxTotal - withholdingAmount;
+    
+    const newInvoice: InvoiceData = {
+      id: `gen-${Date.now()}`,
+      invoice: invoiceFormData.invoiceNumber,
+      date: invoiceFormData.issueDate,
+      amount: `$${total.toFixed(2)}`,
+      description: items.map(item => item.description).join(", "),
+      status: 'Awaiting Approval',
+      isUploaded: false
+    };
+    
+    setUploadedInvoices([...uploadedInvoices, newInvoice]);
+    setIsInvoiceGeneratorOpen(false);
+    
+    toast.success("Invoice generated successfully", {
+      description: "Your invoice has been created and submitted for review."
+    });
+  };
+
   const contextValue = {
     currentStep,
     setCurrentStep,
@@ -457,6 +531,10 @@ export const PayoutWidgetProvider: React.FC<{
     setSelectedInvoice,
     uploadedInvoices,
     setUploadedInvoices,
+    isInvoiceGeneratorOpen,
+    setIsInvoiceGeneratorOpen,
+    invoiceFormData,
+    setInvoiceFormData,
     prepaidCardEmail,
     setPrepaidCardEmail,
     companyName,
@@ -474,7 +552,8 @@ export const PayoutWidgetProvider: React.FC<{
     getStatusColor,
     handleUploadInvoice,
     handleViewInvoice,
-    handleDownloadInvoice
+    handleDownloadInvoice,
+    handleGenerateInvoice
   };
 
   return (
