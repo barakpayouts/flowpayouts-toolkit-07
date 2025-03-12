@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage, Eye } from 'lucide-react';
+import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage, Eye, FilePlus } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { usePayoutWidget, PayoutRecord, InvoiceData } from '@/contexts/PayoutWidgetContext';
@@ -32,7 +33,9 @@ const DashboardTabs: React.FC = () => {
     selectedInvoice,
     setSelectedInvoice,
     isInvoiceUploadOpen,
-    setIsInvoiceUploadOpen
+    setIsInvoiceUploadOpen,
+    isInvoiceGeneratorOpen,
+    setIsInvoiceGeneratorOpen
   } = usePayoutWidget();
   const [uploadProgress, setUploadProgress] = React.useState(0);
   const [isUploading, setIsUploading] = React.useState(false);
@@ -110,6 +113,11 @@ const DashboardTabs: React.FC = () => {
     toast.info("Opening invoice preview", {
       description: "Loading invoice preview..."
     });
+  };
+
+  const openInvoiceGenerator = () => {
+    setIsInvoiceUploadOpen(false);
+    setIsInvoiceGeneratorOpen(true);
   };
 
   return (
@@ -320,7 +328,7 @@ const DashboardTabs: React.FC = () => {
           <div className="mt-6 space-y-4">
             {!selectedFile ? (
               <>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div 
                     className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
                     onClick={openFileDialog}
@@ -341,6 +349,17 @@ const DashboardTabs: React.FC = () => {
                     </div>
                     <p className="font-medium text-sm">Google Drive</p>
                     <p className="text-xs opacity-70">Import from Google Drive</p>
+                  </div>
+                  
+                  <div 
+                    className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                    onClick={openInvoiceGenerator}
+                  >
+                    <div className="p-3 rounded-full bg-white/10">
+                      <FilePlus size={20} style={{ color: config.accentColor }} />
+                    </div>
+                    <p className="font-medium text-sm">Generate New</p>
+                    <p className="text-xs opacity-70">Create a new invoice</p>
                   </div>
                 </div>
                 
@@ -410,18 +429,34 @@ const DashboardTabs: React.FC = () => {
                 Cancel
               </Button>
               
+              {selectedFile && (
+                <Button 
+                  className="flex-1 text-gray-900 font-semibold hover:text-gray-900"
+                  style={{
+                    background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+                    boxShadow: `0 4px 15px ${config.accentColor}40`,
+                  }}
+                  disabled={!selectedFile || isUploading}
+                  onClick={simulateUpload}
+                >
+                  {isUploading ? 'Uploading...' : 'Upload Invoice'}
+                </Button>
+              )}
+            </div>
+            
+            {!selectedFile && (
               <Button 
-                className="flex-1 text-gray-900 font-semibold hover:text-gray-900"
+                className="w-full mt-2 flex items-center justify-center gap-2 text-gray-900 font-semibold hover:text-gray-900"
                 style={{
                   background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
                   boxShadow: `0 4px 15px ${config.accentColor}40`,
                 }}
-                disabled={!selectedFile || isUploading}
-                onClick={simulateUpload}
+                onClick={openInvoiceGenerator}
               >
-                {isUploading ? 'Uploading...' : 'Upload Invoice'}
+                <FilePlus size={16} />
+                <span>Generate New Invoice</span>
               </Button>
-            </div>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
