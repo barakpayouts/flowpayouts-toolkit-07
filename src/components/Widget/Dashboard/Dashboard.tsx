@@ -163,9 +163,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
       )}
       
       {/* Invoice Upload Dialog */}
-      {isInvoiceUploadOpen && (
-        <UploadInvoice onClose={handleCloseInvoiceUpload} />
-      )}
+      <UploadInvoice 
+        isOpen={isInvoiceUploadOpen} 
+        onClose={handleCloseInvoiceUpload} 
+      />
     </div>
   );
 };
