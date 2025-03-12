@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Lock, Upload } from 'lucide-react';
@@ -51,7 +50,6 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Function to handle upload button click
   const handleUploadClick = () => {
     if (onUploadInvoice) {
       onUploadInvoice();
@@ -61,7 +59,6 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
     }
   };
   
-  // Function to handle file selection
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -72,7 +69,6 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
     }
   };
   
-  // Function to trigger file input click
   const handleChooseFile = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -86,7 +82,6 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         {description && <p className="text-white/70">{description}</p>}
       </div>
       
-      {/* Show upload button if requested */}
       {showUploadInvoice && (
         <div className="mb-6 text-center">
           <Button
@@ -172,7 +167,6 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         </div>
       )}
       
-      {/* Simple Upload Invoice Dialog */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
         <DialogContent className="bg-payouts-dark border-white/10 text-white max-w-md w-[90%]">
           <DialogHeader>

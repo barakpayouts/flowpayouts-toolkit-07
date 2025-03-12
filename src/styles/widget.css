@@ -601,27 +601,34 @@
   transform: scaleX(-1);
 }
 
-/* Dialog styling for widget */
-.widget-container [role="dialog"] {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Dialog styling for widget - Fix dialog positioning and styling */
+.widget-container [role="dialog"],
+.widget-frame [role="dialog"] {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-.widget-container [role="dialog"] .fixed.inset-0 {
-  position: absolute !important;
+.widget-container [role="dialog"] .fixed.inset-0,
+.widget-frame [role="dialog"] .fixed.inset-0 {
+  position: fixed !important;
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(2px) !important;
 }
 
-.widget-container [role="dialog"] .fixed.left-\[50\%\].top-\[50\%\] {
-  position: absolute !important;
+.widget-container [role="dialog"] .fixed.left-\\[50\\%\\].top-\\[50\\%\\],
+.widget-frame [role="dialog"] .fixed.left-\\[50\\%\\].top-\\[50\\%\\] {
+  position: fixed !important;
   width: 90% !important;
   max-width: 400px !important;
   background-color: var(--bg-color, #143745) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: white !important;
+  z-index: 1000 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Fix for Upload dialog */
