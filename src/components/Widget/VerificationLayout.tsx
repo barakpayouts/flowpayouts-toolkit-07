@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Lock } from 'lucide-react';
+import { Lock, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 
@@ -62,6 +62,7 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
             variant="glass"
             className="mx-auto flex items-center gap-2"
           >
+            <Upload size={16} />
             Upload Invoice
           </Button>
         </div>
