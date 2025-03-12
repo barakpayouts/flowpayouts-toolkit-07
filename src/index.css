@@ -14,3 +14,38 @@
 /* Import animations and theme */
 @import './styles/animations.css';
 @import './styles/theme-colors.css';
+
+/* Widget dialog styling */
+.widget-frame .widget-dialog-content {
+  position: absolute;
+  max-width: 90%;
+  width: 90%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  border-radius: 12px;
+  background-color: var(--widget-bg, #143745);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.widget-frame .widget-dialog-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+}
+
+/* Ensure dialogs are contained within the widget */
+.widget-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.widget-frame [role="dialog"] {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}

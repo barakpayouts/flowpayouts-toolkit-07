@@ -4,6 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Lock, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog';
 
 interface VerificationLayoutProps {
   children: React.ReactNode;
@@ -39,11 +46,14 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   onUploadInvoice,
 }) => {
   const { config } = useWidgetConfig();
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
   
-  // Simple function to handle upload button click
+  // Function to handle upload button click
   const handleUploadClick = () => {
     if (onUploadInvoice) {
       onUploadInvoice();
+    } else {
+      setShowUploadDialog(true);
     }
   };
   
@@ -139,6 +149,63 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
           </div>
         </div>
       )}
+      
+      {/* Upload Invoice Dialog */}
+      <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+        <DialogContent className="widget-dialog-content">
+          <DialogHeader>
+            <DialogTitle>Upload Invoice</DialogTitle>
+            <DialogDescription>
+              Select an invoice document to upload for processing
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 border-2 border-dashed border-white/20 rounded-lg p-8 text-center">
+            <Upload className="mx-auto h-12 w-12 text-white/50 mb-4" />
+            <p className="text-sm text-white/70 mb-4">
+              Drag and drop your invoice here, or click to browse
+            </p>
+            <input 
+              type="file" 
+              className="hidden" 
+              id="invoice-upload" 
+              accept=".pdf,.jpg,.jpeg,.png" 
+            />
+            <label htmlFor="invoice-upload">
+              <Button 
+                variant="outline"
+                className="bg-white/10 border-white/20 hover:bg-white/20"
+              >
+                Select File
+              </Button>
+            </label>
+            <p className="text-xs text-white/50 mt-4">
+              Supported formats: PDF, JPG, PNG (Max size: 10MB)
+            </p>
+          </div>
+          
+          <div className="flex justify-end gap-2 mt-4">
+            <Button 
+              variant="dark"
+              onClick={() => setShowUploadDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              style={{
+                background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+              }}
+              className="text-payouts-dark font-medium"
+              onClick={() => {
+                // Close dialog and proceed with upload logic
+                setShowUploadDialog(false);
+              }}
+            >
+              Upload
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
