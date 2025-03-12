@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage, Eye } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -304,7 +305,7 @@ const DashboardTabs: React.FC = () => {
       </Tabs>
 
       <Sheet open={isInvoiceUploadOpen} onOpenChange={setIsInvoiceUploadOpen}>
-        <SheetContent className="sm:max-w-md" style={{ background: config.primaryColor, borderColor: `${config.accentColor}20` }}>
+        <SheetContent className="sm:max-w-md widget-dialog-content" style={{ background: config.primaryColor, borderColor: `${config.accentColor}20` }}>
           <SheetHeader>
             <SheetTitle>Upload Invoice</SheetTitle>
             <SheetDescription>
@@ -423,7 +424,7 @@ const DashboardTabs: React.FC = () => {
 
       <Dialog open={isInvoiceDetailOpen} onOpenChange={setIsInvoiceDetailOpen}>
         <DialogContent 
-          className="sm:max-w-md" 
+          className="sm:max-w-md widget-dialog-content" 
           style={{ 
             background: config.primaryColor, 
             borderColor: `${config.accentColor}20` 
@@ -445,33 +446,33 @@ const DashboardTabs: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-1 text-white">
                     {selectedInvoice?.method ? 'PAYOUT TRANSACTION' : 'INVOICE'}
                   </h3>
-                  <p className="text-sm text-white/80">{selectedInvoice?.invoice}</p>
+                  <p className="text-sm text-white">{selectedInvoice?.invoice}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-white/80">Date</p>
+                  <p className="text-sm text-white">Date</p>
                   <p className="font-medium text-white">{selectedInvoice?.date}</p>
                 </div>
               </div>
               
               <div className="mb-6">
-                <p className="text-sm text-white/80 mb-1">Description</p>
+                <p className="text-sm text-white mb-1">Description</p>
                 <p className="font-medium text-white">{selectedInvoice?.description}</p>
               </div>
               
               {selectedInvoice?.method && (
                 <div className="mb-6">
-                  <p className="text-sm text-white/80 mb-1">Payment Method</p>
+                  <p className="text-sm text-white mb-1">Payment Method</p>
                   <p className="font-medium text-white">{selectedInvoice?.method}</p>
                 </div>
               )}
               
               <div className="border-t border-white/10 pt-4 mb-6">
                 <div className="flex justify-between mb-2">
-                  <p className="text-white/80">Subtotal</p>
+                  <p className="text-white">Subtotal</p>
                   <p className="text-white">{selectedInvoice?.amount}</p>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <p className="text-white/80">Tax (0%)</p>
+                  <p className="text-white">Tax (0%)</p>
                   <p className="text-white">$0.00</p>
                 </div>
                 <div className="flex justify-between font-semibold text-lg pt-2 border-t border-white/10">
@@ -481,7 +482,7 @@ const DashboardTabs: React.FC = () => {
               </div>
               
               <div className="mt-4 bg-black/20 p-3 rounded border border-white/10">
-                <p className="text-sm text-white/80 mb-1">Status</p>
+                <p className="text-sm text-white mb-1">Status</p>
                 <p className={`font-medium ${getStatusColor(selectedInvoice?.status || '')}`}>
                   {selectedInvoice?.status}
                 </p>
@@ -535,42 +536,42 @@ const DashboardTabs: React.FC = () => {
 
       <Dialog open={showInvoicePreview} onOpenChange={setShowInvoicePreview}>
         <DialogContent 
-          className="sm:max-w-3xl h-[80vh] max-h-[80vh] flex flex-col" 
+          className="sm:max-w-3xl h-[80vh] max-h-[80vh] flex flex-col widget-dialog-content" 
           style={{ 
-            background: "white",
+            background: config.primaryColor,
             borderColor: `${config.accentColor}20` 
           }}
         >
           <DialogHeader>
-            <DialogTitle className="text-gray-900">
+            <DialogTitle className="text-white">
               Invoice Preview: {selectedInvoice?.invoice}
             </DialogTitle>
-            <DialogDescription className="text-gray-500">
+            <DialogDescription className="text-white/80">
               Full preview of invoice document
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex-grow overflow-auto mt-2 border border-gray-200 rounded-lg">
-            <div className="p-8 min-h-full bg-white text-black">
+          <div className="flex-grow overflow-auto mt-2 border border-white/10 rounded-lg">
+            <div className="p-8 min-h-full bg-white/5 text-white">
               <div className="flex justify-between items-start mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">INVOICE</h2>
-                  <p className="text-gray-600 text-lg">{selectedInvoice?.invoice}</p>
+                  <h2 className="text-2xl font-bold text-white mb-2">INVOICE</h2>
+                  <p className="text-white/80 text-lg">{selectedInvoice?.invoice}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-gray-500 mb-1">Date Issued</p>
-                  <p className="text-gray-900 font-medium">{selectedInvoice?.date}</p>
+                  <p className="text-white/80 mb-1">Date Issued</p>
+                  <p className="text-white font-medium">{selectedInvoice?.date}</p>
                   <div className="mt-2 py-1 px-3 inline-block rounded-md" style={{
                     backgroundColor: selectedInvoice?.status === 'Completed' 
-                      ? '#dcfce7' 
+                      ? 'rgba(22, 163, 74, 0.2)' 
                       : selectedInvoice?.status === 'Pending' 
-                        ? '#fef9c3' 
-                        : '#dbeafe',
+                        ? 'rgba(202, 138, 4, 0.2)' 
+                        : 'rgba(37, 99, 235, 0.2)',
                     color: selectedInvoice?.status === 'Completed' 
-                      ? '#166534' 
+                      ? '#4ade80' 
                       : selectedInvoice?.status === 'Pending' 
-                        ? '#854d0e' 
-                        : '#1e40af',
+                        ? '#fcd34d' 
+                        : '#93c5fd',
                   }}>
                     {selectedInvoice?.status}
                   </div>
@@ -579,26 +580,26 @@ const DashboardTabs: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-8 mb-8">
                 <div>
-                  <h3 className="text-gray-500 font-medium mb-2">From</h3>
-                  <p className="font-medium text-gray-900">Your Company Name</p>
-                  <p className="text-gray-700">123 Business Street</p>
-                  <p className="text-gray-700">City, State 12345</p>
-                  <p className="text-gray-700">contact@yourcompany.com</p>
+                  <h3 className="text-white/80 font-medium mb-2">From</h3>
+                  <p className="font-medium text-white">Your Company Name</p>
+                  <p className="text-white/80">123 Business Street</p>
+                  <p className="text-white/80">City, State 12345</p>
+                  <p className="text-white/80">contact@yourcompany.com</p>
                 </div>
                 <div>
-                  <h3 className="text-gray-500 font-medium mb-2">To</h3>
-                  <p className="font-medium text-gray-900">Client Company</p>
-                  <p className="text-gray-700">456 Client Avenue</p>
-                  <p className="text-gray-700">Client City, State 67890</p>
-                  <p className="text-gray-700">billing@clientcompany.com</p>
+                  <h3 className="text-white/80 font-medium mb-2">To</h3>
+                  <p className="font-medium text-white">Client Company</p>
+                  <p className="text-white/80">456 Client Avenue</p>
+                  <p className="text-white/80">Client City, State 67890</p>
+                  <p className="text-white/80">billing@clientcompany.com</p>
                 </div>
               </div>
 
               <div className="mb-8">
-                <h3 className="text-gray-700 font-medium mb-3">Description</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <h3 className="text-white/80 font-medium mb-3">Description</h3>
+                <div className="border border-white/10 rounded-lg overflow-hidden">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50 text-gray-700">
+                    <thead className="bg-black/30 text-white">
                       <tr>
                         <th className="py-3 px-4">Item</th>
                         <th className="py-3 px-4">Quantity</th>
@@ -606,12 +607,12 @@ const DashboardTabs: React.FC = () => {
                         <th className="py-3 px-4 text-right">Amount</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-white/10">
                       <tr>
-                        <td className="py-3 px-4 text-gray-900">{selectedInvoice?.description}</td>
-                        <td className="py-3 px-4 text-gray-700">1</td>
-                        <td className="py-3 px-4 text-gray-700">{selectedInvoice?.amount}</td>
-                        <td className="py-3 px-4 text-gray-900 text-right">{selectedInvoice?.amount}</td>
+                        <td className="py-3 px-4 text-white">{selectedInvoice?.description}</td>
+                        <td className="py-3 px-4 text-white/80">1</td>
+                        <td className="py-3 px-4 text-white/80">{selectedInvoice?.amount}</td>
+                        <td className="py-3 px-4 text-white text-right">{selectedInvoice?.amount}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -621,28 +622,28 @@ const DashboardTabs: React.FC = () => {
               <div className="flex justify-end">
                 <div className="w-64">
                   <div className="flex justify-between py-2">
-                    <p className="text-gray-600">Subtotal</p>
-                    <p className="text-gray-900">{selectedInvoice?.amount}</p>
+                    <p className="text-white/80">Subtotal</p>
+                    <p className="text-white">{selectedInvoice?.amount}</p>
                   </div>
                   <div className="flex justify-between py-2">
-                    <p className="text-gray-600">Tax (0%)</p>
-                    <p className="text-gray-900">$0.00</p>
+                    <p className="text-white/80">Tax (0%)</p>
+                    <p className="text-white">$0.00</p>
                   </div>
-                  <div className="flex justify-between py-2 border-t border-gray-200 font-medium">
-                    <p className="text-gray-800">Total</p>
-                    <p className="text-gray-900">{selectedInvoice?.amount}</p>
+                  <div className="flex justify-between py-2 border-t border-white/10 font-medium">
+                    <p className="text-white">Total</p>
+                    <p className="text-white">{selectedInvoice?.amount}</p>
                   </div>
                 </div>
               </div>
 
               {selectedInvoice?.method && (
-                <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-gray-700 font-medium">Payment Method</p>
-                  <p className="text-gray-900">{selectedInvoice?.method}</p>
+                <div className="mt-8 p-4 bg-black/20 rounded-lg">
+                  <p className="text-white/80 font-medium">Payment Method</p>
+                  <p className="text-white">{selectedInvoice?.method}</p>
                 </div>
               )}
 
-              <div className="mt-8 text-center text-gray-500 text-sm">
+              <div className="mt-8 text-center text-white/60 text-sm">
                 <p>Thank you for your business!</p>
               </div>
             </div>
@@ -653,7 +654,7 @@ const DashboardTabs: React.FC = () => {
               variant="outline" 
               size="sm"
               onClick={handleDownloadInvoice}
-              className="gap-1"
+              className="gap-1 text-white border-white/20 hover:bg-white/10"
             >
               <Download size={14} />
               <span>Download PDF</span>
