@@ -23,6 +23,19 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
+  color: #FFFFFF;
 }
 
-/* Remove any custom dialog styling from the index.css file */
+/* High contrast text styles */
+.text-high-contrast {
+  color: #FFFFFF !important;
+}
+
+.opacity-text {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Dialog content override for better contrast */
+[role="dialog"] [class*="Content"] * {
+  color: #FFFFFF;
+}

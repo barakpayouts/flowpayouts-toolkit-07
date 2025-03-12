@@ -67,6 +67,7 @@
   padding: 0.75rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
 }
 
 .chat-messages {
@@ -642,9 +643,41 @@
   max-width: 90% !important;
   width: auto !important;
   margin: 0 !important;
-  color: var(--text-color, white) !important;
+  color: #FFFFFF !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Improved dialog and form element colors for contrast */
+.widget-dialog-content {
+  color: #FFFFFF !important;
+}
+
+.widget-dialog-content h2,
+.widget-dialog-content h3,
+.widget-dialog-content p,
+.widget-dialog-content label,
+.widget-dialog-content span:not([class*="text-payouts-dark"]):not([class*="text-gray"]) {
+  color: #FFFFFF !important;
+}
+
+.widget-dialog-content button:not([style*="background"]) {
+  color: #FFFFFF;
+}
+
+.invoice-details,
+.invoice-preview,
+.file-preview,
+.upload-option {
+  color: #FFFFFF;
+}
+
+.upload-option p {
+  color: #FFFFFF !important;
+}
+
+.upload-option .text-xs {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* Fix for Upload dialog */
@@ -655,6 +688,7 @@
   text-align: center;
   transition: all 0.2s ease;
   cursor: pointer;
+  color: #FFFFFF;
 }
 
 .upload-area:hover {
