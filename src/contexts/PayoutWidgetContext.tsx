@@ -29,6 +29,15 @@ export interface InvoiceData {
   method?: string;
 }
 
+export interface TeamMemberData {
+  id: string;
+  email: string;
+  name: string;
+  role: 'Admin' | 'Member' | 'Viewer';
+  status: 'Active' | 'Pending' | 'Declined';
+  dateAdded: string;
+}
+
 interface PayoutWidgetContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;
@@ -64,6 +73,10 @@ interface PayoutWidgetContextType {
   setSelectedInvoice: (invoice: InvoiceData | null) => void;
   uploadedInvoices: InvoiceData[];
   setUploadedInvoices: (invoices: InvoiceData[]) => void;
+  teamMembers: TeamMemberData[];
+  setTeamMembers: (members: TeamMemberData[]) => void;
+  companyName: string;
+  setCompanyName: (name: string) => void;
   handleNextStep: () => void;
   handleBackStep: () => void;
   handleSelectPayoutMethod: (method: PayoutMethod) => void;
@@ -77,6 +90,8 @@ interface PayoutWidgetContextType {
   handleUploadInvoice: (file: File) => void;
   handleViewInvoice: (invoice: InvoiceData) => void;
   handleDownloadInvoice: () => void;
+  handleInviteTeamMember: (email: string, role: 'Admin' | 'Member' | 'Viewer') => void;
+  handleRemoveTeamMember: (id: string) => void;
   prepaidCardEmail: string;
   setPrepaidCardEmail: (email: string) => void;
 }
@@ -127,6 +142,7 @@ export const PayoutWidgetProvider: React.FC<{
   const [onboardingCompleted, setOnboardingCompleted] = useState(value?.onboardingCompleted || false);
   const [isLoggedIn, setIsLoggedIn] = useState(value?.isLoggedIn || false);
   const [prepaidCardEmail, setPrepaidCardEmail] = useState(value?.prepaidCardEmail || "");
+  const [companyName, setCompanyName] = useState("Acme Inc.");
   
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(value?.advancedPaymentStage || false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<AdvanceTier>(value?.selectedAdvanceTier as AdvanceTier || null);
@@ -136,6 +152,16 @@ export const PayoutWidgetProvider: React.FC<{
   const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(null);
   const [uploadedInvoices, setUploadedInvoices] = useState<InvoiceData[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMemberData[]>([
+    {
+      id: '1',
+      email: 'current-user@example.com',
+      name: 'Current User',
+      role: 'Admin',
+      status: 'Active',
+      dateAdded: '2023-12-01'
+    }
+  ]);
   
   React.useEffect(() => {
     if (value?.selectedMethod !== undefined) {
@@ -395,6 +421,31 @@ export const PayoutWidgetProvider: React.FC<{
     });
   };
 
+  const handleInviteTeamMember = (email: string, role: 'Admin' | 'Member' | 'Viewer') => {
+    const newMember: TeamMemberData = {
+      id: Date.now().toString(),
+      email,
+      name: email.split('@')[0],
+      role,
+      status: 'Pending',
+      dateAdded: new Date().toISOString().split('T')[0]
+    };
+
+    setTeamMembers([...teamMembers, newMember]);
+    
+    toast.success("Team member invited", {
+      description: `An invitation has been sent to ${email}`
+    });
+  };
+  
+  const handleRemoveTeamMember = (id: string) => {
+    setTeamMembers(prev => prev.filter(member => member.id !== id));
+    
+    toast.success("Team member removed", {
+      description: "The team member has been removed from your account"
+    });
+  };
+
   const contextValue = {
     currentStep,
     setCurrentStep,
@@ -430,6 +481,10 @@ export const PayoutWidgetProvider: React.FC<{
     setSelectedInvoice,
     uploadedInvoices,
     setUploadedInvoices,
+    teamMembers,
+    setTeamMembers,
+    companyName,
+    setCompanyName,
     prepaidCardEmail,
     setPrepaidCardEmail,
     handleNextStep,
@@ -445,6 +500,8 @@ export const PayoutWidgetProvider: React.FC<{
     handleUploadInvoice,
     handleViewInvoice,
     handleDownloadInvoice,
+    handleInviteTeamMember,
+    handleRemoveTeamMember,
   };
 
   return (
