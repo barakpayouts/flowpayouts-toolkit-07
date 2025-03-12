@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage, Eye, FilePlus } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -578,27 +579,30 @@ const DashboardTabs: React.FC = () => {
 
       <Dialog open={showInvoicePreview} onOpenChange={setShowInvoicePreview}>
         <DialogContent 
-          className="w-[90%] max-w-[360px] h-[80vh] max-h-[600px] flex flex-col widget-dialog-content" 
+          className="w-[95%] max-w-[600px] h-[90vh] max-h-[800px] flex flex-col widget-dialog-content overflow-hidden" 
           style={{ 
             background: config.primaryColor,
             borderColor: `${config.accentColor}20` 
           }}
         >
-          <DialogHeader>
-            <DialogTitle className="text-white">
-              Invoice Preview: {selectedInvoice?.invoice}
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-white flex items-center justify-between">
+              <span>Invoice Preview: {selectedInvoice?.invoice}</span>
+              <DialogClose className="rounded-full hover:bg-white/10 p-1">
+                <X size={18} className="text-white/80" />
+              </DialogClose>
             </DialogTitle>
             <DialogDescription className="text-white/80">
               Full preview of invoice document
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex-grow overflow-auto mt-2 border border-white/10 rounded-lg">
-            <div className="p-8 min-h-full bg-white/5 text-white">
+          <div className="flex-grow overflow-auto mt-2 border border-white/10 rounded-lg bg-white/5">
+            <div className="p-6 min-h-full text-white">
               <div className="flex justify-between items-start mb-8">
                 <div>
                   <h2 className="text-2xl font-bold text-white mb-2">INVOICE</h2>
-                  <p className="text-white/80 text-lg">{selectedInvoice?.invoice}</p>
+                  <p className="text-white/90 text-lg">{selectedInvoice?.invoice}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-white/80 mb-1">Date Issued</p>
@@ -620,16 +624,16 @@ const DashboardTabs: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-8 mb-8">
+              <div className="grid grid-cols-2 gap-6 mb-8 bg-black/20 p-4 rounded-lg">
                 <div>
-                  <h3 className="text-white/80 font-medium mb-2">From</h3>
-                  <p className="font-medium text-white">Your Company Name</p>
+                  <h3 className="text-white/90 font-medium mb-2 border-b border-white/10 pb-1">From</h3>
+                  <p className="font-medium text-white">{companyName || "Your Company Name"}</p>
                   <p className="text-white/80">123 Business Street</p>
                   <p className="text-white/80">City, State 12345</p>
                   <p className="text-white/80">contact@yourcompany.com</p>
                 </div>
                 <div>
-                  <h3 className="text-white/80 font-medium mb-2">To</h3>
+                  <h3 className="text-white/90 font-medium mb-2 border-b border-white/10 pb-1">To</h3>
                   <p className="font-medium text-white">Client Company</p>
                   <p className="text-white/80">456 Client Avenue</p>
                   <p className="text-white/80">Client City, State 67890</p>
@@ -638,60 +642,83 @@ const DashboardTabs: React.FC = () => {
               </div>
 
               <div className="mb-8">
-                <h3 className="text-white/80 font-medium mb-3">Description</h3>
-                <div className="border border-white/10 rounded-lg overflow-hidden">
+                <h3 className="text-white/90 font-medium mb-3 border-b border-white/10 pb-1">Description</h3>
+                <div className="border border-white/10 rounded-lg overflow-auto">
                   <table className="w-full text-left">
                     <thead className="bg-black/30 text-white">
                       <tr>
-                        <th className="py-3 px-4">Item</th>
-                        <th className="py-3 px-4">Quantity</th>
-                        <th className="py-3 px-4">Rate</th>
-                        <th className="py-3 px-4 text-right">Amount</th>
+                        <th className="py-2 px-3 font-semibold">Item</th>
+                        <th className="py-2 px-3 font-semibold text-center">Quantity</th>
+                        <th className="py-2 px-3 font-semibold text-center">Rate</th>
+                        <th className="py-2 px-3 font-semibold text-right">Amount</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/10">
-                      <tr>
-                        <td className="py-3 px-4 text-white">{selectedInvoice?.description}</td>
-                        <td className="py-3 px-4 text-white/80">1</td>
-                        <td className="py-3 px-4 text-white/80">{selectedInvoice?.amount}</td>
-                        <td className="py-3 px-4 text-white text-right">{selectedInvoice?.amount}</td>
-                      </tr>
+                      {selectedInvoice?.description?.split(", ").map((desc, index) => (
+                        <tr key={index} className="hover:bg-black/10">
+                          <td className="py-2 px-3 text-white">{desc}</td>
+                          <td className="py-2 px-3 text-white/80 text-center">1</td>
+                          <td className="py-2 px-3 text-white/80 text-center">
+                            {index === 0 ? selectedInvoice?.amount : "$0.00"}
+                          </td>
+                          <td className="py-2 px-3 text-white text-right">
+                            {index === 0 ? selectedInvoice?.amount : "$0.00"}
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <div className="flex justify-end">
-                <div className="w-64">
-                  <div className="flex justify-between py-2">
+              <div className="flex justify-end mb-8">
+                <div className="w-64 bg-black/20 p-4 rounded-lg">
+                  <div className="flex justify-between py-2 border-b border-white/10">
                     <p className="text-white/80">Subtotal</p>
                     <p className="text-white">{selectedInvoice?.amount}</p>
                   </div>
-                  <div className="flex justify-between py-2">
-                    <p className="text-white/80">Tax (0%)</p>
-                    <p className="text-white">$0.00</p>
+                  <div className="flex justify-between py-2 border-b border-white/10">
+                    <p className="text-white/80">Tax (10%)</p>
+                    <p className="text-white">
+                      {selectedInvoice?.amount ? 
+                        `$${(parseFloat(selectedInvoice.amount.replace(/[^0-9.-]+/g, '')) * 0.1).toFixed(2)}` : 
+                        "$0.00"}
+                    </p>
                   </div>
-                  <div className="flex justify-between py-2 border-t border-white/10 font-medium">
+                  <div className="flex justify-between py-2">
+                    <p className="text-white/80">Withholding (5%)</p>
+                    <p className="text-white">
+                      {selectedInvoice?.amount ? 
+                        `-$${(parseFloat(selectedInvoice.amount.replace(/[^0-9.-]+/g, '')) * 0.05).toFixed(2)}` : 
+                        "$0.00"}
+                    </p>
+                  </div>
+                  <div className="flex justify-between py-2 mt-2 border-t border-white/10 font-medium">
                     <p className="text-white">Total</p>
-                    <p className="text-white">{selectedInvoice?.amount}</p>
+                    <p className="text-white">
+                      {selectedInvoice?.amount ? 
+                        `$${(parseFloat(selectedInvoice.amount.replace(/[^0-9.-]+/g, '')) * 1.05).toFixed(2)}` : 
+                        selectedInvoice?.amount}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {selectedInvoice?.method && (
-                <div className="mt-8 p-4 bg-black/20 rounded-lg">
-                  <p className="text-white/80 font-medium">Payment Method</p>
+                <div className="mt-4 p-4 bg-black/20 rounded-lg mb-6">
+                  <p className="text-white/90 font-medium border-b border-white/10 pb-1 mb-2">Payment Method</p>
                   <p className="text-white">{selectedInvoice?.method}</p>
                 </div>
               )}
 
-              <div className="mt-8 text-center text-white/60 text-sm">
+              <div className="mt-6 text-center border-t border-white/10 pt-4 text-white/60 text-sm">
                 <p>Thank you for your business!</p>
+                <p className="mt-1">Invoice generated by {companyName || "Your Company"} Payment System</p>
               </div>
             </div>
           </div>
           
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-4 flex items-center justify-between w-full">
             <Button 
               variant="outline" 
               size="sm"
