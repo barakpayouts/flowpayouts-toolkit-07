@@ -353,7 +353,7 @@ const DashboardTabs: React.FC = () => {
                   
                   <div 
                     className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
-                    onClick={openInvoiceGenerator}
+                    onClick={() => openInvoiceGenerator()}
                   >
                     <div className="p-3 rounded-full bg-white/10">
                       <FilePlus size={20} style={{ color: config.accentColor }} />
@@ -451,7 +451,7 @@ const DashboardTabs: React.FC = () => {
                   background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
                   boxShadow: `0 4px 15px ${config.accentColor}40`,
                 }}
-                onClick={openInvoiceGenerator}
+                onClick={() => openInvoiceGenerator()}
               >
                 <FilePlus size={16} />
                 <span>Generate New Invoice</span>
