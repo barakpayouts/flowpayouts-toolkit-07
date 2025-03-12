@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Lock, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogDescription
 } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 interface VerificationLayoutProps {
   children: React.ReactNode;
@@ -48,6 +49,7 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
   const { config } = useWidgetConfig();
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Function to handle upload button click
   const handleUploadClick = () => {
@@ -64,6 +66,16 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
     const files = event.target.files;
     if (files && files.length > 0) {
       setSelectedFileName(files[0].name);
+      toast.success("File selected", {
+        description: `Selected ${files[0].name}`
+      });
+    }
+  };
+  
+  // Function to trigger file input click
+  const handleChooseFile = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
   
@@ -196,11 +208,14 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
                   id="invoice-upload" 
                   accept=".pdf,.jpg,.jpeg,.png" 
                   onChange={handleFileSelect}
+                  ref={fileInputRef}
                 />
                 <label htmlFor="invoice-upload">
                   <Button 
                     variant="outline"
                     className="bg-white/10 border-white/20 hover:bg-white/20"
+                    onClick={handleChooseFile}
+                    type="button"
                   >
                     Select File
                   </Button>
@@ -226,9 +241,13 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
               className="text-payouts-dark font-medium"
               onClick={() => {
                 // Process upload and close dialog
-                setShowUploadDialog(false);
-                // Show success message or trigger next step
-                console.log("File uploaded:", selectedFileName);
+                if (selectedFileName) {
+                  toast.success("File uploaded successfully", {
+                    description: `Uploaded ${selectedFileName}`
+                  });
+                  setShowUploadDialog(false);
+                  setSelectedFileName(null);
+                }
               }}
               disabled={!selectedFileName}
             >
