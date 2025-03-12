@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage, Eye } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -7,7 +6,6 @@ import { usePayoutWidget, PayoutRecord, InvoiceData } from '@/contexts/PayoutWid
 import { cn } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from "@/components/ui/sheet";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
@@ -304,14 +302,20 @@ const DashboardTabs: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      <Sheet open={isInvoiceUploadOpen} onOpenChange={setIsInvoiceUploadOpen}>
-        <SheetContent className="sm:max-w-md widget-dialog-content" style={{ background: config.primaryColor, borderColor: `${config.accentColor}20` }}>
-          <SheetHeader>
-            <SheetTitle>Upload Invoice</SheetTitle>
-            <SheetDescription>
+      <Dialog open={isInvoiceUploadOpen} onOpenChange={setIsInvoiceUploadOpen}>
+        <DialogContent 
+          className="sm:max-w-md widget-dialog-content" 
+          style={{ 
+            background: config.primaryColor, 
+            borderColor: `${config.accentColor}20` 
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Upload Invoice</DialogTitle>
+            <DialogDescription>
               Upload an invoice from your computer or Google Drive
-            </SheetDescription>
-          </SheetHeader>
+            </DialogDescription>
+          </DialogHeader>
           
           <div className="mt-6 space-y-4">
             {!selectedFile ? (
@@ -396,7 +400,7 @@ const DashboardTabs: React.FC = () => {
             )}
           </div>
           
-          <SheetFooter className="absolute bottom-0 left-0 right-0 p-6">
+          <DialogFooter className="mt-6">
             <div className="flex gap-2 w-full">
               <Button 
                 variant="dark" 
@@ -418,9 +422,9 @@ const DashboardTabs: React.FC = () => {
                 {isUploading ? 'Uploading...' : 'Upload Invoice'}
               </Button>
             </div>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isInvoiceDetailOpen} onOpenChange={setIsInvoiceDetailOpen}>
         <DialogContent 

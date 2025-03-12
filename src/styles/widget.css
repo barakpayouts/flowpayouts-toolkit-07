@@ -601,7 +601,7 @@
   transform: scaleX(-1);
 }
 
-/* Dialog positioning and styling for widget - Fix dialog positioning and styling */
+/* Dialog positioning and styling for widget */
 .widget-container .fixed,
 .widget-frame .fixed {
   position: fixed !important;
@@ -701,3 +701,4 @@
 .file-preview-remove:hover {
   background-color: rgba(255, 0, 0, 0.2);
 }
+
