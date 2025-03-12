@@ -1,23 +1,16 @@
+
 import React, { useState, useRef } from 'react';
 import { X, Upload, FileText, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { toast } from "sonner";
 import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
-import { 
-  Dialog,
-  DialogContent,
-  DialogOverlay,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 
 interface UploadInvoiceProps {
   onClose: () => void;
-  isOpen: boolean;
 }
 
-const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
+const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
   const { config } = useWidgetConfig();
   const { handleUploadInvoice } = usePayoutWidget();
   const [dragging, setDragging] = useState(false);
@@ -52,6 +45,7 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
   };
 
   const handleFile = (file: File) => {
+    // Check file type
     const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
     if (!validTypes.includes(file.type)) {
       toast.error("Invalid file type", {
@@ -60,6 +54,7 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
       return;
     }
     
+    // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("File too large", {
         description: "Maximum file size is 5MB."
@@ -75,6 +70,7 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
     
     setUploading(true);
     
+    // Simulate upload progress
     let currentProgress = 0;
     const interval = setInterval(() => {
       currentProgress += Math.random() * 10;
@@ -82,16 +78,19 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
         currentProgress = 100;
         clearInterval(interval);
         
+        // Simulate completion after progress reaches 100%
         setTimeout(() => {
           setUploading(false);
           setUploaded(true);
           
+          // Pass the file to the context handler
           handleUploadInvoice(file);
           
           toast.success("Invoice uploaded successfully", {
             description: "Your invoice has been uploaded and will be processed."
           });
           
+          // Close modal after a short delay
           setTimeout(() => {
             onClose();
           }, 1500);
@@ -121,10 +120,12 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
   };
 
   const handleGoogleDriveUpload = () => {
+    // Simulate Google Drive selection
     toast.info("Google Drive", {
       description: "Connecting to Google Drive...",
     });
     
+    // Simulate file selection after a delay
     setTimeout(() => {
       const mockFile = new File(["dummy content"], "invoice-from-drive.pdf", { type: "application/pdf" });
       setFile(mockFile);
@@ -135,156 +136,157 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogOverlay className="bg-black/80" />
-      <DialogContent 
-        className="widget-dialog-content border-0 p-0 overflow-hidden max-w-md w-full" 
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div 
+        className="w-full max-w-md p-6 rounded-xl shadow-xl"
         style={{ 
           background: `${config.primaryColor}`,
           border: `1px solid ${config.borderColor}`
         }}
       >
-        <div className="p-6">
-          <DialogTitle className="text-xl font-semibold text-white mb-4">
-            Upload Invoice
-          </DialogTitle>
-          <DialogDescription className="text-sm text-white/70 mb-6">
-            Upload your invoice to process your payment request
-          </DialogDescription>
-          
-          {!file ? (
-            <>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div 
-                  className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
-                  onClick={openFileSelector}
-                >
-                  <div className="p-3 rounded-full bg-white/10">
-                    <Upload size={20} style={{ color: config.accentColor }} />
-                  </div>
-                  <p className="font-medium text-sm text-white">From Computer</p>
-                  <p className="text-xs opacity-70 text-white">Upload from your device</p>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold">Upload Invoice</h2>
+          <Button 
+            variant="dark" 
+            size="icon" 
+            onClick={onClose}
+            className="h-8 w-8"
+          >
+            <X size={16} />
+          </Button>
+        </div>
+        
+        {!file ? (
+          <>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div 
+                className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                onClick={openFileSelector}
+              >
+                <div className="p-3 rounded-full bg-white/10">
+                  <Upload size={20} style={{ color: config.accentColor }} />
                 </div>
-                
-                <div 
-                  className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
-                  onClick={handleGoogleDriveUpload}
-                >
-                  <div className="p-3 rounded-full bg-white/10">
-                    <FileText size={20} style={{ color: config.accentColor }} />
-                  </div>
-                  <p className="font-medium text-sm text-white">Google Drive</p>
-                  <p className="text-xs opacity-70 text-white">Import from Google Drive</p>
-                </div>
+                <p className="font-medium text-sm">From Computer</p>
+                <p className="text-xs opacity-70">Upload from your device</p>
               </div>
               
               <div 
-                className={`upload-area ${dragging ? 'dragging' : ''}`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={openFileSelector}
+                className="upload-option p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-2 text-center"
+                onClick={handleGoogleDriveUpload}
               >
-                <input 
-                  type="file" 
-                  ref={fileInputRef}
-                  className="hidden" 
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={handleFileChange}
-                />
-                <div className="flex flex-col items-center gap-3">
-                  <div 
-                    className="w-14 h-14 rounded-full flex items-center justify-center"
-                    style={{ background: `${config.accentColor}20` }}
-                  >
-                    <Upload 
-                      size={24} 
-                      style={{ color: config.accentColor }} 
-                    />
-                  </div>
-                  <div>
-                    <p className="font-medium mb-1 text-white">Drop your invoice here</p>
-                    <p className="text-xs text-white/60">or click to browse files</p>
-                  </div>
-                  <p className="text-xs text-white/60 mt-2">
-                    Supports PDF, JPEG, PNG (max 5MB)
-                  </p>
+                <div className="p-3 rounded-full bg-white/10">
+                  <FileText size={20} style={{ color: config.accentColor }} />
                 </div>
+                <p className="font-medium text-sm">Google Drive</p>
+                <p className="text-xs opacity-70">Import from Google Drive</p>
               </div>
-            </>
-          ) : (
-            <div className="space-y-4">
-              <div className="file-preview">
+            </div>
+            
+            <div 
+              className={`invoice-upload-dropzone ${dragging ? 'dragging' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                className="hidden" 
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={handleFileChange}
+              />
+              <div className="flex flex-col items-center gap-3">
                 <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center"
                   style={{ background: `${config.accentColor}20` }}
                 >
-                  <FileText 
-                    size={18} 
-                    className="file-preview-icon"
-                    style={{ color: config.accentColor }}
+                  <Upload 
+                    size={24} 
+                    style={{ color: config.accentColor }} 
                   />
                 </div>
-                <div className="file-preview-info">
-                  <p className="file-preview-name text-white">{file.name}</p>
-                  <p className="file-preview-size text-white/70">{getFileSize(file.size)}</p>
+                <div>
+                  <p className="font-medium mb-1">Drop your invoice here</p>
+                  <p className="text-xs text-white/60">or click to browse files</p>
                 </div>
-                {!uploading && !uploaded && (
-                  <Button 
-                    variant="dark" 
-                    size="icon" 
-                    onClick={handleRemoveFile}
-                    className="h-7 w-7 bg-white/10"
-                  >
-                    <X size={14} />
-                  </Button>
-                )}
-                {uploaded && (
-                  <div 
-                    className="w-7 h-7 rounded-full flex items-center justify-center"
-                    style={{ background: config.accentColor }}
-                  >
-                    <Check size={14} className="text-payouts-dark" />
-                  </div>
-                )}
+                <p className="text-xs text-white/60 mt-2">
+                  Supports PDF, JPEG, PNG (max 5MB)
+                </p>
               </div>
-              
-              {(uploading || uploaded) && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-white">
-                    <span>{uploaded ? 'Complete' : 'Uploading...'}</span>
-                    <span>{Math.round(progress)}%</span>
-                  </div>
-                  <div className="progress-track">
-                    <div 
-                      className="progress-fill" 
-                      style={{ 
-                        width: `${progress}%`,
-                        background: config.accentColor
-                      }} 
-                    />
-                  </div>
-                </div>
-              )}
-              
+            </div>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="invoice-file-preview">
+              <div 
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: `${config.accentColor}20` }}
+              >
+                <FileText 
+                  size={18} 
+                  className="invoice-file-preview-icon"
+                  style={{ color: config.accentColor }}
+                />
+              </div>
+              <div className="invoice-file-preview-info">
+                <p className="invoice-file-preview-name">{file.name}</p>
+                <p className="invoice-file-preview-size">{getFileSize(file.size)}</p>
+              </div>
               {!uploading && !uploaded && (
                 <Button 
-                  onClick={handleUpload}
-                  className="w-full font-semibold"
-                  style={{
-                    background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
-                    color: config.primaryColor,
-                  }}
+                  variant="dark" 
+                  size="icon" 
+                  onClick={handleRemoveFile}
+                  className="h-7 w-7 bg-white/10"
                 >
-                  <Upload size={16} className="mr-2" />
-                  Upload Invoice
+                  <X size={14} />
                 </Button>
               )}
+              {uploaded && (
+                <div 
+                  className="w-7 h-7 rounded-full flex items-center justify-center"
+                  style={{ background: config.accentColor }}
+                >
+                  <Check size={14} className="text-payouts-dark" />
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+            
+            {(uploading || uploaded) && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span>{uploaded ? 'Complete' : 'Uploading...'}</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
+                <div className="invoice-upload-progress">
+                  <div 
+                    className="invoice-upload-progress-bar" 
+                    style={{ 
+                      width: `${progress}%`,
+                      background: config.accentColor
+                    }} 
+                  />
+                </div>
+              </div>
+            )}
+            
+            {!uploading && !uploaded && (
+              <Button 
+                onClick={handleUpload}
+                className="w-full font-semibold"
+                style={{
+                  background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+                  color: config.primaryColor,
+                }}
+              >
+                <Upload size={16} className="mr-2" />
+                Upload Invoice
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

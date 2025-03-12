@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 
@@ -28,15 +27,6 @@ export interface InvoiceData {
   fileName?: string;
   isUploaded?: boolean;
   method?: string;
-}
-
-export interface TeamMemberData {
-  id: string;
-  email: string;
-  name: string;
-  role: 'Admin' | 'Member' | 'Viewer';
-  status: 'Active' | 'Pending' | 'Declined';
-  dateAdded: string;
 }
 
 interface PayoutWidgetContextType {
@@ -74,10 +64,6 @@ interface PayoutWidgetContextType {
   setSelectedInvoice: (invoice: InvoiceData | null) => void;
   uploadedInvoices: InvoiceData[];
   setUploadedInvoices: (invoices: InvoiceData[]) => void;
-  teamMembers: TeamMemberData[];
-  setTeamMembers: (members: TeamMemberData[]) => void;
-  companyName: string;
-  setCompanyName: (name: string) => void;
   handleNextStep: () => void;
   handleBackStep: () => void;
   handleSelectPayoutMethod: (method: PayoutMethod) => void;
@@ -91,8 +77,6 @@ interface PayoutWidgetContextType {
   handleUploadInvoice: (file: File) => void;
   handleViewInvoice: (invoice: InvoiceData) => void;
   handleDownloadInvoice: () => void;
-  handleInviteTeamMember: (email: string, role: 'Admin' | 'Member' | 'Viewer') => void;
-  handleRemoveTeamMember: (id: string) => void;
   prepaidCardEmail: string;
   setPrepaidCardEmail: (email: string) => void;
 }
@@ -143,7 +127,6 @@ export const PayoutWidgetProvider: React.FC<{
   const [onboardingCompleted, setOnboardingCompleted] = useState(value?.onboardingCompleted || false);
   const [isLoggedIn, setIsLoggedIn] = useState(value?.isLoggedIn || false);
   const [prepaidCardEmail, setPrepaidCardEmail] = useState(value?.prepaidCardEmail || "");
-  const [companyName, setCompanyName] = useState("Acme Inc.");
   
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(value?.advancedPaymentStage || false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<AdvanceTier>(value?.selectedAdvanceTier as AdvanceTier || null);
@@ -152,42 +135,7 @@ export const PayoutWidgetProvider: React.FC<{
   const [isInvoiceUploadOpen, setIsInvoiceUploadOpen] = useState(false);
   const [isInvoiceDetailOpen, setIsInvoiceDetailOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(null);
-  const [uploadedInvoices, setUploadedInvoices] = useState<InvoiceData[]>([
-    {
-      id: 'sample-1',
-      invoice: 'INV-2024-05-01',
-      date: '2024-05-01',
-      amount: '$1,250.00',
-      description: 'Monthly service fee',
-      status: 'Completed',
-      fileName: 'invoice-may-2024.pdf',
-      isUploaded: true,
-      method: 'Bank Transfer'
-    },
-    {
-      id: 'sample-2',
-      invoice: 'INV-2024-06-01',
-      date: '2024-06-01',
-      amount: '$1,350.00',
-      description: 'Monthly service fee',
-      status: 'Pending',
-      fileName: 'invoice-june-2024.pdf',
-      isUploaded: true,
-      method: 'Bank Transfer'
-    }
-  ]);
-  
-  // Add the missing teamMembers state
-  const [teamMembers, setTeamMembers] = useState<TeamMemberData[]>([
-    {
-      id: '1',
-      email: 'current-user@example.com',
-      name: 'Current User',
-      role: 'Admin',
-      status: 'Active',
-      dateAdded: '2023-12-01'
-    }
-  ]);
+  const [uploadedInvoices, setUploadedInvoices] = useState<InvoiceData[]>([]);
   
   React.useEffect(() => {
     if (value?.selectedMethod !== undefined) {
@@ -421,15 +369,14 @@ export const PayoutWidgetProvider: React.FC<{
       id: `user-${Date.now()}`,
       invoice: `INV-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`,
       date: new Date().toLocaleDateString(),
-      amount: '$1,500.00',
-      description: file.name.replace(/\.[^/.]+$/, ""),
+      amount: '$0.00',
+      description: file.name,
       status: 'Awaiting Approval',
       fileName: file.name,
-      isUploaded: true,
-      method: 'Advanced Payment'
+      isUploaded: true
     };
     
-    setUploadedInvoices(prev => [newInvoice, ...prev]);
+    setUploadedInvoices([...uploadedInvoices, newInvoice]);
     setIsInvoiceUploadOpen(false);
     
     toast.success("Invoice uploaded successfully", {
@@ -440,48 +387,11 @@ export const PayoutWidgetProvider: React.FC<{
   const handleViewInvoice = (invoice: InvoiceData) => {
     setSelectedInvoice(invoice);
     setIsInvoiceDetailOpen(true);
-    
-    if (invoice.isUploaded && invoice.status === 'Awaiting Approval') {
-      toast.info("Invoice being processed", {
-        description: "Your invoice is being reviewed and will be processed soon."
-      });
-    }
   };
   
   const handleDownloadInvoice = () => {
-    if (!selectedInvoice) return;
-    
     toast.success("Invoice download started", {
-      description: `Downloading ${selectedInvoice.fileName || selectedInvoice.invoice}.pdf`
-    });
-    
-    setTimeout(() => {
-      setIsInvoiceDetailOpen(false);
-    }, 1500);
-  };
-
-  const handleInviteTeamMember = (email: string, role: 'Admin' | 'Member' | 'Viewer') => {
-    const newMember: TeamMemberData = {
-      id: Date.now().toString(),
-      email,
-      name: email.split('@')[0],
-      role,
-      status: 'Pending',
-      dateAdded: new Date().toISOString().split('T')[0]
-    };
-
-    setTeamMembers([...teamMembers, newMember]);
-    
-    toast.success("Team member invited", {
-      description: `An invitation has been sent to ${email}`
-    });
-  };
-  
-  const handleRemoveTeamMember = (id: string) => {
-    setTeamMembers(prev => prev.filter(member => member.id !== id));
-    
-    toast.success("Team member removed", {
-      description: "The team member has been removed from your account"
+      description: "Your invoice is being downloaded."
     });
   };
 
@@ -520,10 +430,6 @@ export const PayoutWidgetProvider: React.FC<{
     setSelectedInvoice,
     uploadedInvoices,
     setUploadedInvoices,
-    teamMembers,
-    setTeamMembers,
-    companyName,
-    setCompanyName,
     prepaidCardEmail,
     setPrepaidCardEmail,
     handleNextStep,
@@ -539,8 +445,6 @@ export const PayoutWidgetProvider: React.FC<{
     handleUploadInvoice,
     handleViewInvoice,
     handleDownloadInvoice,
-    handleInviteTeamMember,
-    handleRemoveTeamMember,
   };
 
   return (
