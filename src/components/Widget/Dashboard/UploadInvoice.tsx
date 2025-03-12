@@ -7,7 +7,9 @@ import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 import { 
   Dialog,
   DialogContent,
-  DialogOverlay
+  DialogOverlay,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 
 interface UploadInvoiceProps {
@@ -50,7 +52,6 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
   };
 
   const handleFile = (file: File) => {
-    // Check file type
     const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
     if (!validTypes.includes(file.type)) {
       toast.error("Invalid file type", {
@@ -59,7 +60,6 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
       return;
     }
     
-    // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("File too large", {
         description: "Maximum file size is 5MB."
@@ -75,7 +75,6 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
     
     setUploading(true);
     
-    // Simulate upload progress
     let currentProgress = 0;
     const interval = setInterval(() => {
       currentProgress += Math.random() * 10;
@@ -83,19 +82,16 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
         currentProgress = 100;
         clearInterval(interval);
         
-        // Simulate completion after progress reaches 100%
         setTimeout(() => {
           setUploading(false);
           setUploaded(true);
           
-          // Pass the file to the context handler
           handleUploadInvoice(file);
           
           toast.success("Invoice uploaded successfully", {
             description: "Your invoice has been uploaded and will be processed."
           });
           
-          // Close modal after a short delay
           setTimeout(() => {
             onClose();
           }, 1500);
@@ -125,12 +121,10 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
   };
 
   const handleGoogleDriveUpload = () => {
-    // Simulate Google Drive selection
     toast.info("Google Drive", {
       description: "Connecting to Google Drive...",
     });
     
-    // Simulate file selection after a delay
     setTimeout(() => {
       const mockFile = new File(["dummy content"], "invoice-from-drive.pdf", { type: "application/pdf" });
       setFile(mockFile);
@@ -151,17 +145,12 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose, isOpen }) => {
         }}
       >
         <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-white">Upload Invoice</h2>
-            <Button 
-              variant="dark" 
-              size="icon" 
-              onClick={onClose}
-              className="h-8 w-8"
-            >
-              <X size={16} />
-            </Button>
-          </div>
+          <DialogTitle className="text-xl font-semibold text-white mb-4">
+            Upload Invoice
+          </DialogTitle>
+          <DialogDescription className="text-sm text-white/70 mb-6">
+            Upload your invoice to process your payment request
+          </DialogDescription>
           
           {!file ? (
             <>
