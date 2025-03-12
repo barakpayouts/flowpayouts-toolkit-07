@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { PayoutWidgetProvider } from '@/contexts/PayoutWidgetContext';
@@ -330,7 +331,8 @@ const PayoutWidget: React.FC = () => {
       prepaidCardEmail,
       setPrepaidCardEmail,
       handleLogin,
-      handleStartOnboarding
+      handleStartOnboarding,
+      companyName: config.companyName || "Acme Inc.", // Add companyName from config
     }}>
       <div className="widget-frame">
         {!showLoginScreen && renderHeader()}
