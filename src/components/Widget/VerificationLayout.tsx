@@ -172,7 +172,7 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
         </div>
       )}
       
-      {/* Upload Invoice Dialog */}
+      {/* Simple Upload Invoice Dialog */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
         <DialogContent className="bg-payouts-dark border-white/10 text-white">
           <DialogHeader>
@@ -210,16 +210,14 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
                   onChange={handleFileSelect}
                   ref={fileInputRef}
                 />
-                <label htmlFor="invoice-upload">
-                  <Button 
-                    variant="outline"
-                    className="bg-white/10 border-white/20 hover:bg-white/20"
-                    onClick={handleChooseFile}
-                    type="button"
-                  >
-                    Select File
-                  </Button>
-                </label>
+                <Button 
+                  variant="outline"
+                  className="bg-white/10 border-white/20 hover:bg-white/20"
+                  onClick={handleChooseFile}
+                  type="button"
+                >
+                  Select File
+                </Button>
                 <p className="text-xs text-white/50 mt-4">
                   Supported formats: PDF, JPG, PNG (Max size: 10MB)
                 </p>
@@ -240,7 +238,6 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
               }}
               className="text-payouts-dark font-medium"
               onClick={() => {
-                // Process upload and close dialog
                 if (selectedFileName) {
                   toast.success("File uploaded successfully", {
                     description: `Uploaded ${selectedFileName}`

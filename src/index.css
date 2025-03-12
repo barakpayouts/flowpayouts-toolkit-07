@@ -15,47 +15,44 @@
 @import './styles/animations.css';
 @import './styles/theme-colors.css';
 
-/* Widget dialog styling - IMPORTANT: this makes dialogs display correctly inside the widget */
-.widget-frame .widget-dialog-content {
-  position: absolute !important;
-  max-width: 90%;
-  width: 90%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
-  border-radius: 12px;
-  background-color: var(--widget-bg, #143745);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.widget-frame .widget-dialog-overlay {
-  position: absolute !important;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 50;
-}
-
-/* Ensure dialogs are contained within the widget */
+/* Basic widget container setup */
 .widget-frame {
-  position: relative !important;
+  position: relative;
   overflow: hidden;
-  /* Make sure we don't break existing layout */
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 
-.widget-frame [role="dialog"] {
+/* Override dialog positioning for widget */
+.widget-frame [data-state="open"][role="dialog"] {
+  z-index: 50;
+  position: absolute !important;
+  width: 100%;
+  height: 100%;
+}
+
+/* Dialog overlay - ensure this appears within the widget */
+.widget-frame [role="dialog"] .fixed,
+.widget-frame [role="dialog"] .fixed.inset-0 {
   position: absolute !important;
   inset: 0;
-  overflow: hidden;
-  /* Higher z-index to ensure visibility */
-  z-index: 1000;
+  width: 100%;
+  height: 100%;
 }
 
-/* Override fixed positioning for dialog components inside widget */
-.widget-frame .fixed {
+/* Position dialog content appropriately within widget */
+.widget-frame [role="dialog"] .fixed.left-\[50\%\].top-\[50\%\] {
+  background-color: var(--widget-bg, #143745) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  max-width: 90% !important;
+  max-height: 90% !important;
+  overflow-y: auto !important;
   position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  border-radius: 12px !important;
 }
