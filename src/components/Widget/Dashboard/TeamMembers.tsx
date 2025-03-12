@@ -140,34 +140,34 @@ const TeamMembers: React.FC = () => {
       </div>
 
       <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
-        <DialogContent className="widget-dialog-content sm:max-w-md">
+        <DialogContent className="widget-dialog-content sm:max-w-md bg-payouts-primary border border-white/20">
           <DialogHeader>
-            <DialogTitle>Invite Team Member</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white">Invite Team Member</DialogTitle>
+            <DialogDescription className="text-white/80">
               Add a new member to your payment team. They'll receive an email invitation.
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <label htmlFor="email" className="text-sm font-medium">
+              <label htmlFor="email" className="text-sm font-medium text-white">
                 Email
               </label>
               <div className="flex items-center border rounded-md border-white/20 bg-white/5 px-3 py-2">
-                <Mail className="mr-2 h-4 w-4 opacity-70" />
+                <Mail className="mr-2 h-4 w-4 text-white opacity-70" />
                 <input
                   type="email"
                   id="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  className="flex-1 bg-transparent border-0 outline-none"
+                  className="flex-1 bg-transparent border-0 outline-none text-white"
                   placeholder="colleague@company.com"
                 />
               </div>
             </div>
             
             <div className="grid gap-2">
-              <label className="text-sm font-medium">Role</label>
+              <label className="text-sm font-medium text-white">Role</label>
               <div className="flex flex-wrap gap-2">
                 {(['Admin', 'Member', 'Viewer'] as const).map(role => (
                   <button
@@ -177,7 +177,7 @@ const TeamMembers: React.FC = () => {
                     className={`px-3 py-1.5 rounded text-sm font-medium ${
                       selectedRole === role
                         ? 'bg-payouts-accent text-payouts-dark'
-                        : 'bg-white/10 hover:bg-white/20'
+                        : 'bg-white/10 hover:bg-white/20 text-white'
                     }`}
                   >
                     {getRoleIcon(role)}
@@ -185,7 +185,7 @@ const TeamMembers: React.FC = () => {
                   </button>
                 ))}
               </div>
-              <p className="text-xs opacity-70 mt-1">
+              <p className="text-xs text-white/70 mt-1">
                 {selectedRole === 'Admin' && 'Can manage all settings and invite others'}
                 {selectedRole === 'Member' && 'Can create and manage payments'}
                 {selectedRole === 'Viewer' && 'Can only view payment information'}
@@ -196,7 +196,7 @@ const TeamMembers: React.FC = () => {
           <DialogFooter>
             <button 
               onClick={() => setIsInviteOpen(false)}
-              className="px-4 py-2 rounded bg-white/10 hover:bg-white/20"
+              className="px-4 py-2 rounded bg-white/10 hover:bg-white/20 text-white"
             >
               Cancel
             </button>

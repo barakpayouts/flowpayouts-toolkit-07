@@ -834,3 +834,41 @@
 .settings-toggle.off .settings-toggle-knob {
   left: 0.25rem;
 }
+
+/* Improved dialog styling for team member invites */
+.widget-dialog-content.sm\:max-w-md {
+  background-color: #143745 !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.widget-dialog-content input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.widget-dialog-content .text-white/70 {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.widget-dialog-content .text-white/80 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.widget-dialog-content button.bg-payouts-accent {
+  background-color: #d0e92a !important;
+  color: #0f2a35 !important;
+  font-weight: 500;
+}
+
+.widget-dialog-content button.bg-payouts-accent:hover {
+  background-color: #e0f34a !important;
+}
+
+.widget-dialog-content button.bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+.widget-dialog-content button.bg-white\/10:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
