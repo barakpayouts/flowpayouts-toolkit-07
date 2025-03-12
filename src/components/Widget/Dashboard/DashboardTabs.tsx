@@ -715,13 +715,14 @@ const DashboardTabs: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isInvoiceGeneratorOpen} onOpenChange={setIsInvoiceGeneratorOpen} hideCloseButton>
+      <Dialog open={isInvoiceGeneratorOpen} onOpenChange={setIsInvoiceGeneratorOpen}>
         <DialogContent 
           className="w-[95%] max-w-[800px] widget-dialog-content" 
           style={{ 
             background: config.primaryColor, 
             borderColor: `${config.accentColor}20` 
           }}
+          hideCloseButton={true}
         >
           <DialogHeader>
             <DialogTitle className="text-white">Generate New Invoice</DialogTitle>
