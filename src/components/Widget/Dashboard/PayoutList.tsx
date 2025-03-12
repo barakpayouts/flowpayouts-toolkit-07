@@ -74,11 +74,10 @@ const PayoutList = () => {
       </div>
       
       {/* Invoice Upload Modal */}
-      {showUploadModal && (
-        <UploadInvoice 
-          onClose={() => setShowUploadModal(false)} 
-        />
-      )}
+      <UploadInvoice 
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)} 
+      />
       
       {/* Invoice List */}
       <div className="space-y-3">
