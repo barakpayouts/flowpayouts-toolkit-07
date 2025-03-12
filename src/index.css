@@ -15,7 +15,7 @@
 @import './styles/animations.css';
 @import './styles/theme-colors.css';
 
-/* Widget dialog styling */
+/* Widget dialog styling - IMPORTANT: this makes dialogs display correctly inside the widget */
 .widget-frame .widget-dialog-content {
   position: absolute;
   max-width: 90%;
@@ -40,12 +40,22 @@
 
 /* Ensure dialogs are contained within the widget */
 .widget-frame {
-  position: relative;
+  position: relative !important;
   overflow: hidden;
+  /* Make sure we don't break existing layout */
+  display: flex;
+  flex-direction: column;
 }
 
 .widget-frame [role="dialog"] {
-  position: absolute;
+  position: absolute !important;
   inset: 0;
   overflow: hidden;
+  /* Higher z-index to ensure visibility */
+  z-index: 1000;
+}
+
+/* Override fixed positioning for dialog components inside widget */
+.widget-frame .fixed {
+  position: absolute;
 }

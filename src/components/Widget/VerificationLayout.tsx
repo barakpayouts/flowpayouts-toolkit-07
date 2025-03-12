@@ -47,6 +47,7 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
 }) => {
   const { config } = useWidgetConfig();
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   
   // Function to handle upload button click
   const handleUploadClick = () => {
@@ -54,6 +55,14 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
       onUploadInvoice();
     } else {
       setShowUploadDialog(true);
+    }
+  };
+  
+  // Function to handle file selection
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      setSelectedFileName(files[0].name);
     }
   };
   
@@ -161,27 +170,45 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
           </DialogHeader>
           
           <div className="mt-4 border-2 border-dashed border-white/20 rounded-lg p-8 text-center">
-            <Upload className="mx-auto h-12 w-12 text-white/50 mb-4" />
-            <p className="text-sm text-white/70 mb-4">
-              Drag and drop your invoice here, or click to browse
-            </p>
-            <input 
-              type="file" 
-              className="hidden" 
-              id="invoice-upload" 
-              accept=".pdf,.jpg,.jpeg,.png" 
-            />
-            <label htmlFor="invoice-upload">
-              <Button 
-                variant="outline"
-                className="bg-white/10 border-white/20 hover:bg-white/20"
-              >
-                Select File
-              </Button>
-            </label>
-            <p className="text-xs text-white/50 mt-4">
-              Supported formats: PDF, JPG, PNG (Max size: 10MB)
-            </p>
+            {selectedFileName ? (
+              <div className="flex flex-col items-center">
+                <div className="bg-white/10 p-3 rounded-md text-white mb-3 max-w-full overflow-hidden text-ellipsis">
+                  <span className="font-medium">{selectedFileName}</span>
+                </div>
+                <Button 
+                  variant="outline"
+                  className="bg-white/10 border-white/20 hover:bg-white/20"
+                  onClick={() => setSelectedFileName(null)}
+                >
+                  Select a different file
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Upload className="mx-auto h-12 w-12 text-white/50 mb-4" />
+                <p className="text-sm text-white/70 mb-4">
+                  Drag and drop your invoice here, or click to browse
+                </p>
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  id="invoice-upload" 
+                  accept=".pdf,.jpg,.jpeg,.png" 
+                  onChange={handleFileSelect}
+                />
+                <label htmlFor="invoice-upload">
+                  <Button 
+                    variant="outline"
+                    className="bg-white/10 border-white/20 hover:bg-white/20"
+                  >
+                    Select File
+                  </Button>
+                </label>
+                <p className="text-xs text-white/50 mt-4">
+                  Supported formats: PDF, JPG, PNG (Max size: 10MB)
+                </p>
+              </>
+            )}
           </div>
           
           <div className="flex justify-end gap-2 mt-4">
@@ -197,9 +224,12 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
               }}
               className="text-payouts-dark font-medium"
               onClick={() => {
-                // Close dialog and proceed with upload logic
+                // Process upload and close dialog
                 setShowUploadDialog(false);
+                // Show success message or trigger next step
+                console.log("File uploaded:", selectedFileName);
               }}
+              disabled={!selectedFileName}
             >
               Upload
             </Button>

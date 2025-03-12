@@ -1,4 +1,3 @@
-
 /* Widget styling */
 .widget-container {
   background-color: var(--bg-color, #143745);
@@ -598,4 +597,90 @@
 
 .mirror {
   transform: scaleX(-1);
+}
+
+/* Dialog and modal styling within the widget */
+.widget-dialog {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.widget-dialog-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.widget-dialog-content {
+  position: relative;
+  width: 90%;
+  max-width: 500px;
+  background: var(--widget-bg, #143745);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  max-height: 85%;
+  overflow-y: auto;
+  color: white;
+}
+
+/* File upload styling */
+.upload-area {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.upload-area:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.upload-area.dragging {
+  border-color: var(--accent, #d0e92a);
+  background-color: rgba(208, 233, 42, 0.1);
+}
+
+.file-preview {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.file-preview-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-preview-remove {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.file-preview-remove:hover {
+  background-color: rgba(255, 0, 0, 0.2);
 }
