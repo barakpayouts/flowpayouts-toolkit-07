@@ -6,7 +6,13 @@ import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 import { Upload, FilePlus, FileText } from "lucide-react";
 import InvoiceGenerator from './InvoiceGenerator';
 
-const UploadInvoice = () => {
+interface UploadInvoiceProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+  onSuccess?: (fileName: string) => void;
+}
+
+const UploadInvoice = ({ isOpen, onClose, onSuccess }: UploadInvoiceProps) => {
   const { 
     isInvoiceUploadOpen, 
     setIsInvoiceUploadOpen, 
@@ -14,6 +20,12 @@ const UploadInvoice = () => {
     isInvoiceGeneratorOpen,
     setIsInvoiceGeneratorOpen
   } = usePayoutWidget();
+  
+  // Use either the props or the context values
+  const dialogOpen = isOpen !== undefined ? isOpen : isInvoiceUploadOpen;
+  const setDialogOpen = onClose ? 
+    (value: boolean) => !value && onClose() : 
+    setIsInvoiceUploadOpen;
   
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -59,6 +71,9 @@ const UploadInvoice = () => {
   const handleSubmit = () => {
     if (file) {
       handleUploadInvoice(file);
+      if (onSuccess) {
+        onSuccess(file.name);
+      }
       setFile(null);
     }
   };
@@ -71,13 +86,13 @@ const UploadInvoice = () => {
   };
 
   const openInvoiceGenerator = () => {
-    setIsInvoiceUploadOpen(false);
+    setDialogOpen(false);
     setIsInvoiceGeneratorOpen(true);
   };
   
   return (
     <>
-      <Dialog open={isInvoiceUploadOpen} onOpenChange={setIsInvoiceUploadOpen}>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="widget-dialog-content">
           <DialogHeader>
             <DialogTitle>Invoice Upload</DialogTitle>
@@ -143,7 +158,7 @@ const UploadInvoice = () => {
           )}
           
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setIsInvoiceUploadOpen(false)}>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel
             </Button>
             <Button 
