@@ -1,6 +1,6 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
+import { Notification } from "@/components/Widget/Dashboard/Notifications/NotificationsPanel";
 
 export type PayoutMethod = 'Bank Transfer' | 'Cryptocurrency' | 'Digital Wallet' | 'Card Payment' | 'Prepaid Card' | 'Gift Card' | 'Advanced Payment' | null;
 export type DetailOption = 'PayPal' | 'Venmo' | 'Payoneer' | 'Visa Prepaid' | 'Mastercard Prepaid' | 'Amazon' | 'Walmart' | 'Target' | null;
@@ -80,7 +80,9 @@ interface PayoutWidgetContextType {
   handleDownloadInvoice: () => void;
   prepaidCardEmail: string;
   setPrepaidCardEmail: (email: string) => void;
-  companyName: string; // Add this property to fix the error
+  companyName: string;
+  notifications: Notification[];
+  setNotifications: (notifications: Notification[]) => void;
 }
 
 const PayoutWidgetContext = createContext<PayoutWidgetContextType | undefined>(undefined);
@@ -115,7 +117,7 @@ export const PayoutWidgetProvider: React.FC<{
     setPrepaidCardEmail?: (email: string) => void,
     advanceType?: AdvanceType,
     setAdvanceType?: (type: AdvanceType) => void,
-    companyName?: string, // Add companyName to the value props
+    companyName?: string,
   } 
 }> = ({ children, value }) => {
   const steps = ['profile', 'payout', 'details', 'bank', 'tax'];
@@ -130,8 +132,24 @@ export const PayoutWidgetProvider: React.FC<{
   const [onboardingCompleted, setOnboardingCompleted] = useState(value?.onboardingCompleted || false);
   const [isLoggedIn, setIsLoggedIn] = useState(value?.isLoggedIn || false);
   const [prepaidCardEmail, setPrepaidCardEmail] = useState(value?.prepaidCardEmail || "");
-  const [companyName, setCompanyName] = useState(value?.companyName || "Acme Inc."); // Initialize companyName state
-  
+  const [companyName, setCompanyName] = useState(value?.companyName || "Acme Inc.");
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: "1",
+      title: "Welcome to the Dashboard",
+      message: "You can manage all your payment methods and transactions here.",
+      date: "3/12/2025 • 12:03:21 PM",
+      read: false
+    },
+    {
+      id: "2",
+      title: "New Team Features Available",
+      message: "You can now invite team members to help manage your payments.",
+      date: "3/12/2025 • 12:03:21 PM",
+      read: false
+    }
+  ]);
+
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(value?.advancedPaymentStage || false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<AdvanceTier>(value?.selectedAdvanceTier as AdvanceTier || null);
   const [advanceType, setAdvanceType] = useState<AdvanceType>(value?.advanceType || null);
@@ -441,25 +459,6 @@ export const PayoutWidgetProvider: React.FC<{
     setUploadedInvoices,
     prepaidCardEmail,
     setPrepaidCardEmail,
-    companyName, // Add companyName to the context value
-    handleNextStep,
-    handleBackStep,
-    handleSelectPayoutMethod,
-    handleSelectDetailOption,
-    handleFormChange,
-    handleStartOnboarding,
-    handleLogin,
-    handleLogout,
-    handleChangePayoutMethod,
-    getStatusColor,
-    handleUploadInvoice,
-    handleViewInvoice,
-    handleDownloadInvoice,
-  };
+    companyName,
+   
 
-  return (
-    <PayoutWidgetContext.Provider value={contextValue}>
-      {children}
-    </PayoutWidgetContext.Provider>
-  );
-};
