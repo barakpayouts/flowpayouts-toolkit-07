@@ -3,12 +3,13 @@ import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileI
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { usePayoutWidget, PayoutRecord, InvoiceData } from '@/contexts/PayoutWidgetContext';
-import { cn } from "@/lib/utils";
+import { cn, debugLog } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import InvoiceForm from './InvoiceForm';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -118,7 +119,7 @@ const DashboardTabs: React.FC = () => {
     setIsInvoiceUploadOpen(false);
     setTimeout(() => {
       setIsInvoiceGeneratorOpen(true);
-      console.log("Opening invoice generator dialog");
+      debugLog("Opening invoice generator dialog", { isInvoiceGeneratorOpen: true });
     }, 100);
   };
 
@@ -713,9 +714,27 @@ const DashboardTabs: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={isInvoiceGeneratorOpen} onOpenChange={setIsInvoiceGeneratorOpen} hideCloseButton>
+        <DialogContent 
+          className="w-[95%] max-w-[800px] widget-dialog-content" 
+          style={{ 
+            background: config.primaryColor, 
+            borderColor: `${config.accentColor}20` 
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-white">Generate New Invoice</DialogTitle>
+            <DialogDescription className="text-white/80">
+              Create a professional invoice for your client with detailed information
+            </DialogDescription>
+          </DialogHeader>
+          
+          <InvoiceForm />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 export default DashboardTabs;
-
