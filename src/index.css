@@ -25,34 +25,29 @@
   height: 100%;
 }
 
-/* Override dialog positioning for widget */
-.widget-frame [data-state="open"][role="dialog"] {
+/* Dialog positioning within widget */
+.widget-frame [role="dialog"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
   z-index: 50;
-  position: absolute !important;
-  width: 100%;
-  height: 100%;
 }
 
-/* Dialog overlay - ensure this appears within the widget */
-.widget-frame [role="dialog"] .fixed,
-.widget-frame [role="dialog"] .fixed.inset-0 {
-  position: absolute !important;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* Position dialog content appropriately within widget */
-.widget-frame [role="dialog"] .fixed.left-\[50\%\].top-\[50\%\] {
-  background-color: var(--widget-bg, #143745) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
-  max-width: 90% !important;
-  max-height: 90% !important;
-  overflow-y: auto !important;
+/* Dialog overlay within widget */
+.widget-frame [role="dialog"] [data-radix-popper-content-wrapper] {
   position: absolute !important;
   left: 50% !important;
   top: 50% !important;
   transform: translate(-50%, -50%) !important;
-  border-radius: 12px !important;
+  width: auto !important;
+  max-width: 90% !important;
+}
+
+/* Ensure dialog content has good contrast against dark backgrounds */
+.widget-frame [role="dialog"] [data-radix-dialog-content] {
+  background-color: var(--primary-bg, #143745);
+  color: var(--text-color, white);
+  border-color: rgba(255, 255, 255, 0.1);
 }

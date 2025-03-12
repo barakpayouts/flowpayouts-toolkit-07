@@ -601,39 +601,30 @@
   transform: scaleX(-1);
 }
 
-/* Dialog and modal styling within the widget */
-.widget-dialog {
-  position: absolute !important;
+/* Dialog styling for widget */
+.widget-container [role="dialog"] {
+  position: absolute;
   inset: 0;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
 }
 
-.widget-dialog-overlay {
+.widget-container [role="dialog"] .fixed.inset-0 {
   position: absolute !important;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 50;
 }
 
-.widget-dialog-content {
-  position: relative !important;
-  width: 90%;
-  max-width: 500px;
-  background: var(--widget-bg, #143745) !important;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  z-index: 100;
-  max-height: 85%;
-  overflow-y: auto;
-  color: white;
+.widget-container [role="dialog"] .fixed.left-\[50\%\].top-\[50\%\] {
+  position: absolute !important;
+  width: 90% !important;
+  max-width: 400px !important;
+  background-color: var(--bg-color, #143745) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
 }
 
-/* File upload styling */
+/* Fix for Upload dialog */
 .upload-area {
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 8px;

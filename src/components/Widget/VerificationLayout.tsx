@@ -174,7 +174,7 @@ const VerificationLayout: React.FC<VerificationLayoutProps> = ({
       
       {/* Simple Upload Invoice Dialog */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent className="bg-payouts-dark border-white/10 text-white">
+        <DialogContent className="bg-payouts-dark border-white/10 text-white max-w-md w-[90%]">
           <DialogHeader>
             <DialogTitle>Upload Invoice</DialogTitle>
             <DialogDescription className="text-white/70">

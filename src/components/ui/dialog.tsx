@@ -10,7 +10,6 @@ const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
 
 const DialogPortal = DialogPrimitive.Portal
-DialogPortal.displayName = DialogPrimitive.Portal.displayName
 
 const DialogClose = DialogPrimitive.Close
 
