@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { DollarSign, Clock, FileText, Upload, Calendar, X, Download, Lock, FileImage } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -11,7 +10,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
-// Function to determine status color based on payment status
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'Completed': return 'text-green-500';
@@ -75,13 +73,11 @@ const DashboardTabs: React.FC = () => {
   };
 
   const handleGoogleDriveUpload = () => {
-    // Simulate Google Drive selection
     setUploadSource('google');
     toast.info("Google Drive", {
       description: "Connecting to Google Drive...",
     });
     
-    // Simulate file selection after a delay
     setTimeout(() => {
       const mockFile = new File(["dummy content"], "invoice-from-drive.pdf", { type: "application/pdf" });
       setSelectedFile(mockFile);
@@ -93,6 +89,19 @@ const DashboardTabs: React.FC = () => {
 
   const openFileDialog = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleViewPayoutDetails = (payout: PayoutRecord) => {
+    const invoice: InvoiceData = {
+      id: payout.id,
+      invoice: payout.invoice,
+      date: payout.date,
+      amount: payout.amount,
+      description: payout.description,
+      status: payout.status,
+      method: payout.method
+    };
+    handleViewInvoice(invoice);
   };
 
   return (
@@ -143,7 +152,11 @@ const DashboardTabs: React.FC = () => {
         <TabsContent value="payouts" className="mt-0">
           <div className="payouts-list space-y-3">
             {payouts.filter(p => p.status === 'Completed').map(payout => (
-              <div key={payout.id} className="payout-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <div 
+                key={payout.id} 
+                className="payout-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
+                onClick={() => handleViewPayoutDetails(payout)}
+              >
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-medium">{payout.amount}</p>
@@ -174,7 +187,11 @@ const DashboardTabs: React.FC = () => {
         <TabsContent value="pending" className="mt-0">
           <div className="pending-list space-y-3">
             {payouts.filter(p => p.status !== 'Completed').map(payout => (
-              <div key={payout.id} className="payout-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+              <div 
+                key={payout.id} 
+                className="payout-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
+                onClick={() => handleViewPayoutDetails(payout)}
+              >
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-medium">{payout.amount}</p>
@@ -217,7 +234,6 @@ const DashboardTabs: React.FC = () => {
           </div>
 
           <div className="invoices-list space-y-3">
-            {/* Show uploaded invoices */}
             {uploadedInvoices.map(invoice => (
               <div 
                 key={invoice.id} 
@@ -250,23 +266,11 @@ const DashboardTabs: React.FC = () => {
               </div>
             ))}
             
-            {/* Show system invoices */}
             {payouts.map(payout => (
               <div 
                 key={payout.id} 
                 className="invoice-item p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors cursor-pointer"
-                onClick={() => {
-                  // Convert payout to invoice format for viewing
-                  const invoice: InvoiceData = {
-                    id: payout.id,
-                    invoice: payout.invoice,
-                    date: payout.date,
-                    amount: payout.amount,
-                    description: payout.description,
-                    status: payout.status
-                  };
-                  handleViewInvoice(invoice);
-                }}
+                onClick={() => handleViewPayoutDetails(payout)}
               >
                 <div className="flex justify-between items-start">
                   <div>
@@ -290,7 +294,6 @@ const DashboardTabs: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Invoice Upload Dialog */}
       <Sheet open={isInvoiceUploadOpen} onOpenChange={setIsInvoiceUploadOpen}>
         <SheetContent className="sm:max-w-md" style={{ background: config.primaryColor, borderColor: `${config.accentColor}20` }}>
           <SheetHeader>
@@ -409,7 +412,6 @@ const DashboardTabs: React.FC = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Invoice Detail Dialog */}
       <Dialog open={isInvoiceDetailOpen} onOpenChange={setIsInvoiceDetailOpen}>
         <DialogContent 
           className="sm:max-w-md" 
@@ -419,47 +421,58 @@ const DashboardTabs: React.FC = () => {
           }}
         >
           <DialogHeader>
-            <DialogTitle>Invoice {selectedInvoice?.invoice}</DialogTitle>
-            <DialogDescription>
-              Invoice details for {selectedInvoice?.description}
+            <DialogTitle className="text-white">
+              {selectedInvoice?.method ? 'Payout Details' : 'Invoice'} {selectedInvoice?.invoice}
+            </DialogTitle>
+            <DialogDescription className="text-white/80">
+              {selectedInvoice?.method ? 'Transaction details' : 'Invoice details'} for {selectedInvoice?.description}
             </DialogDescription>
           </DialogHeader>
           
           <div className="invoice-details mt-4 space-y-4">
-            <div className="invoice-preview p-6 bg-white/5 rounded-lg border border-white/10">
+            <div className="invoice-preview p-6 bg-black/20 rounded-lg border border-white/10">
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-1">INVOICE</h3>
-                  <p className="text-sm opacity-70">{selectedInvoice?.invoice}</p>
+                  <h3 className="text-lg font-semibold mb-1 text-white">
+                    {selectedInvoice?.method ? 'PAYOUT TRANSACTION' : 'INVOICE'}
+                  </h3>
+                  <p className="text-sm text-white/80">{selectedInvoice?.invoice}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm opacity-70">Date</p>
-                  <p className="font-medium">{selectedInvoice?.date}</p>
+                  <p className="text-sm text-white/80">Date</p>
+                  <p className="font-medium text-white">{selectedInvoice?.date}</p>
                 </div>
               </div>
               
               <div className="mb-6">
-                <p className="text-sm opacity-70 mb-1">Description</p>
-                <p className="font-medium">{selectedInvoice?.description}</p>
+                <p className="text-sm text-white/80 mb-1">Description</p>
+                <p className="font-medium text-white">{selectedInvoice?.description}</p>
               </div>
+              
+              {selectedInvoice?.method && (
+                <div className="mb-6">
+                  <p className="text-sm text-white/80 mb-1">Payment Method</p>
+                  <p className="font-medium text-white">{selectedInvoice?.method}</p>
+                </div>
+              )}
               
               <div className="border-t border-white/10 pt-4 mb-6">
                 <div className="flex justify-between mb-2">
-                  <p className="opacity-70">Subtotal</p>
-                  <p>{selectedInvoice?.amount}</p>
+                  <p className="text-white/80">Subtotal</p>
+                  <p className="text-white">{selectedInvoice?.amount}</p>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <p className="opacity-70">Tax (0%)</p>
-                  <p>$0.00</p>
+                  <p className="text-white/80">Tax (0%)</p>
+                  <p className="text-white">$0.00</p>
                 </div>
                 <div className="flex justify-between font-semibold text-lg pt-2 border-t border-white/10">
-                  <p>Total</p>
-                  <p>{selectedInvoice?.amount}</p>
+                  <p className="text-white">Total</p>
+                  <p className="text-white">{selectedInvoice?.amount}</p>
                 </div>
               </div>
               
-              <div className="mt-4 bg-white/5 p-3 rounded border border-white/10">
-                <p className="text-sm opacity-70 mb-1">Status</p>
+              <div className="mt-4 bg-black/20 p-3 rounded border border-white/10">
+                <p className="text-sm text-white/80 mb-1">Status</p>
                 <p className={`font-medium ${getStatusColor(selectedInvoice?.status || '')}`}>
                   {selectedInvoice?.status}
                 </p>
@@ -480,14 +493,20 @@ const DashboardTabs: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="gap-1"
+              className="gap-1 text-white border-white/20 hover:bg-white/10"
               onClick={handleDownloadInvoice}
             >
               <Download size={14} />
               <span>Download PDF</span>
             </Button>
             <DialogClose asChild>
-              <Button variant="secondary" size="sm">Close</Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="text-white border-white/20 hover:bg-white/10"
+              >
+                Close
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>

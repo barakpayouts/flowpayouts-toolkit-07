@@ -26,6 +26,7 @@ export interface InvoiceData {
   status: PayoutStatus;
   fileName?: string;
   isUploaded?: boolean;
+  method?: string;
 }
 
 interface PayoutWidgetContextType {
