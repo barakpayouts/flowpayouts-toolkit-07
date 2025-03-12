@@ -5,6 +5,7 @@ import CurrentMethodCard from './CurrentMethodCard';
 import DashboardTabs from './DashboardTabs';
 import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 import { Bell, X } from 'lucide-react';
+import UploadInvoice from './UploadInvoice';
 
 interface Notification {
   id: string;
@@ -20,7 +21,14 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
-  const { handleBackStep, showDashboard, advanceType } = usePayoutWidget();
+  const { 
+    handleBackStep, 
+    showDashboard, 
+    advanceType, 
+    isInvoiceUploadOpen,
+    setIsInvoiceUploadOpen,
+    isInvoiceDetailOpen 
+  } = usePayoutWidget();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -67,6 +75,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
   
+  const handleCloseInvoiceUpload = () => {
+    setIsInvoiceUploadOpen(false);
+  };
+  
   return (
     <div className="dashboard-container relative">
       {/* Notification Bell */}
@@ -87,10 +99,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
         {showNotifications && (
           <div className="absolute top-12 right-0 w-72 max-h-80 overflow-y-auto bg-payouts-primary border border-white/10 rounded-lg shadow-lg z-20">
             <div className="p-3 border-b border-white/10 flex justify-between items-center">
-              <h4 className="font-medium">Notifications</h4>
+              <h4 className="font-medium text-white">Notifications</h4>
               {unreadCount > 0 && (
                 <button 
-                  className="text-xs underline opacity-70 hover:opacity-100"
+                  className="text-xs underline opacity-70 hover:opacity-100 text-white"
                   onClick={markAllAsRead}
                 >
                   Mark all as read
@@ -99,7 +111,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
             </div>
             
             {notifications.length === 0 ? (
-              <div className="p-4 text-center text-sm opacity-70">
+              <div className="p-4 text-center text-sm opacity-70 text-white">
                 No notifications
               </div>
             ) : (
@@ -111,7 +123,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
                     onClick={() => markAsRead(notif.id)}
                   >
                     <div className="flex justify-between items-start mb-1">
-                      <h5 className="text-sm font-medium">{notif.title}</h5>
+                      <h5 className="text-sm font-medium text-white">{notif.title}</h5>
                       <button 
                         className="text-white/50 hover:text-white"
                         onClick={(e) => {
@@ -122,8 +134,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
                         <X size={14} />
                       </button>
                     </div>
-                    <p className="text-xs mb-1">{notif.message}</p>
-                    <span className="text-xs opacity-50">
+                    <p className="text-xs mb-1 text-white">{notif.message}</p>
+                    <span className="text-xs opacity-50 text-white">
                       {new Date(notif.date).toLocaleDateString()} • {new Date(notif.date).toLocaleTimeString()}
                     </span>
                     {!notif.read && (
@@ -144,10 +156,15 @@ const Dashboard: React.FC<DashboardProps> = ({ onBack }) => {
       {onBack && (
         <button
           onClick={onBack || handleBackStep}
-          className="mt-6 w-full py-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors text-sm"
+          className="mt-6 w-full py-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors text-sm text-white"
         >
           Back
         </button>
+      )}
+      
+      {/* Invoice Upload Dialog */}
+      {isInvoiceUploadOpen && (
+        <UploadInvoice onClose={handleCloseInvoiceUpload} />
       )}
     </div>
   );

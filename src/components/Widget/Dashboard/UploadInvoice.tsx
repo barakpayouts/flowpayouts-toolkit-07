@@ -135,17 +135,18 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
     }, 1500);
   };
 
+  // The dialog styling is now handled in CSS (widget.css)
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="invoice-upload-modal" aria-modal="true">
       <div 
-        className="w-full max-w-md p-6 rounded-xl shadow-xl"
+        className="invoice-upload-modal-content"
         style={{ 
           background: `${config.primaryColor}`,
           border: `1px solid ${config.borderColor}`
         }}
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">Upload Invoice</h2>
+          <h2 className="text-xl font-semibold text-white">Upload Invoice</h2>
           <Button 
             variant="dark" 
             size="icon" 
@@ -166,8 +167,8 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
                 <div className="p-3 rounded-full bg-white/10">
                   <Upload size={20} style={{ color: config.accentColor }} />
                 </div>
-                <p className="font-medium text-sm">From Computer</p>
-                <p className="text-xs opacity-70">Upload from your device</p>
+                <p className="font-medium text-sm text-white">From Computer</p>
+                <p className="text-xs opacity-70 text-white">Upload from your device</p>
               </div>
               
               <div 
@@ -177,8 +178,8 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
                 <div className="p-3 rounded-full bg-white/10">
                   <FileText size={20} style={{ color: config.accentColor }} />
                 </div>
-                <p className="font-medium text-sm">Google Drive</p>
-                <p className="text-xs opacity-70">Import from Google Drive</p>
+                <p className="font-medium text-sm text-white">Google Drive</p>
+                <p className="text-xs opacity-70 text-white">Import from Google Drive</p>
               </div>
             </div>
             
@@ -187,6 +188,7 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
+              onClick={openFileSelector}
             >
               <input 
                 type="file" 
@@ -206,7 +208,7 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
                   />
                 </div>
                 <div>
-                  <p className="font-medium mb-1">Drop your invoice here</p>
+                  <p className="font-medium mb-1 text-white">Drop your invoice here</p>
                   <p className="text-xs text-white/60">or click to browse files</p>
                 </div>
                 <p className="text-xs text-white/60 mt-2">
@@ -229,8 +231,8 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
                 />
               </div>
               <div className="invoice-file-preview-info">
-                <p className="invoice-file-preview-name">{file.name}</p>
-                <p className="invoice-file-preview-size">{getFileSize(file.size)}</p>
+                <p className="invoice-file-preview-name text-white">{file.name}</p>
+                <p className="invoice-file-preview-size text-white/70">{getFileSize(file.size)}</p>
               </div>
               {!uploading && !uploaded && (
                 <Button 
@@ -254,7 +256,7 @@ const UploadInvoice: React.FC<UploadInvoiceProps> = ({ onClose }) => {
             
             {(uploading || uploaded) && (
               <div className="space-y-2">
-                <div className="flex justify-between text-xs">
+                <div className="flex justify-between text-xs text-white">
                   <span>{uploaded ? 'Complete' : 'Uploading...'}</span>
                   <span>{Math.round(progress)}%</span>
                 </div>
