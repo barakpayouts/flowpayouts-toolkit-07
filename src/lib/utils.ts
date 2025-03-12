@@ -25,3 +25,7 @@ export function formatDate(date: Date | string): string {
     day: 'numeric'
   }).format(date);
 }
+
+export function debugLog(message: string, data?: any): void {
+  console.log(`[DEBUG] ${message}`, data || '');
+}
