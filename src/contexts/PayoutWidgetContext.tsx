@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState } from 'react';
 import { toast } from "sonner";
 
@@ -173,6 +174,18 @@ export const PayoutWidgetProvider: React.FC<{
       fileName: 'invoice-june-2024.pdf',
       isUploaded: true,
       method: 'Bank Transfer'
+    }
+  ]);
+  
+  // Add the missing teamMembers state
+  const [teamMembers, setTeamMembers] = useState<TeamMemberData[]>([
+    {
+      id: '1',
+      email: 'current-user@example.com',
+      name: 'Current User',
+      role: 'Admin',
+      status: 'Active',
+      dateAdded: '2023-12-01'
     }
   ]);
   
