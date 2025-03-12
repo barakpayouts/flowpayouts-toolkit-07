@@ -179,61 +179,51 @@ export const PayoutWidgetProvider: React.FC<{
     value?.advanceType
   ]);
 
-  // Update the payouts array to remove Early Access entries
   const payouts = [
     { 
       id: 'p1', 
-      amount: '$1,250.00', 
-      date: 'May 15, 2023', 
+      amount: '$875.00', 
+      date: 'Jan 15, 2024', 
       status: 'Completed' as PayoutStatus, 
-      method: 'Bank Transfer',
-      invoice: 'INV-2023-05-01',
-      description: 'April commission payment'
+      method: 'Advanced Payment (70%) - Invoice Factoring',
+      invoice: 'INV-2024-01-01',
+      description: 'Invoice factoring advance'
     },
     { 
       id: 'p2', 
-      amount: '$890.75', 
-      date: 'Jun 12, 2023', 
+      amount: '$1,062.50', 
+      date: 'Feb 1, 2024', 
       status: 'Completed' as PayoutStatus, 
-      method: 'Bank Transfer',
-      invoice: 'INV-2023-06-01',
-      description: 'May commission payment'
+      method: 'Advanced Payment (85%) - Direct Advance',
+      invoice: 'INV-2024-02-01',
+      description: 'Direct advance on upcoming payout'
     },
     { 
       id: 'p3', 
-      amount: '$1,475.50', 
-      date: 'Jul 15, 2023', 
+      amount: '$1,250.00', 
+      date: 'Feb 15, 2024', 
       status: 'Completed' as PayoutStatus, 
-      method: 'Digital Wallet (PayPal)',
-      invoice: 'INV-2023-07-01',
-      description: 'June commission payment'
+      method: 'Bank Transfer',
+      invoice: 'INV-2024-02-15',
+      description: 'January commission payment'
     },
     { 
       id: 'p4', 
-      amount: '$2,100.00', 
-      date: 'Aug 15, 2023', 
+      amount: '$1,475.50', 
+      date: 'Mar 1, 2024', 
       status: 'Pending' as PayoutStatus, 
-      method: 'Digital Wallet (PayPal)',
-      invoice: 'INV-2023-08-01',
-      description: 'July commission payment'
+      method: 'Advanced Payment (70%) - Invoice Factoring',
+      invoice: 'INV-2024-03-01',
+      description: 'Invoice factoring advance'
     },
     { 
       id: 'p5', 
-      amount: '$1,890.25', 
-      date: 'Sep 15, 2023', 
+      amount: '$2,100.00', 
+      date: 'Mar 10, 2024', 
       status: 'Awaiting Approval' as PayoutStatus, 
-      method: 'Digital Wallet (PayPal)',
-      invoice: 'INV-2023-09-01',
-      description: 'August commission payment'
-    },
-    { 
-      id: 'p6', 
-      amount: '$700.00', 
-      date: 'Oct 5, 2023', 
-      status: 'Completed' as PayoutStatus, 
-      method: 'Advanced Payment (70%) - Visa Prepaid',
-      invoice: 'INV-2023-10-01',
-      description: 'September commission advance'
+      method: 'Advanced Payment (85%) - Direct Advance',
+      invoice: 'INV-2024-03-10',
+      description: 'Direct advance request'
     }
   ];
 
