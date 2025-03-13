@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import UploadInvoice from './UploadInvoice';
 import { toast } from "sonner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Invoice {
   id: string;
@@ -55,6 +57,7 @@ const invoices: Invoice[] = [
 const PayoutList = () => {
   const { config } = useWidgetConfig();
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const isMobile = useIsMobile();
   
   const handleUploadSuccess = (fileName: string) => {
     setShowUploadModal(false);
@@ -68,6 +71,19 @@ const PayoutList = () => {
         color: config.textColor,
       },
     });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Completed':
+        return 'bg-green-500/20 text-green-400';
+      case 'Pending':
+        return 'bg-blue-500/20 text-blue-400';
+      case 'Awaiting Approval':
+        return 'bg-yellow-500/20 text-yellow-400';
+      default:
+        return 'bg-gray-500/20 text-gray-400';
+    }
   };
   
   return (
@@ -96,35 +112,67 @@ const PayoutList = () => {
       />
       
       {/* Invoice List */}
-      <div className="space-y-3">
-        {invoices.map((invoice) => (
-          <div 
-            key={invoice.id}
-            className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-colors"
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-medium text-white/70">{invoice.id}</p>
-                <h3 className="text-base font-medium mt-1">{invoice.description}</h3>
-                <p className="text-sm text-white/60 mt-1">{invoice.date}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-base font-semibold" style={{ color: config.accentColor }}>
-                  {invoice.amount}
-                </p>
-                <span 
-                  className={`text-xs font-medium px-2 py-1 rounded-full mt-1 inline-block
-                    ${invoice.status === 'Completed' ? 'bg-green-500/20 text-green-400' : 
-                      invoice.status === 'Pending' ? 'bg-blue-500/20 text-blue-400' : 
-                        'bg-yellow-500/20 text-yellow-400'}`}
-                >
-                  {invoice.status}
-                </span>
+      {isMobile ? (
+        // Mobile optimized view
+        <div className="space-y-3">
+          {invoices.map((invoice) => (
+            <div 
+              key={invoice.id}
+              className="bg-white/5 rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-colors"
+            >
+              <div className="flex flex-col">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm font-medium text-white/70">{invoice.id}</p>
+                  <span 
+                    className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusColor(invoice.status)}`}
+                  >
+                    {invoice.status}
+                  </span>
+                </div>
+                
+                <h3 className="text-base font-medium mb-1">{invoice.description}</h3>
+                
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-sm text-white/60">{invoice.date}</p>
+                  <p className="text-base font-semibold" style={{ color: config.accentColor }}>
+                    {invoice.amount}
+                  </p>
+                </div>
               </div>
             </div>
+          ))}
+        </div>
+      ) : (
+        // Desktop view with scroll area
+        <ScrollArea className="h-[320px] rounded-md">
+          <div className="space-y-3 pr-4">
+            {invoices.map((invoice) => (
+              <div 
+                key={invoice.id}
+                className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm font-medium text-white/70">{invoice.id}</p>
+                    <h3 className="text-base font-medium mt-1">{invoice.description}</h3>
+                    <p className="text-sm text-white/60 mt-1">{invoice.date}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-base font-semibold" style={{ color: config.accentColor }}>
+                      {invoice.amount}
+                    </p>
+                    <span 
+                      className={`text-xs font-medium px-2 py-1 rounded-full mt-1 inline-block ${getStatusColor(invoice.status)}`}
+                    >
+                      {invoice.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </ScrollArea>
+      )}
     </div>
   );
 };
