@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
-import { Copy, Check, Code2, ExternalLink } from 'lucide-react';
+import { Copy, Check, Code2, ExternalLink, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
