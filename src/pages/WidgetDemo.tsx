@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import PayoutWidget from "@/components/Widget/PayoutWidget";
 import { RecipientType, VerificationStep, PayoutMethod, useWidgetConfig } from '@/hooks/use-widget-config';
-import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid, Bot, Scan, Mail } from 'lucide-react';
+import { Check, ChevronDown, Palette, RefreshCcw, Save, ArrowLeft, Sparkles, FileSliders, ChevronRight, CreditCard, LayoutGrid, Bot, Scan, Mail, Code } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,6 +18,7 @@ import {
 import GlassMorphism from '@/components/ui/GlassMorphism';
 import AIStyleConfigurator from '@/components/Widget/AIStyleConfig/AIStyleConfigurator';
 import SendTestEmailModal from '@/components/Widget/SendTestEmailModal';
+import EmbedCodeGenerator from '@/components/Widget/EmbedCodeGenerator';
 
 const WidgetDemo = () => {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ const WidgetDemo = () => {
   const [widgetKey, setWidgetKey] = useState(0);
   const [activeTab, setActiveTab] = useState<'steps' | 'payouts' | 'styling' | 'ai'>('steps');
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showEmbedCode, setShowEmbedCode] = useState(false);
 
   const handleSelectRecipientType = (type: RecipientType) => {
     setRecipientType(type);
@@ -206,6 +208,14 @@ const WidgetDemo = () => {
               >
                 <Mail size={16} />
                 Send Test Email
+              </Button>
+              <Button 
+                variant="dark" 
+                onClick={() => setShowEmbedCode(!showEmbedCode)}
+                className="flex items-center gap-2 text-white hover:bg-black/40"
+              >
+                <Code size={16} />
+                {showEmbedCode ? 'Hide Embed Code' : 'Get Embed Code'}
               </Button>
               <Button 
                 variant="dark" 
@@ -555,6 +565,12 @@ const WidgetDemo = () => {
               </div>
             </div>
           </div>
+          
+          {showEmbedCode && (
+            <div className="mt-8">
+              <EmbedCodeGenerator widgetKey={widgetKey} />
+            </div>
+          )}
         </GlassMorphism>
       </div>
       
@@ -568,3 +584,4 @@ const WidgetDemo = () => {
 };
 
 export default WidgetDemo;
+
