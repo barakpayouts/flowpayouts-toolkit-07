@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
-import { ArrowRight, Wallet, Clock, CheckCircle, FileText, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ArrowRight, Wallet, Clock, CheckCircle, FileText, ToggleLeft, ToggleRight, UserCheck, ShieldCheck, CreditCard, AlertTriangle } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 const RecipientWelcome: React.FC = () => {
   const { handleLogin, handleStartOnboarding } = usePayoutWidget();
@@ -11,6 +12,28 @@ const RecipientWelcome: React.FC = () => {
   
   // Determine if we're in onboarding-only mode or payment mode
   const hasPayoutAmount = showDemo ? false : !!config.payoutAmount;
+  
+  // Mock onboarding status data - in a real app this would come from the backend
+  const onboardingStatus = {
+    account: 'pending', // 'completed', 'pending', 'required'
+    tax: 'required',
+    kyc: 'required',
+    billing: 'pending',
+    overallProgress: 25 // percentage complete
+  };
+  
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle size={16} className="text-green-500" />;
+      case 'pending':
+        return <Clock size={16} className="text-yellow-500" />;
+      case 'required':
+        return <AlertTriangle size={16} className="text-red-400" />;
+      default:
+        return null;
+    }
+  };
   
   return (
     <div className="welcome-container">
@@ -34,7 +57,7 @@ const RecipientWelcome: React.FC = () => {
         </button>
       </div>
       
-      <div className="text-center mb-6">
+      <div className="text-center mb-4">
         <h2 className="text-xl font-semibold mb-2">
           {hasPayoutAmount ? "Payment Ready" : "Onboarding Required"}
         </h2>
@@ -53,6 +76,68 @@ const RecipientWelcome: React.FC = () => {
             </span>
           </div>
         )}
+      </div>
+      
+      {/* Onboarding Status Section */}
+      <div className="mb-5 p-4 rounded-lg border border-white/20 bg-white/5">
+        <h3 className="text-sm font-semibold mb-2">Onboarding Status</h3>
+        
+        <div className="mb-3">
+          <Progress value={onboardingStatus.overallProgress} className="h-1.5 bg-white/10" />
+          <p className="text-xs opacity-70 mt-1">
+            {onboardingStatus.overallProgress}% complete
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-full bg-white/10">
+              <UserCheck size={14} className="text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-medium">Account</p>
+                {getStatusIcon(onboardingStatus.account)}
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-full bg-white/10">
+              <FileText size={14} className="text-purple-400" />
+            </div>
+            <div className="flex-1">
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-medium">Tax Forms</p>
+                {getStatusIcon(onboardingStatus.tax)}
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-full bg-white/10">
+              <ShieldCheck size={14} className="text-green-400" />
+            </div>
+            <div className="flex-1">
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-medium">KYC</p>
+                {getStatusIcon(onboardingStatus.kyc)}
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-full bg-white/10">
+              <CreditCard size={14} className="text-orange-400" />
+            </div>
+            <div className="flex-1">
+              <div className="flex justify-between items-center">
+                <p className="text-xs font-medium">Billing</p>
+                {getStatusIcon(onboardingStatus.billing)}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div className="space-y-4 mb-6">
