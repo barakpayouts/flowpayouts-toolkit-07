@@ -15,6 +15,7 @@ import AdvancedPayment from './PayoutMethods/AdvancedPayment';
 import MethodDetails from './PayoutSteps/MethodDetails';
 import Dashboard from './Dashboard/Dashboard';
 import LoginScreen from './LoginScreen';
+import RecipientWelcome from './RecipientWelcome';
 import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,8 @@ const PayoutWidget: React.FC = () => {
   const [requiresBankVerification, setRequiresBankVerification] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
-  const [showLoginScreen, setShowLoginScreen] = useState(true);
+  const [showLoginScreen, setShowLoginScreen] = useState(false);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<string | null>(null);
@@ -51,7 +53,6 @@ const PayoutWidget: React.FC = () => {
       setAdvancedPaymentStage(false);
       setSelectedAdvanceTier(null);
     }
-    
   };
   
   const handleNext = () => {
@@ -84,6 +85,7 @@ const PayoutWidget: React.FC = () => {
 
   const handleLogin = () => {
     setIsLoggedIn(true);
+    setShowWelcomeScreen(false);
     setShowLoginScreen(false);
     setOnboardingCompleted(true);
     setSelectedMethod('Digital Wallet');
@@ -94,6 +96,7 @@ const PayoutWidget: React.FC = () => {
   };
   
   const handleStartOnboarding = () => {
+    setShowWelcomeScreen(false);
     setShowLoginScreen(false);
     setActiveStep(0);
     setOnboardingCompleted(false);
@@ -124,6 +127,10 @@ const PayoutWidget: React.FC = () => {
   };
 
   const renderStepContent = () => {
+    if (showWelcomeScreen) {
+      return <RecipientWelcome />;
+    }
+    
     if (showLoginScreen) {
       return <LoginScreen />;
     }
@@ -222,6 +229,8 @@ const PayoutWidget: React.FC = () => {
   const currentStep = steps.length > 0 ? steps[activeStep] : 'payout';
   
   const renderHeader = () => {
+    if (showWelcomeScreen) return null;
+    
     return (
       <div className="widget-header">
         <div className="widget-header-pills">
@@ -284,7 +293,7 @@ const PayoutWidget: React.FC = () => {
   };
   
   const renderFooter = () => {
-    if (steps.length === 0 || showDashboard) return null;
+    if (showWelcomeScreen || steps.length === 0 || showDashboard) return null;
     
     return (
       <div className="widget-footer">
@@ -334,15 +343,15 @@ const PayoutWidget: React.FC = () => {
       companyName: config.companyName || "Acme Inc.", 
     }}>
       <div className="widget-frame">
-        {!showLoginScreen && renderHeader()}
+        {!showWelcomeScreen && !showLoginScreen && renderHeader()}
         
-        {!showLoginScreen && renderStepCircles()}
+        {!showWelcomeScreen && !showLoginScreen && renderStepCircles()}
         
         <div className="widget-content">
           {renderStepContent()}
         </div>
         
-        {!showLoginScreen && !showDashboard && renderFooter()}
+        {!showWelcomeScreen && !showLoginScreen && !showDashboard && renderFooter()}
       </div>
     </PayoutWidgetProvider>
   );
