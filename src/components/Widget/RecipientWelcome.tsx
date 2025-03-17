@@ -1,18 +1,39 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
-import { ArrowRight, Wallet, Clock, CheckCircle, FileText } from 'lucide-react';
+import { ArrowRight, Wallet, Clock, CheckCircle, FileText, ToggleLeft, ToggleRight } from 'lucide-react';
 
 const RecipientWelcome: React.FC = () => {
   const { handleLogin, handleStartOnboarding } = usePayoutWidget();
   const { config } = useWidgetConfig();
+  const [showDemo, setShowDemo] = useState(false);
   
   // Determine if we're in onboarding-only mode or payment mode
-  const hasPayoutAmount = !!config.payoutAmount;
+  const hasPayoutAmount = showDemo ? false : !!config.payoutAmount;
   
   return (
     <div className="welcome-container">
+      {/* Demo toggle - only visible in development/demo mode */}
+      <div className="flex justify-end mb-2">
+        <button 
+          onClick={() => setShowDemo(!showDemo)} 
+          className="flex items-center gap-1.5 text-xs opacity-70 hover:opacity-100 transition-opacity bg-white/10 px-3 py-1.5 rounded-full"
+        >
+          {showDemo ? (
+            <>
+              <ToggleRight size={14} className="text-payouts-accent" />
+              Onboarding Mode
+            </>
+          ) : (
+            <>
+              <ToggleLeft size={14} />
+              Payment Mode
+            </>
+          )}
+        </button>
+      </div>
+      
       <div className="text-center mb-6">
         <h2 className="text-xl font-semibold mb-2">
           {hasPayoutAmount ? "Payment Ready" : "Onboarding Required"}
@@ -28,7 +49,7 @@ const RecipientWelcome: React.FC = () => {
         {hasPayoutAmount && (
           <div className="mt-4 py-3 px-6 bg-white/10 rounded-lg inline-block">
             <span className="text-2xl font-bold" style={{ color: config.accentColor || '#9b87f5' }}>
-              {config.payoutAmount}
+              {config.payoutAmount || "$1,250.00"}
             </span>
           </div>
         )}
