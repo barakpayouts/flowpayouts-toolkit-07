@@ -3,7 +3,7 @@ import React from 'react';
 import { BankVerificationMethod } from '@/hooks/use-widget-config';
 import { cn } from '@/lib/utils';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
-import { Wallet2, FileText, BarChart, Radio } from 'lucide-react';
+import { Wallet2, FileText, BarChart, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface VerificationMethodTabsProps {
@@ -16,6 +16,40 @@ const VerificationMethodTabs: React.FC<VerificationMethodTabsProps> = ({
   onMethodChange,
 }) => {
   const { config } = useWidgetConfig();
+  
+  // Mock verification status - in a real app would come from backend
+  const verificationStatus = {
+    plaid: 'completed',
+    statement: 'pending',
+    microdeposit: 'required'
+  };
+  
+  const getStatusIndicator = (methodId: string) => {
+    const status = verificationStatus[methodId as keyof typeof verificationStatus];
+    
+    switch (status) {
+      case 'completed':
+        return (
+          <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-0.5">
+            <CheckCircle size={14} />
+          </div>
+        );
+      case 'pending':
+        return (
+          <div className="absolute top-2 right-2 bg-yellow-500 text-white rounded-full p-0.5">
+            <Clock size={14} />
+          </div>
+        );
+      case 'required':
+        return (
+          <div className="absolute top-2 right-2 bg-red-400 text-white rounded-full p-0.5">
+            <AlertTriangle size={14} />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
   
   const methods = [
     { id: 'plaid', label: 'Instant Verification', description: 'Connect your bank securely using Plaid', icon: Wallet2 },
@@ -36,7 +70,7 @@ const VerificationMethodTabs: React.FC<VerificationMethodTabsProps> = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={cn(
-              "flex flex-col items-center text-center p-4 rounded-xl transition-all",
+              "flex flex-col items-center text-center p-4 rounded-xl transition-all relative",
               isActive 
                 ? "bg-white/10 shadow-lg border border-white/20" 
                 : "bg-white/5 hover:bg-white/8 border border-transparent"
@@ -46,6 +80,8 @@ const VerificationMethodTabs: React.FC<VerificationMethodTabsProps> = ({
               boxShadow: isActive ? `0 4px 20px -5px ${config.accentColor}40` : 'none',
             }}
           >
+            {getStatusIndicator(method.id)}
+            
             <div 
               className={cn(
                 "w-12 h-12 rounded-full flex items-center justify-center mb-3",

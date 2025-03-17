@@ -2,7 +2,7 @@
 import React from 'react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { motion } from 'framer-motion';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const MicroDepositVerification: React.FC = () => {
@@ -15,7 +15,13 @@ const MicroDepositVerification: React.FC = () => {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-6"
     >
-      <h4 className="text-center font-medium text-lg">Micro-Deposit Verification</h4>
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="font-medium text-lg">Micro-Deposit Verification</h4>
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs">
+          <Clock size={14} />
+          <span>In Progress</span>
+        </div>
+      </div>
       <p className="text-center text-sm text-white/70 mb-4">We'll send two small deposits to your account for verification</p>
       
       <div className="space-y-5 bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10">

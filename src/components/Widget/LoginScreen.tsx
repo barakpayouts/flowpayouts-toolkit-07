@@ -16,14 +16,14 @@ const LoginScreen: React.FC = () => {
     overallProgress: 50 // percentage complete
   };
   
-  const getStatusIcon = (status: string) => {
+  const getStatusText = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle size={16} className="text-green-500" />;
+        return <span className="text-green-500">Completed</span>;
       case 'pending':
-        return <Clock size={16} className="text-yellow-500" />;
+        return <span className="text-yellow-500">Pending</span>;
       case 'required':
-        return <AlertTriangle size={16} className="text-red-400" />;
+        return <span className="text-red-400">Required</span>;
       default:
         return null;
     }
@@ -45,53 +45,37 @@ const LoginScreen: React.FC = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-full bg-white/10">
-              <UserCheck size={14} className="text-blue-400" />
+        <div className="space-y-2">
+          <div className="flex justify-between items-center py-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <UserCheck size={16} className="text-blue-400" />
+              <span className="text-sm">Account</span>
             </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-center">
-                <p className="text-xs font-medium">Account</p>
-                {getStatusIcon(onboardingStatus.account)}
-              </div>
-            </div>
+            {getStatusText(onboardingStatus.account)}
           </div>
           
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-full bg-white/10">
-              <FileText size={14} className="text-purple-400" />
+          <div className="flex justify-between items-center py-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <FileText size={16} className="text-purple-400" />
+              <span className="text-sm">Tax Forms</span>
             </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-center">
-                <p className="text-xs font-medium">Tax Forms</p>
-                {getStatusIcon(onboardingStatus.tax)}
-              </div>
-            </div>
+            {getStatusText(onboardingStatus.tax)}
           </div>
           
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-full bg-white/10">
-              <ShieldCheck size={14} className="text-green-400" />
+          <div className="flex justify-between items-center py-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={16} className="text-green-400" />
+              <span className="text-sm">KYC</span>
             </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-center">
-                <p className="text-xs font-medium">KYC</p>
-                {getStatusIcon(onboardingStatus.kyc)}
-              </div>
-            </div>
+            {getStatusText(onboardingStatus.kyc)}
           </div>
           
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-full bg-white/10">
-              <CreditCard size={14} className="text-orange-400" />
+          <div className="flex justify-between items-center py-2">
+            <div className="flex items-center gap-2">
+              <CreditCard size={16} className="text-orange-400" />
+              <span className="text-sm">Billing</span>
             </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-center">
-                <p className="text-xs font-medium">Billing</p>
-                {getStatusIcon(onboardingStatus.billing)}
-              </div>
-            </div>
+            {getStatusText(onboardingStatus.billing)}
           </div>
         </div>
       </div>
