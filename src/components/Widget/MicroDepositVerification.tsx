@@ -4,9 +4,19 @@ import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { motion } from 'framer-motion';
 import { AlertCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import OnboardingStatus from './OnboardingStatus';
 
 const MicroDepositVerification: React.FC = () => {
   const { config } = useWidgetConfig();
+  
+  // Mock onboarding status data - in a real app this would come from the backend
+  const onboardingStatus = {
+    account: 'pending' as const, // 'completed', 'pending', 'required'
+    tax: 'required' as const,
+    kyc: 'required' as const,
+    billing: 'pending' as const,
+    overallProgress: 25 // percentage complete
+  };
   
   return (
     <motion.div 
@@ -22,6 +32,10 @@ const MicroDepositVerification: React.FC = () => {
           <span>In Progress</span>
         </div>
       </div>
+      
+      {/* Onboarding Status Section - Now visible after login */}
+      <OnboardingStatus onboardingStatus={onboardingStatus} />
+      
       <p className="text-center text-sm text-white/70 mb-4">We'll send two small deposits to your account for verification</p>
       
       <div className="space-y-5 bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10">
