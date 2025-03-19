@@ -9,22 +9,28 @@ import {
   getClientId, 
   getEnvironment, 
   handleFormSubmission, 
-  getCodeVerifier,
-  initializeAirwallex
+  getCodeVerifier
 } from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { config } = useWidgetConfig();
   const beneficiaryFormRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
   const [isFormLoading, setIsFormLoading] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   
   useEffect(() => {
+    let isMounted = true;
+    
     const initAndRenderElement = async () => {
       try {
+        if (!isMounted) return;
+        
         setIsFormLoading(true);
         setFormError(null);
+        
+        console.log('Initializing Airwallex form...');
         
         // Dynamically import the Airwallex SDK
         const { createElement, init } = await import('@airwallex/components-sdk');
@@ -38,7 +44,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           codeVerifier: getCodeVerifier(),
         });
         
-        console.log('Airwallex SDK initialized, creating beneficiary form');
+        console.log('Airwallex SDK initialized successfully');
         
         // Create the beneficiary form element
         const element = await createElement('beneficiaryForm', {
@@ -89,25 +95,36 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           },
         });
         
-        console.log('Beneficiary form created, mounting to DOM');
+        console.log('Beneficiary form created successfully');
         
-        // Wait for mount element to be available
+        // Ensure the DOM is ready before mounting the form
         setTimeout(() => {
+          if (!isMounted) return;
+          
           const mountElement = document.getElementById('beneficiary-root');
+          console.log('Looking for mount element with ID "beneficiary-root":', !!mountElement);
+          
           if (mountElement) {
-            console.log('Found mount element, mounting form');
-            element.mount('#beneficiary-root');
-            beneficiaryFormRef.current = element;
-            setIsFormInitialized(true);
-            setIsFormLoading(false);
+            try {
+              element.mount('#beneficiary-root');
+              console.log('Form mounted successfully');
+              beneficiaryFormRef.current = element;
+              setIsFormInitialized(true);
+              setIsFormLoading(false);
+            } catch (mountError) {
+              console.error('Error mounting form:', mountError);
+              setFormError('Error mounting payment form. Please try again.');
+              setIsFormLoading(false);
+            }
           } else {
             console.error('Mount element not found after timeout');
-            setFormError('Mount element not found. Please refresh and try again.');
+            setFormError('Unable to initialize payment form. Please refresh and try again.');
             setIsFormLoading(false);
           }
-        }, 500);
+        }, 1000); // Increased timeout to ensure DOM is ready
         
       } catch (error) {
+        if (!isMounted) return;
         console.error('Error initializing Airwallex form:', error);
         setFormError('Failed to initialize payment form. Please try again later.');
         setIsFormLoading(false);
@@ -121,6 +138,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     
     // Cleanup when component unmounts
     return () => {
+      isMounted = false;
       if (beneficiaryFormRef.current) {
         try {
           beneficiaryFormRef.current.unmount();
@@ -149,7 +167,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   };
   
   return (
-    <div className="payout-details-form">
+    <div className="payout-details-form" ref={containerRef}>
       <div className="flex items-center justify-between mb-6">
         <button 
           onClick={onBack}
@@ -196,10 +214,14 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         
         <div
           id="beneficiary-root"
-          className={isFormLoading ? 'hidden' : 'block'}
+          className={`airwallex-form-container ${isFormLoading ? 'hidden' : 'block'}`}
           style={{ 
             minHeight: "500px", 
-            marginBottom: "20px"
+            marginBottom: "20px",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            borderRadius: "8px",
+            padding: "16px",
+            backgroundColor: "rgba(255, 255, 255, 0.05)"
           }}
         />
         

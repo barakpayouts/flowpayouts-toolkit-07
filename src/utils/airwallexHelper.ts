@@ -46,14 +46,17 @@ export const handleFormSubmission = (result: any) => {
  * This is a simple implementation for demo purposes
  */
 export const getCodeVerifier = (): string => {
-  return 'payout-widget-code-verifier-123456';
+  // A fixed code verifier for development
+  return 'airwallex-code-verifier-123456789';
 };
 
 /**
  * Initialize Airwallex with error handling
+ * Returns a promise that resolves to true if initialization succeeds, false otherwise
  */
-export const initializeAirwallex = async () => {
+export const initializeAirwallex = async (): Promise<boolean> => {
   try {
+    // Dynamically import the Airwallex SDK to ensure it's only loaded when needed
     const { init } = await import('@airwallex/components-sdk');
     
     // Initialize the Airwallex SDK
@@ -72,4 +75,3 @@ export const initializeAirwallex = async () => {
     return false;
   }
 };
-
