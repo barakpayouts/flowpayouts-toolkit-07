@@ -1,4 +1,3 @@
-
 // This file contains helper functions for Airwallex integration
 
 // Define custom types since they're not exported from the SDK

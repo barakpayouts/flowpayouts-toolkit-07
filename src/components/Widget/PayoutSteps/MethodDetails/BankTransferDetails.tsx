@@ -10,7 +10,8 @@ import {
   getEnvironment, 
   getCodeVerifier,
   createBeneficiaryForm,
-  createBeneficiaryFormConfig
+  createBeneficiaryFormConfig,
+  mountAirwallexElement
 } from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -21,8 +22,6 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   
   useEffect(() => {
     let isMounted = true;
-    let mountAttempts = 0;
-    const maxMountAttempts = 5;
     
     const initializeForm = async () => {
       try {
@@ -55,65 +54,58 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         console.log('Form config created:', formConfig);
         
         // 3. Create the Airwallex element
-        const { createElement } = await import('@airwallex/components-sdk');
-        const element = await createElement('beneficiaryForm', formConfig);
-        console.log('Form element created successfully');
+        const element = await createBeneficiaryForm(formConfig);
+        if (!element) {
+          setFormError('Failed to create payment form. Please try again later.');
+          setIsFormLoading(false);
+          return;
+        }
         
         // Store the element reference
         beneficiaryFormRef.current = element;
         
-        // 4. Attempt to mount the form with retries
-        const attemptMount = () => {
+        // 4. Prepare the DOM before mounting
+        // We'll add a short delay to ensure DOM is fully rendered
+        setTimeout(() => {
           if (!isMounted) return;
           
-          mountAttempts++;
-          console.log(`Mount attempt ${mountAttempts} of ${maxMountAttempts}`);
-          
-          const formContainer = document.getElementById('beneficiary-form-container');
-          if (!formContainer) {
-            console.error('Form container element not found');
-            
-            if (mountAttempts < maxMountAttempts) {
-              // Retry mounting after a short delay
-              setTimeout(attemptMount, 1000);
-            } else {
-              setFormError('Unable to initialize payment form. Please refresh and try again.');
-              setIsFormLoading(false);
-            }
-            return;
-          }
-          
           try {
-            // Clear any existing content in the container
-            while (formContainer.firstChild) {
-              formContainer.removeChild(formContainer.firstChild);
+            // Get the container element
+            const formContainer = document.getElementById('beneficiary-form-container');
+            if (!formContainer) {
+              console.error('Form container element not found');
+              setFormError('Form container not found. Please refresh and try again.');
+              setIsFormLoading(false);
+              return;
             }
             
-            // Create a fresh mount point
+            // Clear any existing content
+            formContainer.innerHTML = '';
+            
+            // Create a fresh mount point with the ID 'beneficiary-root'
             const mountPoint = document.createElement('div');
             mountPoint.id = 'beneficiary-root';
             formContainer.appendChild(mountPoint);
             
-            // Mount the element
-            element.mount('#beneficiary-root');
-            console.log('Form mounted successfully!');
-            
-            setIsFormLoading(false);
-          } catch (mountError) {
-            console.error('Error mounting form:', mountError);
-            
-            if (mountAttempts < maxMountAttempts) {
-              // Retry mounting after a short delay
-              setTimeout(attemptMount, 1000);
-            } else {
-              setFormError('Error mounting payment form. Please try again later.');
+            // Mount the element - with a short delay to ensure the DOM is updated
+            setTimeout(() => {
+              if (!isMounted) return;
+              
+              // Use our helper to mount the element
+              const mounted = mountAirwallexElement(element, '#beneficiary-root');
+              
+              if (!mounted) {
+                setFormError('Error mounting payment form. Please try again later.');
+              }
+              
               setIsFormLoading(false);
-            }
+            }, 200);
+          } catch (error) {
+            console.error('Error preparing mount point:', error);
+            setFormError('Error preparing form. Please try again later.');
+            setIsFormLoading(false);
           }
-        };
-        
-        // Start the mounting process with a longer delay to ensure DOM is ready
-        setTimeout(attemptMount, 1500);
+        }, 500);
         
       } catch (error) {
         if (!isMounted) return;
