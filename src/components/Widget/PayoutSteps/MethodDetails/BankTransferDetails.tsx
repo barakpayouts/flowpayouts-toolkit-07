@@ -8,34 +8,32 @@ import {
   getAuthCode, 
   getClientId, 
   getEnvironment, 
-  handleFormSubmission, 
-  getCodeVerifier
+  getCodeVerifier,
+  createBeneficiaryForm
 } from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { config } = useWidgetConfig();
   const beneficiaryFormRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isFormInitialized, setIsFormInitialized] = useState(false);
   const [isFormLoading, setIsFormLoading] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   
   useEffect(() => {
     let isMounted = true;
+    let mountAttempts = 0;
+    const maxMountAttempts = 5;
     
-    const initAndRenderElement = async () => {
+    const initializeForm = async () => {
       try {
         if (!isMounted) return;
         
+        console.log('Starting Airwallex form initialization');
         setIsFormLoading(true);
         setFormError(null);
         
-        console.log('Initializing Airwallex form...');
+        // 1. Import and initialize the Airwallex SDK
+        const { init } = await import('@airwallex/components-sdk');
         
-        // Dynamically import the Airwallex SDK
-        const { createElement, init } = await import('@airwallex/components-sdk');
-        
-        // Initialize the Airwallex SDK
         await init({
           locale: 'en',
           env: getEnvironment(),
@@ -46,14 +44,14 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         
         console.log('Airwallex SDK initialized successfully');
         
-        // Create the beneficiary form element
-        const element = await createElement('beneficiaryForm', {
+        // 2. Create the form configuration object
+        const formConfig = {
           defaultValues: {
             beneficiary: {
               entity_type: 'COMPANY',
               bank_details: {
                 account_currency: config.currency || 'USD',
-                bank_country_code: 'US', // Default to US
+                bank_country_code: 'US',
                 local_clearing_system: 'BANK_TRANSFER',
               },
             },
@@ -62,66 +60,99 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           theme: {
             palette: {
               primary: {
-                '10': '#143745', 
-                '20': '#143745',
-                '30': '#143745',
-                '40': '#143745',
-                '50': '#143745',
-                '60': config.accentColor,
-                '70': config.accentColor,
-                '80': config.accentColor,
-                '90': config.accentColor,
-                '100': config.accentColor,
+                '10': config.backgroundColor || '#143745', 
+                '20': config.backgroundColor || '#143745',
+                '30': config.backgroundColor || '#143745',
+                '40': config.backgroundColor || '#143745',
+                '50': config.backgroundColor || '#143745',
+                '60': config.accentColor || '#d0e92a',
+                '70': config.accentColor || '#d0e92a',
+                '80': config.accentColor || '#d0e92a',
+                '90': config.accentColor || '#d0e92a',
+                '100': config.accentColor || '#d0e92a',
               },
               gradients: {
-                primary: [config.backgroundColor, config.accentColor],
-                secondary: [config.backgroundColor, config.accentColor],
-                tertiary: [config.backgroundColor, config.accentColor],
-                quaternary: [config.accentColor, config.accentColor],
+                primary: [config.backgroundColor || '#143745', config.accentColor || '#d0e92a'],
+                secondary: [config.backgroundColor || '#143745', config.accentColor || '#d0e92a'],
+                tertiary: [config.backgroundColor || '#143745', config.accentColor || '#d0e92a'],
+                quaternary: [config.accentColor || '#d0e92a', config.accentColor || '#d0e92a'],
               },
             },
             components: {
               spinner: {
                 colors: {
                   start: {
-                    initial: config.backgroundColor,
+                    initial: config.backgroundColor || '#143745',
                   },
                   stop: {
-                    initial: config.accentColor,
+                    initial: config.accentColor || '#d0e92a',
                   },
                 },
               },
             },
           },
-        });
+        };
         
-        console.log('Beneficiary form created successfully');
+        // 3. Create the Airwallex element
+        const { createElement } = await import('@airwallex/components-sdk');
+        const element = await createElement('beneficiaryForm', formConfig);
+        console.log('Form element created successfully');
         
-        // Ensure the DOM is ready before mounting the form
-        setTimeout(() => {
+        // Store the element reference
+        beneficiaryFormRef.current = element;
+        
+        // 4. Attempt to mount the form with retries
+        const attemptMount = () => {
           if (!isMounted) return;
           
-          const mountElement = document.getElementById('beneficiary-root');
-          console.log('Looking for mount element with ID "beneficiary-root":', !!mountElement);
+          mountAttempts++;
+          console.log(`Mount attempt ${mountAttempts} of ${maxMountAttempts}`);
           
-          if (mountElement) {
-            try {
-              element.mount('#beneficiary-root');
-              console.log('Form mounted successfully');
-              beneficiaryFormRef.current = element;
-              setIsFormInitialized(true);
-              setIsFormLoading(false);
-            } catch (mountError) {
-              console.error('Error mounting form:', mountError);
-              setFormError('Error mounting payment form. Please try again.');
+          const formContainer = document.getElementById('beneficiary-form-container');
+          if (!formContainer) {
+            console.error('Form container element not found');
+            
+            if (mountAttempts < maxMountAttempts) {
+              // Retry mounting after a short delay
+              setTimeout(attemptMount, 500);
+            } else {
+              setFormError('Unable to initialize payment form. Please refresh and try again.');
               setIsFormLoading(false);
             }
-          } else {
-            console.error('Mount element not found after timeout');
-            setFormError('Unable to initialize payment form. Please refresh and try again.');
-            setIsFormLoading(false);
+            return;
           }
-        }, 1000); // Increased timeout to ensure DOM is ready
+          
+          try {
+            // Clear any existing content in the container
+            while (formContainer.firstChild) {
+              formContainer.removeChild(formContainer.firstChild);
+            }
+            
+            // Create a fresh mount point
+            const mountPoint = document.createElement('div');
+            mountPoint.id = 'beneficiary-root';
+            formContainer.appendChild(mountPoint);
+            
+            // Mount the element
+            element.mount('#beneficiary-root');
+            console.log('Form mounted successfully!');
+            
+            setIsFormLoading(false);
+          } catch (mountError) {
+            console.error('Error mounting form:', mountError);
+            
+            if (mountAttempts < maxMountAttempts) {
+              // Retry mounting after a short delay
+              setTimeout(attemptMount, 500);
+            } else {
+              setFormError('Error mounting payment form. Please try again later.');
+              setIsFormLoading(false);
+            }
+          }
+        };
+        
+        // Start the mounting process
+        setTimeout(attemptMount, 100);
         
       } catch (error) {
         if (!isMounted) return;
@@ -131,10 +162,8 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       }
     };
     
-    // Only run once when component mounts
-    if (!isFormInitialized) {
-      initAndRenderElement();
-    }
+    // Initialize the form when the component mounts
+    initializeForm();
     
     // Cleanup when component unmounts
     return () => {
@@ -148,26 +177,27 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         }
       }
     };
-  }, [config.accentColor, config.backgroundColor, config.currency, isFormInitialized]);
+  }, [config.accentColor, config.backgroundColor, config.currency]);
   
   const handleSubmit = async () => {
-    if (beneficiaryFormRef.current) {
-      try {
-        console.log('Submitting Airwallex form');
-        const submitResult = await beneficiaryFormRef.current.submit();
-        handleFormSubmission(submitResult);
-        toast.success('Bank details submitted successfully!');
-      } catch (error) {
-        console.error('Error submitting form:', error);
-        toast.error('There was an error submitting your details. Please try again.');
-      }
-    } else {
+    if (!beneficiaryFormRef.current) {
       toast.error('Form not initialized. Please refresh and try again.');
+      return;
+    }
+    
+    try {
+      console.log('Submitting Airwallex form');
+      const submitResult = await beneficiaryFormRef.current.submit();
+      console.log('Form submission result:', submitResult);
+      toast.success('Bank details submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('There was an error submitting your details. Please try again.');
     }
   };
   
   return (
-    <div className="payout-details-form" ref={containerRef}>
+    <div className="payout-details-form">
       <div className="flex items-center justify-between mb-6">
         <button 
           onClick={onBack}
@@ -213,15 +243,16 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         )}
         
         <div
-          id="beneficiary-root"
-          className={`airwallex-form-container ${isFormLoading ? 'hidden' : 'block'}`}
+          id="beneficiary-form-container"
+          className="airwallex-form-container"
           style={{ 
-            minHeight: "500px", 
+            minHeight: "400px", 
             marginBottom: "20px",
             border: "1px solid rgba(255, 255, 255, 0.1)",
             borderRadius: "8px",
             padding: "16px",
-            backgroundColor: "rgba(255, 255, 255, 0.05)"
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            display: isFormLoading ? 'none' : 'block'
           }}
         />
         
@@ -233,7 +264,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             boxShadow: `0 4px 15px ${config.accentColor}40`,
           }}
           onClick={handleSubmit}
-          disabled={isFormLoading || !!formError || !isFormInitialized}
+          disabled={isFormLoading || !!formError}
         >
           Submit Bank Details
         </Button>

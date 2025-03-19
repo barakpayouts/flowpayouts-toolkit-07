@@ -75,3 +75,48 @@ export const initializeAirwallex = async (): Promise<boolean> => {
     return false;
   }
 };
+
+/**
+ * Create Airwallex beneficiary form element
+ * Returns a promise that resolves to the created element if successful, or null if it fails
+ */
+export const createBeneficiaryForm = async (config: any) => {
+  try {
+    const { createElement } = await import('@airwallex/components-sdk');
+    
+    // Create the beneficiary form element with the provided configuration
+    const element = await createElement('beneficiaryForm', config);
+    console.log('Beneficiary form created successfully');
+    return element;
+  } catch (error) {
+    console.error('Failed to create beneficiary form:', error);
+    return null;
+  }
+};
+
+/**
+ * Mount Airwallex element to DOM
+ * Returns true if mounting was successful, false otherwise
+ */
+export const mountAirwallexElement = (element: any, selector: string): boolean => {
+  try {
+    if (!element) {
+      console.error('Cannot mount null element');
+      return false;
+    }
+    
+    const targetElement = document.querySelector(selector);
+    if (!targetElement) {
+      console.error(`Mount target not found: ${selector}`);
+      return false;
+    }
+    
+    // Mount the element to the DOM
+    element.mount(selector);
+    console.log(`Element mounted successfully to ${selector}`);
+    return true;
+  } catch (error) {
+    console.error('Error mounting element:', error);
+    return false;
+  }
+};
