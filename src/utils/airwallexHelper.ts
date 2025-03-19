@@ -1,6 +1,40 @@
 
 // This file contains helper functions for Airwallex integration
-import type { BeneficiaryFormOptions, EntityType } from '@airwallex/components-sdk';
+
+// Define custom types since they're not exported from the SDK
+export type EntityType = 'COMPANY' | 'INDIVIDUAL';
+
+export interface BeneficiaryFormOptions {
+  defaultValues: {
+    beneficiary: {
+      entity_type: EntityType;
+      bank_details: {
+        account_currency: string;
+        bank_country_code: string;
+        local_clearing_system: string;
+      }
+    };
+    payment_methods: string[];
+  };
+  theme?: {
+    palette?: {
+      primary?: Record<string, string>;
+      gradients?: Record<string, string[]>;
+    };
+    components?: {
+      spinner?: {
+        colors?: {
+          start?: {
+            initial?: string;
+          };
+          stop?: {
+            initial?: string;
+          };
+        };
+      };
+    };
+  };
+}
 
 /**
  * Get auth code for Airwallex API
@@ -84,7 +118,7 @@ export const createBeneficiaryFormConfig = (currency: string, backgroundColor: s
   return {
     defaultValues: {
       beneficiary: {
-        entity_type: 'COMPANY' as EntityType, // Type assertion to EntityType
+        entity_type: 'COMPANY' as EntityType,
         bank_details: {
           account_currency: currency || 'USD',
           bank_country_code: 'US',

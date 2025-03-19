@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
@@ -10,7 +9,9 @@ import {
   getEnvironment, 
   getCodeVerifier,
   createBeneficiaryForm,
-  createBeneficiaryFormConfig
+  createBeneficiaryFormConfig,
+  BeneficiaryFormOptions,
+  EntityType
 } from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -52,6 +53,8 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           config.accentColor || '#d0e92a'
         );
         
+        console.log('Form config created:', formConfig);
+        
         // 3. Create the Airwallex element
         const { createElement } = await import('@airwallex/components-sdk');
         const element = await createElement('beneficiaryForm', formConfig);
@@ -73,7 +76,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             
             if (mountAttempts < maxMountAttempts) {
               // Retry mounting after a short delay
-              setTimeout(attemptMount, 800);
+              setTimeout(attemptMount, 1000);
             } else {
               setFormError('Unable to initialize payment form. Please refresh and try again.');
               setIsFormLoading(false);
@@ -102,7 +105,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             
             if (mountAttempts < maxMountAttempts) {
               // Retry mounting after a short delay
-              setTimeout(attemptMount, 800);
+              setTimeout(attemptMount, 1000);
             } else {
               setFormError('Error mounting payment form. Please try again later.');
               setIsFormLoading(false);
@@ -110,8 +113,8 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           }
         };
         
-        // Start the mounting process with a delay to ensure DOM is ready
-        setTimeout(attemptMount, 800);
+        // Start the mounting process with a longer delay to ensure DOM is ready
+        setTimeout(attemptMount, 1200);
         
       } catch (error) {
         if (!isMounted) return;
