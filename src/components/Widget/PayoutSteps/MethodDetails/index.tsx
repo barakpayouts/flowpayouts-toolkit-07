@@ -27,11 +27,12 @@ const MethodDetails: React.FC<MethodDetailsProps> = ({ onBack }) => {
   
   // Log when the component renders and the showDashboard state
   useEffect(() => {
+    console.log("MethodDetails rendered, selectedMethod:", selectedMethod);
     console.log("MethodDetails rendered, showDashboard:", showDashboard);
     if (advanceType) {
       console.log("Advance type:", advanceType);
     }
-  }, [showDashboard, advanceType]);
+  }, [showDashboard, advanceType, selectedMethod]);
   
   // Parse the advance percentage to a number
   const getAdvancePercentage = (tier: string | null): number => {

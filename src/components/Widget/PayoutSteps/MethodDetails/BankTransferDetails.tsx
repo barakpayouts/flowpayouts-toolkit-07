@@ -1,168 +1,143 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { 
-  initializeAirwallex,
-  createBeneficiaryForm,
-  createBeneficiaryFormConfig,
-  mountAirwallexElement
+  createAndMountBeneficiaryForm,
+  setupBeneficiaryFormEventListeners,
+  submitBeneficiaryForm
 } from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { config } = useWidgetConfig();
-  const beneficiaryFormRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isFormLoading, setIsFormLoading] = useState(true);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const elementRef = useRef<any>(null);
+  const formId = "airwallex-beneficiary-form";
   
+  // Initialize and mount form
   useEffect(() => {
-    let isMounted = true;
-    let mountRetryTimer: ReturnType<typeof setTimeout>;
-    
-    const initializeForm = async () => {
+    const setupForm = async () => {
+      setIsLoading(true);
+      setError(null);
+      
       try {
-        if (!isMounted) return;
+        console.log(`Setting up form with container ID: ${formId}`);
         
-        console.log('Starting Airwallex form initialization');
-        setIsFormLoading(true);
-        setFormError(null);
-        
-        // 1. Initialize the Airwallex SDK
-        const initialized = await initializeAirwallex();
-        if (!initialized) {
-          setFormError('Failed to initialize payment system. Please try again later.');
-          setIsFormLoading(false);
-          return;
-        }
-        
-        // 2. Create the form configuration
-        const formConfig = createBeneficiaryFormConfig(
+        // Create and mount form
+        const element = await createAndMountBeneficiaryForm(
+          formId, 
           config.currency || 'USD',
           config.backgroundColor || '#143745',
           config.accentColor || '#d0e92a'
         );
         
-        console.log('Form config created:', formConfig);
-        
-        // 3. Create the Airwallex element
-        const element = await createBeneficiaryForm(formConfig);
         if (!element) {
-          setFormError('Failed to create payment form. Please try again later.');
-          setIsFormLoading(false);
+          setError('Could not create form. Please try again later.');
+          setIsLoading(false);
           return;
         }
         
-        // Store the element reference
-        beneficiaryFormRef.current = element;
+        // Store reference
+        elementRef.current = element;
         
-        // 4. Ensure container is ready and mount after a delay
-        mountRetryTimer = setTimeout(() => {
-          if (!isMounted) return;
-          
-          try {
-            // Create a mounting point ID that's guaranteed to be unique
-            const mountId = `beneficiary-root-${Date.now()}`;
-            
-            // Make sure the container exists
-            if (!containerRef.current) {
-              console.error('Form container ref not found');
-              setFormError('Form container not found. Please refresh and try again.');
-              setIsFormLoading(false);
-              return;
-            }
-            
-            // Clear any existing content
-            containerRef.current.innerHTML = '';
-            
-            // Create a fresh mount point
-            const mountPoint = document.createElement('div');
-            mountPoint.id = mountId;
-            containerRef.current.appendChild(mountPoint);
-            
-            console.log(`Created mount point with ID: #${mountId}`);
-            
-            // Wait a bit more for the DOM to update before mounting
-            setTimeout(() => {
-              if (!isMounted) return;
-              
-              try {
-                console.log(`Attempting to mount to #${mountId}`);
-                // Mount the element
-                element.mount(`#${mountId}`);
-                console.log(`Successfully mounted to #${mountId}`);
-                setIsFormLoading(false);
-              } catch (error) {
-                console.error('Error mounting element:', error);
-                
-                // If we still have retries left, try again
-                if (retryCount < 3) {
-                  setRetryCount(prev => prev + 1);
-                  // Try again after a delay
-                  setTimeout(initializeForm, 1000);
-                } else {
-                  setFormError('Error mounting payment form. Please refresh the page and try again.');
-                  setIsFormLoading(false);
-                }
-              }
-            }, 500);
-          } catch (error) {
-            console.error('Error preparing mount point:', error);
-            setFormError('Error preparing form. Please try again later.');
-            setIsFormLoading(false);
-          }
-        }, 1000);
+        // Setup event listeners
+        setupBeneficiaryFormEventListeners(element);
         
+        // Set loading to false
+        setIsLoading(false);
       } catch (error) {
-        if (!isMounted) return;
-        console.error('Error initializing Airwallex form:', error);
-        setFormError('Failed to initialize payment form. Please try again later.');
-        setIsFormLoading(false);
+        console.error('Error setting up form:', error);
+        setError('An error occurred while setting up the payment form.');
+        setIsLoading(false);
       }
     };
     
-    // Initialize the form when the component mounts
-    initializeForm();
+    // Run setup
+    setupForm();
     
-    // Cleanup when component unmounts
+    // Cleanup on unmount
     return () => {
-      isMounted = false;
-      if (mountRetryTimer) clearTimeout(mountRetryTimer);
-      
-      if (beneficiaryFormRef.current) {
+      if (elementRef.current) {
         try {
-          beneficiaryFormRef.current.unmount();
-          console.log('Unmounted Airwallex form');
+          console.log('Unmounting form...');
+          elementRef.current.unmount();
         } catch (error) {
-          console.error('Error unmounting Airwallex form:', error);
+          console.error('Error unmounting form:', error);
         }
       }
     };
-  }, [config.accentColor, config.backgroundColor, config.currency, retryCount]);
+  }, [config.currency, config.backgroundColor, config.accentColor]);
   
-  const handleRefresh = () => {
-    setRetryCount(prev => prev + 1);
-    setFormError(null);
-  };
-  
+  // Handle form submission
   const handleSubmit = async () => {
-    if (!beneficiaryFormRef.current) {
-      toast.error('Form not initialized. Please refresh and try again.');
+    if (!elementRef.current) {
+      toast.error('Form not ready. Please try again.');
       return;
     }
     
+    setIsSubmitting(true);
+    
     try {
-      console.log('Submitting Airwallex form');
-      const submitResult = await beneficiaryFormRef.current.submit();
-      console.log('Form submission result:', submitResult);
-      toast.success('Bank details submitted successfully!');
+      const result = await submitBeneficiaryForm(elementRef.current);
+      
+      if (result.success) {
+        toast.success('Bank details submitted successfully!');
+      } else {
+        toast.error('Error submitting form. Please check your details and try again.');
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast.error('There was an error submitting your details. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+  
+  const handleRetry = () => {
+    // Reset states
+    elementRef.current = null;
+    setError(null);
+    setIsLoading(true);
+    
+    // Force re-mount by changing the ID
+    const container = document.getElementById('form-container');
+    if (container) {
+      container.innerHTML = `<div id="${formId}"></div>`;
+    }
+    
+    // Wait a bit then trigger the effect again
+    setTimeout(() => {
+      const setupForm = async () => {
+        try {
+          const element = await createAndMountBeneficiaryForm(
+            formId, 
+            config.currency || 'USD',
+            config.backgroundColor || '#143745',
+            config.accentColor || '#d0e92a'
+          );
+          
+          if (!element) {
+            setError('Could not create form. Please try again later.');
+            setIsLoading(false);
+            return;
+          }
+          
+          elementRef.current = element;
+          setupBeneficiaryFormEventListeners(element);
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error in retry:', error);
+          setError('An error occurred while setting up the payment form.');
+          setIsLoading(false);
+        }
+      };
+      
+      setupForm();
+    }, 1000);
   };
   
   return (
@@ -190,13 +165,14 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </div>
       </div>
       
-      {/* Airwallex Form Integration */}
+      {/* Form Container */}
       <div className="space-y-6">
-        {formError && (
+        {/* Show error if there is one */}
+        {error && (
           <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-white">
-            <p className="text-sm">{formError}</p>
+            <p className="text-sm">{error}</p>
             <button 
-              onClick={handleRefresh}
+              onClick={handleRetry}
               className="text-xs underline mt-2"
             >
               Try again
@@ -204,16 +180,17 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </div>
         )}
         
-        {isFormLoading && (
+        {/* Loading indicator */}
+        {isLoading && (
           <div className="flex flex-col items-center justify-center p-8">
             <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin mb-4"></div>
             <p className="text-sm opacity-70">Loading payment form...</p>
           </div>
         )}
         
-        <div
-          ref={containerRef}
-          id="beneficiary-form-container"
+        {/* Form container */}
+        <div 
+          id="form-container" 
           className="airwallex-form-container"
           style={{ 
             minHeight: "400px", 
@@ -222,10 +199,13 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             borderRadius: "8px",
             padding: "16px",
             backgroundColor: "rgba(255, 255, 255, 0.05)",
-            display: isFormLoading ? 'none' : 'block'
+            display: isLoading ? 'none' : 'block'
           }}
-        />
+        >
+          <div id={formId}></div>
+        </div>
         
+        {/* Submit button */}
         <Button
           variant="purple"
           className="w-full font-semibold mt-6"
@@ -234,9 +214,9 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             boxShadow: `0 4px 15px ${config.accentColor}40`,
           }}
           onClick={handleSubmit}
-          disabled={isFormLoading || !!formError}
+          disabled={isLoading || !!error || isSubmitting}
         >
-          Submit Bank Details
+          {isSubmitting ? 'Submitting...' : 'Submit Bank Details'}
         </Button>
       </div>
       

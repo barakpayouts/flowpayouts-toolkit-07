@@ -1,41 +1,6 @@
 
 // This file contains helper functions for Airwallex integration
 
-// Define custom types since they're not exported from the SDK
-export type EntityType = 'COMPANY' | 'INDIVIDUAL';
-
-export interface BeneficiaryFormOptions {
-  defaultValues: {
-    beneficiary: {
-      entity_type: EntityType;
-      bank_details: {
-        account_currency: string;
-        bank_country_code: string;
-        local_clearing_system: string;
-      }
-    };
-    payment_methods: string[];
-  };
-  theme?: {
-    palette?: {
-      primary?: Record<string, string>;
-      gradients?: Record<string, string[]>;
-    };
-    components?: {
-      spinner?: {
-        colors?: {
-          start?: {
-            initial?: string;
-          };
-          stop?: {
-            initial?: string;
-          };
-        };
-      };
-    };
-  };
-}
-
 /**
  * Get auth code for Airwallex API
  * In a real implementation, this would call your backend to retrieve a valid auth code
@@ -44,7 +9,7 @@ export const getAuthCode = async (): Promise<string> => {
   // In a real implementation, this would be retrieved from your backend
   // This is just a placeholder
   console.log('Getting Airwallex auth code');
-  return 'mock-auth-code-for-development';
+  return 'x4D7A7wOSQvoygpwqweZpG0GFHTcQfVPBTZoKV7EibgH';
 };
 
 /**
@@ -55,7 +20,7 @@ export const getClientId = (): string => {
   // In a real implementation, this would come from environment variables
   // This is just a placeholder
   console.log('Getting Airwallex client ID');
-  return 'mock-client-id-for-development';
+  return 'BIjjMYsYTPuRqnkEloSvvf';
 };
 
 /**
@@ -68,21 +33,11 @@ export const getEnvironment = (): 'demo' | 'prod' => {
 };
 
 /**
- * Process form submission result
- * This is a helper function to handle the submission result from the Airwallex form
- */
-export const handleFormSubmission = (result: any) => {
-  console.log('Airwallex form submission result:', result);
-  return result;
-};
-
-/**
  * Generate a code verifier for Airwallex
- * This is a simple implementation for demo purposes
+ * This is a simple implementation for demo purposes that follows the documented structure
  */
 export const getCodeVerifier = (): string => {
-  // Generate a more random code verifier with timestamp to avoid caching issues
-  return 'airwallex-code-verifier-' + Date.now();
+  return '~wh344Lea1FsCMVH39Fn9R2~nqq2uyD4wbvG9XCzWRxd0sZh9MFiF9gSVkM0C-ZvrdtjBFA6Cw1EvCpJcIjaeXg1-BXCfZd25ZmvuYZAqZtjJQA3NAa~7X1sgEfbMZJwQ';
 };
 
 /**
@@ -96,7 +51,7 @@ export const initializeAirwallex = async (): Promise<boolean> => {
     // Dynamically import the Airwallex SDK to ensure it's only loaded when needed
     const { init } = await import('@airwallex/components-sdk');
     
-    // Initialize the Airwallex SDK
+    // Initialize the Airwallex SDK with the exact format from documentation
     await init({
       locale: 'en',
       env: getEnvironment(),
@@ -114,20 +69,18 @@ export const initializeAirwallex = async (): Promise<boolean> => {
 };
 
 /**
- * Create a properly typed beneficiary form configuration
+ * Create a beneficiary form configuration
  */
-export const createBeneficiaryFormConfig = (currency: string, backgroundColor: string, accentColor: string): any => {
-  // Return the config as 'any' type to bypass TypeScript checking
-  // This allows the SDK to accept our config object without type errors
+export const createBeneficiaryFormConfig = (currency: string, backgroundColor: string, accentColor: string) => {
   return {
     defaultValues: {
       beneficiary: {
-        entity_type: 'COMPANY', // as EntityType - using string literal to avoid type issues
+        entity_type: 'COMPANY',
         bank_details: {
           account_currency: currency || 'USD',
           bank_country_code: 'US',
           local_clearing_system: 'LOCAL',
-        },
+        }
       },
       payment_methods: ['LOCAL'],
     },
@@ -169,51 +122,91 @@ export const createBeneficiaryFormConfig = (currency: string, backgroundColor: s
 };
 
 /**
- * Create Airwallex beneficiary form element
+ * Create and mount Airwallex beneficiary form element
  * Returns a promise that resolves to the created element if successful, or null if it fails
  */
-export const createBeneficiaryForm = async (config: any) => {
+export const createAndMountBeneficiaryForm = async (
+  containerId: string, 
+  currency: string, 
+  backgroundColor: string, 
+  accentColor: string
+) => {
   try {
-    console.log('Creating Airwallex beneficiary form with config:', config);
+    // First, initialize Airwallex
+    const initialized = await initializeAirwallex();
+    if (!initialized) {
+      console.error('Failed to initialize Airwallex');
+      return null;
+    }
+
+    // Create config
+    const config = createBeneficiaryFormConfig(currency, backgroundColor, accentColor);
+    console.log('Form config created:', config);
     
+    // Import createElement
     const { createElement } = await import('@airwallex/components-sdk');
     
-    // Create the beneficiary form element with the provided configuration
-    // Using 'any' type to bypass TypeScript errors from mismatched types
+    // Create element
+    console.log(`Creating beneficiary form...`);
     const element = await createElement('beneficiaryForm', config);
-    console.log('Beneficiary form created successfully');
+    console.log('Element created, now mounting to', `#${containerId}`);
+    
+    // Mount element directly
+    element.mount(`#${containerId}`);
+    console.log('Element mounted successfully');
+    
     return element;
   } catch (error) {
-    console.error('Failed to create beneficiary form:', error);
+    console.error('Error creating or mounting beneficiary form:', error);
     return null;
   }
 };
 
 /**
- * Mount Airwallex element to DOM
- * Returns true if mounting was successful, false otherwise
+ * Setup event listeners for Airwallex element
  */
-export const mountAirwallexElement = (element: any, selector: string): boolean => {
+export const setupBeneficiaryFormEventListeners = (element: any) => {
+  if (!element) {
+    console.error('Cannot setup event listeners: Element is null');
+    return;
+  }
+
+  // Ready event
+  element.on('ready', (data: any) => {
+    console.log('Beneficiary form ready:', data);
+  });
+
+  // Success event
+  element.on('success', (data: any) => {
+    console.log('Beneficiary form success:', data);
+  });
+
+  // Error event
+  element.on('error', (data: any) => {
+    console.error('Beneficiary form error:', data);
+  });
+
+  // Cancel event
+  element.on('cancel', () => {
+    console.log('Beneficiary form cancelled');
+  });
+};
+
+/**
+ * Handle form submission
+ */
+export const submitBeneficiaryForm = async (element: any) => {
+  if (!element) {
+    console.error('Cannot submit: Element is null');
+    return { success: false, error: 'Form not initialized' };
+  }
+
   try {
-    if (!element) {
-      console.error('Cannot mount null element');
-      return false;
-    }
-    
-    const targetElement = document.querySelector(selector);
-    if (!targetElement) {
-      console.error(`Mount target not found: ${selector}`);
-      return false;
-    }
-    
-    console.log(`Attempting to mount element to ${selector}`);
-    
-    // Mount the element to the DOM
-    element.mount(selector);
-    console.log(`Element mounted successfully to ${selector}`);
-    return true;
+    const result = await element.submit();
+    console.log('Form submitted successfully:', result);
+    return { success: true, data: result };
   } catch (error) {
-    console.error('Error mounting element:', error);
-    return false;
+    console.error('Error submitting form:', error);
+    return { success: false, error };
   }
 };
