@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
@@ -9,9 +10,7 @@ import {
   getEnvironment, 
   getCodeVerifier,
   createBeneficiaryForm,
-  createBeneficiaryFormConfig,
-  BeneficiaryFormOptions,
-  EntityType
+  createBeneficiaryFormConfig
 } from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -114,7 +113,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         };
         
         // Start the mounting process with a longer delay to ensure DOM is ready
-        setTimeout(attemptMount, 1200);
+        setTimeout(attemptMount, 1500);
         
       } catch (error) {
         if (!isMounted) return;
