@@ -9,7 +9,8 @@ import {
   getClientId, 
   getEnvironment, 
   getCodeVerifier,
-  createBeneficiaryForm
+  createBeneficiaryForm,
+  createBeneficiaryFormConfig
 } from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -44,54 +45,12 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         
         console.log('Airwallex SDK initialized successfully');
         
-        // 2. Create the form configuration object
-        const formConfig = {
-          defaultValues: {
-            beneficiary: {
-              entity_type: 'COMPANY',
-              bank_details: {
-                account_currency: config.currency || 'USD',
-                bank_country_code: 'US',
-                local_clearing_system: 'BANK_TRANSFER',
-              },
-            },
-            payment_methods: ['LOCAL'],
-          },
-          theme: {
-            palette: {
-              primary: {
-                '10': config.backgroundColor || '#143745', 
-                '20': config.backgroundColor || '#143745',
-                '30': config.backgroundColor || '#143745',
-                '40': config.backgroundColor || '#143745',
-                '50': config.backgroundColor || '#143745',
-                '60': config.accentColor || '#d0e92a',
-                '70': config.accentColor || '#d0e92a',
-                '80': config.accentColor || '#d0e92a',
-                '90': config.accentColor || '#d0e92a',
-                '100': config.accentColor || '#d0e92a',
-              },
-              gradients: {
-                primary: [config.backgroundColor || '#143745', config.accentColor || '#d0e92a'],
-                secondary: [config.backgroundColor || '#143745', config.accentColor || '#d0e92a'],
-                tertiary: [config.backgroundColor || '#143745', config.accentColor || '#d0e92a'],
-                quaternary: [config.accentColor || '#d0e92a', config.accentColor || '#d0e92a'],
-              },
-            },
-            components: {
-              spinner: {
-                colors: {
-                  start: {
-                    initial: config.backgroundColor || '#143745',
-                  },
-                  stop: {
-                    initial: config.accentColor || '#d0e92a',
-                  },
-                },
-              },
-            },
-          },
-        };
+        // 2. Create the form configuration object using our helper
+        const formConfig = createBeneficiaryFormConfig(
+          config.currency || 'USD',
+          config.backgroundColor || '#143745',
+          config.accentColor || '#d0e92a'
+        );
         
         // 3. Create the Airwallex element
         const { createElement } = await import('@airwallex/components-sdk');
@@ -114,7 +73,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             
             if (mountAttempts < maxMountAttempts) {
               // Retry mounting after a short delay
-              setTimeout(attemptMount, 500);
+              setTimeout(attemptMount, 800);
             } else {
               setFormError('Unable to initialize payment form. Please refresh and try again.');
               setIsFormLoading(false);
@@ -143,7 +102,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             
             if (mountAttempts < maxMountAttempts) {
               // Retry mounting after a short delay
-              setTimeout(attemptMount, 500);
+              setTimeout(attemptMount, 800);
             } else {
               setFormError('Error mounting payment form. Please try again later.');
               setIsFormLoading(false);
@@ -151,8 +110,8 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           }
         };
         
-        // Start the mounting process
-        setTimeout(attemptMount, 100);
+        // Start the mounting process with a delay to ensure DOM is ready
+        setTimeout(attemptMount, 800);
         
       } catch (error) {
         if (!isMounted) return;

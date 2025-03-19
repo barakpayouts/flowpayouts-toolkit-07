@@ -1,5 +1,6 @@
 
 // This file contains helper functions for Airwallex integration
+import type { BeneficiaryFormOptions, EntityType } from '@airwallex/components-sdk';
 
 /**
  * Get auth code for Airwallex API
@@ -77,10 +78,63 @@ export const initializeAirwallex = async (): Promise<boolean> => {
 };
 
 /**
+ * Create a properly typed beneficiary form configuration
+ */
+export const createBeneficiaryFormConfig = (currency: string, backgroundColor: string, accentColor: string): BeneficiaryFormOptions => {
+  return {
+    defaultValues: {
+      beneficiary: {
+        entity_type: 'COMPANY' as EntityType, // Type assertion to EntityType
+        bank_details: {
+          account_currency: currency || 'USD',
+          bank_country_code: 'US',
+          local_clearing_system: 'BANK_TRANSFER',
+        },
+      },
+      payment_methods: ['LOCAL'],
+    },
+    theme: {
+      palette: {
+        primary: {
+          '10': backgroundColor || '#143745', 
+          '20': backgroundColor || '#143745',
+          '30': backgroundColor || '#143745',
+          '40': backgroundColor || '#143745',
+          '50': backgroundColor || '#143745',
+          '60': accentColor || '#d0e92a',
+          '70': accentColor || '#d0e92a',
+          '80': accentColor || '#d0e92a',
+          '90': accentColor || '#d0e92a',
+          '100': accentColor || '#d0e92a',
+        },
+        gradients: {
+          primary: [backgroundColor || '#143745', accentColor || '#d0e92a'],
+          secondary: [backgroundColor || '#143745', accentColor || '#d0e92a'],
+          tertiary: [backgroundColor || '#143745', accentColor || '#d0e92a'],
+          quaternary: [accentColor || '#d0e92a', accentColor || '#d0e92a'],
+        },
+      },
+      components: {
+        spinner: {
+          colors: {
+            start: {
+              initial: backgroundColor || '#143745',
+            },
+            stop: {
+              initial: accentColor || '#d0e92a',
+            },
+          },
+        },
+      },
+    },
+  };
+};
+
+/**
  * Create Airwallex beneficiary form element
  * Returns a promise that resolves to the created element if successful, or null if it fails
  */
-export const createBeneficiaryForm = async (config: any) => {
+export const createBeneficiaryForm = async (config: BeneficiaryFormOptions) => {
   try {
     const { createElement } = await import('@airwallex/components-sdk');
     
