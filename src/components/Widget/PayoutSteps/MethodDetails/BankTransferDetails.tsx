@@ -1,10 +1,133 @@
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { createElement, init, ElementTypes } from '@airwallex/components-sdk';
+import { getAuthCode, getClientId, getEnvironment, handleFormSubmission } from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { config } = useWidgetConfig();
+  const beneficiaryFormRef = useRef<ElementTypes['beneficiaryForm']>();
+  const [isFormInitialized, setIsFormInitialized] = useState(false);
+  const [isFormLoading, setIsFormLoading] = useState(true);
+  const [formError, setFormError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const initAndRenderElement = async () => {
+      try {
+        setIsFormLoading(true);
+        setFormError(null);
+        
+        // Initialize the Airwallex SDK
+        await init({
+          locale: 'en',
+          env: getEnvironment(),
+          authCode: await getAuthCode(),
+          clientId: getClientId(),
+          codeVerifier: '123ABC', // In a real implementation, use a proper code verifier
+        });
+        
+        // Create the beneficiary form element
+        const element = await createElement('beneficiaryForm', {
+          defaultValues: {
+            beneficiary: {
+              entity_type: 'COMPANY',
+              bank_details: {
+                account_currency: config.currency || 'USD',
+                bank_country_code: 'US', // Default to US
+                local_clearing_system: 'BANK_TRANSFER',
+              },
+            },
+            payment_methods: ['LOCAL'],
+          },
+          theme: {
+            palette: {
+              primary: {
+                '10': '#143745', // Using the widget's color scheme
+                '20': '#143745',
+                '30': '#143745',
+                '40': '#143745',
+                '50': '#143745',
+                '60': config.accentColor,
+                '70': config.accentColor,
+                '80': config.accentColor,
+                '90': config.accentColor,
+                '100': config.accentColor,
+              },
+              gradients: {
+                primary: [config.backgroundColor, config.accentColor],
+                secondary: [config.backgroundColor, config.accentColor],
+                tertiary: [config.backgroundColor, config.accentColor],
+                quaternary: [config.accentColor, config.accentColor],
+              },
+            },
+            components: {
+              spinner: {
+                colors: {
+                  start: {
+                    initial: config.backgroundColor,
+                  },
+                  stop: {
+                    initial: config.accentColor,
+                  },
+                },
+              },
+            },
+          },
+        });
+        
+        // Mount the element
+        const mountElement = document.getElementById('beneficiary-root');
+        if (mountElement) {
+          element.mount('#beneficiary-root');
+          beneficiaryFormRef.current = element;
+          setIsFormInitialized(true);
+          setIsFormLoading(false);
+        } else {
+          console.error('Mount element not found');
+          setFormError('Failed to initialize payment form.');
+          setIsFormLoading(false);
+        }
+      } catch (error) {
+        console.error('Error initializing Airwallex form:', error);
+        setFormError('Failed to initialize payment form. Please try again later.');
+        setIsFormLoading(false);
+      }
+    };
+    
+    // Only run once when component mounts
+    if (!isFormInitialized) {
+      initAndRenderElement();
+    }
+    
+    // Cleanup when component unmounts
+    return () => {
+      if (beneficiaryFormRef.current) {
+        try {
+          beneficiaryFormRef.current.unmount();
+        } catch (error) {
+          console.error('Error unmounting Airwallex form:', error);
+        }
+      }
+    };
+  }, [config.accentColor, config.backgroundColor, config.currency, isFormInitialized]);
+  
+  const handleSubmit = async () => {
+    if (beneficiaryFormRef.current) {
+      try {
+        const submitResult = await beneficiaryFormRef.current.submit();
+        handleFormSubmission(submitResult);
+        toast.success('Bank details submitted successfully!');
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        toast.error('There was an error submitting your details. Please try again.');
+      }
+    } else {
+      toast.error('Form not initialized. Please refresh and try again.');
+    }
+  };
   
   return (
     <div className="payout-details-form">
@@ -31,67 +154,48 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </div>
       </div>
       
-      <div className="space-y-4">
-        <div className="form-group">
-          <label className="block text-sm font-medium mb-1">Account Holder Name</label>
-          <input 
-            type="text" 
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
-            placeholder="Enter full name"
-          />
-        </div>
+      {/* Airwallex Form Integration */}
+      <div className="space-y-6">
+        {formError && (
+          <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-white">
+            <p className="text-sm">{formError}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="text-xs underline mt-2"
+            >
+              Refresh the page
+            </button>
+          </div>
+        )}
         
-        <div className="form-group">
-          <label className="block text-sm font-medium mb-1">Bank Name</label>
-          <input 
-            type="text" 
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
-            placeholder="Enter bank name"
-          />
-        </div>
+        {isFormLoading && (
+          <div className="flex flex-col items-center justify-center p-8">
+            <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin mb-4"></div>
+            <p className="text-sm opacity-70">Loading payment form...</p>
+          </div>
+        )}
         
-        <div className="form-group">
-          <label className="block text-sm font-medium mb-1">Account Number/IBAN</label>
-          <input 
-            type="text" 
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
-            placeholder="Enter account number or IBAN"
-          />
-        </div>
+        <div
+          id="beneficiary-root"
+          style={{ 
+            minHeight: "500px", 
+            marginBottom: "20px",
+            display: isFormLoading ? 'none' : 'block'
+          }}
+        />
         
-        <div className="form-group">
-          <label className="block text-sm font-medium mb-1">SWIFT/BIC Code</label>
-          <input 
-            type="text" 
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none"
-            placeholder="Enter SWIFT or BIC code"
-          />
-        </div>
-        
-        <div className="form-group">
-          <label className="block text-sm font-medium mb-1">Currency</label>
-          <select 
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer"
-          >
-            <option value="">Select currency</option>
-            <option value="USD">USD - US Dollar</option>
-            <option value="EUR">EUR - Euro</option>
-            <option value="GBP">GBP - British Pound</option>
-          </select>
-        </div>
-        
-        <div className="form-group">
-          <label className="block text-sm font-medium mb-1">Country</label>
-          <select 
-            className="w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-white/30 focus:outline-none appearance-none cursor-pointer"
-          >
-            <option value="">Select country</option>
-            <option value="US">United States</option>
-            <option value="UK">United Kingdom</option>
-            <option value="CA">Canada</option>
-            <option value="AU">Australia</option>
-          </select>
-        </div>
+        <Button
+          variant="purple"
+          className="w-full font-semibold mt-6"
+          style={{
+            background: `linear-gradient(to right, ${config.accentColor}, ${config.accentColor}DD)`,
+            boxShadow: `0 4px 15px ${config.accentColor}40`,
+          }}
+          onClick={handleSubmit}
+          disabled={isFormLoading || !!formError || !isFormInitialized}
+        >
+          Submit Bank Details
+        </Button>
       </div>
       
       <p className="text-xs opacity-70 mt-6 text-center">
