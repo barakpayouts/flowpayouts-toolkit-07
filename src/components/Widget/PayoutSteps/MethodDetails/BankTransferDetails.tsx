@@ -4,12 +4,18 @@ import { ArrowLeft } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { createElement, init, ElementTypes } from '@airwallex/components-sdk';
-import { getAuthCode, getClientId, getEnvironment, handleFormSubmission } from '@/utils/airwallexHelper';
+import { 
+  getAuthCode, 
+  getClientId, 
+  getEnvironment, 
+  handleFormSubmission, 
+  getCodeVerifier,
+  initializeAirwallex
+} from '@/utils/airwallexHelper';
 
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { config } = useWidgetConfig();
-  const beneficiaryFormRef = useRef<ElementTypes['beneficiaryForm']>();
+  const beneficiaryFormRef = useRef<any>(null);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
   const [isFormLoading, setIsFormLoading] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
@@ -20,14 +26,19 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         setIsFormLoading(true);
         setFormError(null);
         
+        // Dynamically import the Airwallex SDK
+        const { createElement, init } = await import('@airwallex/components-sdk');
+        
         // Initialize the Airwallex SDK
         await init({
           locale: 'en',
           env: getEnvironment(),
           authCode: await getAuthCode(),
           clientId: getClientId(),
-          codeVerifier: '123ABC', // In a real implementation, use a proper code verifier
+          codeVerifier: getCodeVerifier(),
         });
+        
+        console.log('Airwallex SDK initialized, creating beneficiary form');
         
         // Create the beneficiary form element
         const element = await createElement('beneficiaryForm', {
@@ -45,7 +56,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           theme: {
             palette: {
               primary: {
-                '10': '#143745', // Using the widget's color scheme
+                '10': '#143745', 
                 '20': '#143745',
                 '30': '#143745',
                 '40': '#143745',
@@ -78,18 +89,24 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           },
         });
         
-        // Mount the element
-        const mountElement = document.getElementById('beneficiary-root');
-        if (mountElement) {
-          element.mount('#beneficiary-root');
-          beneficiaryFormRef.current = element;
-          setIsFormInitialized(true);
-          setIsFormLoading(false);
-        } else {
-          console.error('Mount element not found');
-          setFormError('Failed to initialize payment form.');
-          setIsFormLoading(false);
-        }
+        console.log('Beneficiary form created, mounting to DOM');
+        
+        // Wait for mount element to be available
+        setTimeout(() => {
+          const mountElement = document.getElementById('beneficiary-root');
+          if (mountElement) {
+            console.log('Found mount element, mounting form');
+            element.mount('#beneficiary-root');
+            beneficiaryFormRef.current = element;
+            setIsFormInitialized(true);
+            setIsFormLoading(false);
+          } else {
+            console.error('Mount element not found after timeout');
+            setFormError('Mount element not found. Please refresh and try again.');
+            setIsFormLoading(false);
+          }
+        }, 500);
+        
       } catch (error) {
         console.error('Error initializing Airwallex form:', error);
         setFormError('Failed to initialize payment form. Please try again later.');
@@ -107,6 +124,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       if (beneficiaryFormRef.current) {
         try {
           beneficiaryFormRef.current.unmount();
+          console.log('Unmounted Airwallex form');
         } catch (error) {
           console.error('Error unmounting Airwallex form:', error);
         }
@@ -117,6 +135,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const handleSubmit = async () => {
     if (beneficiaryFormRef.current) {
       try {
+        console.log('Submitting Airwallex form');
         const submitResult = await beneficiaryFormRef.current.submit();
         handleFormSubmission(submitResult);
         toast.success('Bank details submitted successfully!');
@@ -177,10 +196,10 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         
         <div
           id="beneficiary-root"
+          className={isFormLoading ? 'hidden' : 'block'}
           style={{ 
             minHeight: "500px", 
-            marginBottom: "20px",
-            display: isFormLoading ? 'none' : 'block'
+            marginBottom: "20px"
           }}
         />
         
