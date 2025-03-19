@@ -5,10 +5,7 @@ import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { 
-  getAuthCode, 
-  getClientId, 
-  getEnvironment, 
-  getCodeVerifier,
+  initializeAirwallex,
   createBeneficiaryForm,
   createBeneficiaryFormConfig,
   mountAirwallexElement
@@ -17,11 +14,14 @@ import {
 const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { config } = useWidgetConfig();
   const beneficiaryFormRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isFormLoading, setIsFormLoading] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   
   useEffect(() => {
     let isMounted = true;
+    let mountRetryTimer: ReturnType<typeof setTimeout>;
     
     const initializeForm = async () => {
       try {
@@ -31,20 +31,15 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         setIsFormLoading(true);
         setFormError(null);
         
-        // 1. Import and initialize the Airwallex SDK
-        const { init } = await import('@airwallex/components-sdk');
+        // 1. Initialize the Airwallex SDK
+        const initialized = await initializeAirwallex();
+        if (!initialized) {
+          setFormError('Failed to initialize payment system. Please try again later.');
+          setIsFormLoading(false);
+          return;
+        }
         
-        await init({
-          locale: 'en',
-          env: getEnvironment(),
-          authCode: await getAuthCode(),
-          clientId: getClientId(),
-          codeVerifier: getCodeVerifier(),
-        });
-        
-        console.log('Airwallex SDK initialized successfully');
-        
-        // 2. Create the form configuration object using our helper
+        // 2. Create the form configuration
         const formConfig = createBeneficiaryFormConfig(
           config.currency || 'USD',
           config.backgroundColor || '#143745',
@@ -64,48 +59,62 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         // Store the element reference
         beneficiaryFormRef.current = element;
         
-        // 4. Prepare the DOM before mounting
-        // We'll add a short delay to ensure DOM is fully rendered
-        setTimeout(() => {
+        // 4. Ensure container is ready and mount after a delay
+        mountRetryTimer = setTimeout(() => {
           if (!isMounted) return;
           
           try {
-            // Get the container element
-            const formContainer = document.getElementById('beneficiary-form-container');
-            if (!formContainer) {
-              console.error('Form container element not found');
+            // Create a mounting point ID that's guaranteed to be unique
+            const mountId = `beneficiary-root-${Date.now()}`;
+            
+            // Make sure the container exists
+            if (!containerRef.current) {
+              console.error('Form container ref not found');
               setFormError('Form container not found. Please refresh and try again.');
               setIsFormLoading(false);
               return;
             }
             
             // Clear any existing content
-            formContainer.innerHTML = '';
+            containerRef.current.innerHTML = '';
             
-            // Create a fresh mount point with the ID 'beneficiary-root'
+            // Create a fresh mount point
             const mountPoint = document.createElement('div');
-            mountPoint.id = 'beneficiary-root';
-            formContainer.appendChild(mountPoint);
+            mountPoint.id = mountId;
+            containerRef.current.appendChild(mountPoint);
             
-            // Mount the element - with a short delay to ensure the DOM is updated
+            console.log(`Created mount point with ID: #${mountId}`);
+            
+            // Wait a bit more for the DOM to update before mounting
             setTimeout(() => {
               if (!isMounted) return;
               
-              // Use our helper to mount the element
-              const mounted = mountAirwallexElement(element, '#beneficiary-root');
-              
-              if (!mounted) {
-                setFormError('Error mounting payment form. Please try again later.');
+              try {
+                console.log(`Attempting to mount to #${mountId}`);
+                // Mount the element
+                element.mount(`#${mountId}`);
+                console.log(`Successfully mounted to #${mountId}`);
+                setIsFormLoading(false);
+              } catch (error) {
+                console.error('Error mounting element:', error);
+                
+                // If we still have retries left, try again
+                if (retryCount < 3) {
+                  setRetryCount(prev => prev + 1);
+                  // Try again after a delay
+                  setTimeout(initializeForm, 1000);
+                } else {
+                  setFormError('Error mounting payment form. Please refresh the page and try again.');
+                  setIsFormLoading(false);
+                }
               }
-              
-              setIsFormLoading(false);
-            }, 200);
+            }, 500);
           } catch (error) {
             console.error('Error preparing mount point:', error);
             setFormError('Error preparing form. Please try again later.');
             setIsFormLoading(false);
           }
-        }, 500);
+        }, 1000);
         
       } catch (error) {
         if (!isMounted) return;
@@ -121,6 +130,8 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     // Cleanup when component unmounts
     return () => {
       isMounted = false;
+      if (mountRetryTimer) clearTimeout(mountRetryTimer);
+      
       if (beneficiaryFormRef.current) {
         try {
           beneficiaryFormRef.current.unmount();
@@ -130,7 +141,12 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         }
       }
     };
-  }, [config.accentColor, config.backgroundColor, config.currency]);
+  }, [config.accentColor, config.backgroundColor, config.currency, retryCount]);
+  
+  const handleRefresh = () => {
+    setRetryCount(prev => prev + 1);
+    setFormError(null);
+  };
   
   const handleSubmit = async () => {
     if (!beneficiaryFormRef.current) {
@@ -180,10 +196,10 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg text-white">
             <p className="text-sm">{formError}</p>
             <button 
-              onClick={() => window.location.reload()}
+              onClick={handleRefresh}
               className="text-xs underline mt-2"
             >
-              Refresh the page
+              Try again
             </button>
           </div>
         )}
@@ -196,6 +212,7 @@ const BankTransferDetails: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         )}
         
         <div
+          ref={containerRef}
           id="beneficiary-form-container"
           className="airwallex-form-container"
           style={{ 

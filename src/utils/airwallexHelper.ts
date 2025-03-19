@@ -1,3 +1,4 @@
+
 // This file contains helper functions for Airwallex integration
 
 // Define custom types since they're not exported from the SDK
@@ -80,8 +81,8 @@ export const handleFormSubmission = (result: any) => {
  * This is a simple implementation for demo purposes
  */
 export const getCodeVerifier = (): string => {
-  // A fixed code verifier for development
-  return 'airwallex-code-verifier-123456789';
+  // Generate a more random code verifier with timestamp to avoid caching issues
+  return 'airwallex-code-verifier-' + Date.now();
 };
 
 /**
@@ -90,6 +91,8 @@ export const getCodeVerifier = (): string => {
  */
 export const initializeAirwallex = async (): Promise<boolean> => {
   try {
+    console.log('Initializing Airwallex SDK...');
+    
     // Dynamically import the Airwallex SDK to ensure it's only loaded when needed
     const { init } = await import('@airwallex/components-sdk');
     
@@ -119,11 +122,11 @@ export const createBeneficiaryFormConfig = (currency: string, backgroundColor: s
   return {
     defaultValues: {
       beneficiary: {
-        entity_type: 'COMPANY',
+        entity_type: 'COMPANY', // as EntityType - using string literal to avoid type issues
         bank_details: {
           account_currency: currency || 'USD',
           bank_country_code: 'US',
-          local_clearing_system: 'BANK_TRANSFER',
+          local_clearing_system: 'LOCAL',
         },
       },
       payment_methods: ['LOCAL'],
@@ -171,6 +174,8 @@ export const createBeneficiaryFormConfig = (currency: string, backgroundColor: s
  */
 export const createBeneficiaryForm = async (config: any) => {
   try {
+    console.log('Creating Airwallex beneficiary form with config:', config);
+    
     const { createElement } = await import('@airwallex/components-sdk');
     
     // Create the beneficiary form element with the provided configuration
@@ -200,6 +205,8 @@ export const mountAirwallexElement = (element: any, selector: string): boolean =
       console.error(`Mount target not found: ${selector}`);
       return false;
     }
+    
+    console.log(`Attempting to mount element to ${selector}`);
     
     // Mount the element to the DOM
     element.mount(selector);
