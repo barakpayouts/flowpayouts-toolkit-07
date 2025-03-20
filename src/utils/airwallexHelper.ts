@@ -1,6 +1,9 @@
 
 // This file contains helper functions for Airwallex integration
 
+// Import the required types from the Airwallex SDK
+import type { EntityType } from '@airwallex/components-sdk';
+
 /**
  * Get auth code for Airwallex API
  * In a real implementation, this would call your backend to retrieve a valid auth code
@@ -75,7 +78,7 @@ export const createBeneficiaryFormConfig = (currency: string, backgroundColor: s
   return {
     defaultValues: {
       beneficiary: {
-        entity_type: 'COMPANY',
+        entity_type: 'COMPANY' as EntityType, // Add type assertion to match EntityType
         bank_details: {
           account_currency: currency || 'USD',
           bank_country_code: 'US',
