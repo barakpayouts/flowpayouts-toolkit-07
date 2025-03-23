@@ -80,14 +80,16 @@ export const createBeneficiaryFormConfig = (currency: string, backgroundColor: s
   return {
     defaultValues: {
       beneficiary: {
-        entity_type: 'COMPANY', // Using string literal instead of our EntityType
+        // Cast the string literal to any to avoid type conflicts with SDK's EntityType
+        entity_type: 'COMPANY' as any,
         bank_details: {
           account_currency: currency || 'USD',
           bank_country_code: 'US',
           local_clearing_system: 'LOCAL',
         }
       },
-      payment_methods: ['SWIFT'], // Using string literal instead of our TransferMethod
+      // Cast the array to any to avoid type conflicts with SDK's TransferMethod[]
+      payment_methods: ['SWIFT'] as any,
     },
     theme: {
       palette: {
