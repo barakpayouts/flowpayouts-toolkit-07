@@ -1,8 +1,9 @@
 
 // This file contains helper functions for Airwallex integration
 
-// Import the required types from the Airwallex SDK
-import type { EntityType } from '@airwallex/components-sdk';
+// Define the necessary types since they're not directly exported by the SDK
+export type EntityType = 'COMPANY' | 'INDIVIDUAL';
+export type TransferMethod = 'SWIFT' | 'LOCAL' | 'DOMESTIC';
 
 /**
  * Get auth code for Airwallex API
@@ -78,14 +79,14 @@ export const createBeneficiaryFormConfig = (currency: string, backgroundColor: s
   return {
     defaultValues: {
       beneficiary: {
-        entity_type: 'COMPANY' as EntityType, // Add type assertion to match EntityType
+        entity_type: 'COMPANY' as EntityType, // Using our defined EntityType
         bank_details: {
           account_currency: currency || 'USD',
           bank_country_code: 'US',
           local_clearing_system: 'LOCAL',
         }
       },
-      payment_methods: ['LOCAL'],
+      payment_methods: ['SWIFT' as TransferMethod], // Type correct payment methods
     },
     theme: {
       palette: {
