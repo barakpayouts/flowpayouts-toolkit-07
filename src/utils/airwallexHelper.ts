@@ -2,7 +2,7 @@
 // This file contains helper functions for Airwallex integration
 
 // Define the necessary types for our local use
-// Important: We're not importing from the SDK directly but defining compatible types
+// These are only used for our internal typing
 export type EntityType = 'COMPANY' | 'INDIVIDUAL';
 export type TransferMethod = 'SWIFT' | 'LOCAL' | 'DOMESTIC';
 
@@ -75,6 +75,8 @@ export const initializeAirwallex = async (): Promise<boolean> => {
 
 /**
  * Create a beneficiary form configuration
+ * This function creates the configuration object for the Airwallex beneficiary form
+ * We use type assertions to avoid type conflicts with the SDK
  */
 export const createBeneficiaryFormConfig = (currency: string, backgroundColor: string, accentColor: string) => {
   return {
