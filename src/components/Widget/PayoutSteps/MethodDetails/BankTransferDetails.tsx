@@ -46,8 +46,8 @@ const BankTransferDetails: React.FC<BankTransferDetailsProps> = ({ onBack }) => 
           className="w-full h-[450px] border-0"
           onLoad={handleIframeLoad}
           style={{ 
-            background: colorScheme?.backgroundColor || '#143745',
-            color: colorScheme?.textColor || '#ffffff'
+            background: colorScheme?.primaryColor || '#143745',
+            color: colorScheme?.accentColor || '#ffffff'
           }}
           allow="clipboard-write"
         />
