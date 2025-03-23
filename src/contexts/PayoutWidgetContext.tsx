@@ -49,6 +49,11 @@ export interface InvoiceFormData {
   items: InvoiceItemData[];
 }
 
+export interface ColorScheme {
+  primaryColor?: string;
+  accentColor?: string;
+}
+
 interface PayoutWidgetContextType {
   currentStep: number;
   setCurrentStep: (step: number) => void;
@@ -107,6 +112,7 @@ interface PayoutWidgetContextType {
   companyName: string;
   notifications: Notification[];
   setNotifications: (notifications: Notification[]) => void;
+  colorScheme?: ColorScheme;
 }
 
 const PayoutWidgetContext = createContext<PayoutWidgetContextType | undefined>(undefined);
@@ -142,6 +148,7 @@ export const PayoutWidgetProvider: React.FC<{
     advanceType?: AdvanceType,
     setAdvanceType?: (type: AdvanceType) => void,
     companyName?: string,
+    colorScheme?: ColorScheme,
   } 
 }> = ({ children, value }) => {
   const steps = ['profile', 'payout', 'details', 'bank', 'tax'];
@@ -203,6 +210,11 @@ export const PayoutWidgetProvider: React.FC<{
     ]
   });
   
+  const [colorScheme, setColorScheme] = useState<ColorScheme>({
+    primaryColor: '#143745',
+    accentColor: '#d0e92a'
+  });
+
   React.useEffect(() => {
     if (value?.selectedMethod !== undefined) {
       setSelectedMethod(value.selectedMethod as PayoutMethod);
@@ -239,6 +251,10 @@ export const PayoutWidgetProvider: React.FC<{
     if (value?.companyName !== undefined) {
       setCompanyName(value.companyName);
     }
+    
+    if (value?.colorScheme !== undefined) {
+      setColorScheme(value.colorScheme);
+    }
   }, [
     value?.selectedMethod, 
     value?.showDashboard, 
@@ -248,7 +264,8 @@ export const PayoutWidgetProvider: React.FC<{
     value?.selectedAdvanceTier,
     value?.prepaidCardEmail,
     value?.advanceType,
-    value?.companyName
+    value?.companyName,
+    value?.colorScheme
   ]);
 
   const payouts = [
@@ -540,6 +557,7 @@ export const PayoutWidgetProvider: React.FC<{
     companyName,
     notifications,
     setNotifications,
+    colorScheme,
     handleNextStep,
     handleBackStep,
     handleSelectPayoutMethod,
