@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { RecipientType } from '@/hooks/use-widget-config';
 import { cn } from "@/lib/utils";
@@ -8,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface RecipientConfigProps {
   onComplete: () => void;
+  onBack?: () => void;
 }
 
 interface OnboardingOption {
@@ -28,7 +28,7 @@ interface PortalOption {
   description: string;
 }
 
-const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
+const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete, onBack }) => {
   const { config, setRecipientType, updateConfig } = useWidgetConfig();
   const [step, setStep] = useState<number>(1);
   const [selectedType, setSelectedType] = useState<RecipientType | null>(config.recipientType || null);
@@ -36,15 +36,14 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
   const [onboardingType, setOnboardingType] = useState<string | null>(null);
   const [portalType, setPortalType] = useState<string | null>(null);
 
-  // Updated recipient types to ensure each has a unique type
   const recipientTypes: { type: RecipientType; icon: string; label: string }[] = [
     { type: 'vendor', icon: '🏢', label: 'Vendor' },
     { type: 'insured', icon: '🛡️', label: 'Insured' },
     { type: 'individual', icon: '👤', label: 'Individual' },
     { type: 'business', icon: '💼', label: 'Business' },
     { type: 'contractor', icon: '🔧', label: 'Contractor' },
-    { type: 'client', icon: '👥', label: 'Client' }, // Changed type to 'client'
-    { type: 'other', icon: '🔄', label: 'Other' },  // Changed type to 'other'
+    { type: 'client', icon: '👥', label: 'Client' },
+    { type: 'other', icon: '🔄', label: 'Other' },
   ];
 
   const managementOptions: OnboardingOption[] = [
@@ -124,6 +123,18 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
       }
     } else if (step === 5) {
       completeSetup();
+    }
+  };
+
+  const handleBack = () => {
+    if (step === 1 && onBack) {
+      onBack();
+    } else if (step > 1) {
+      if (step === 3 && managementType === 'independent') {
+        setStep(2);
+      } else {
+        setStep(step - 1);
+      }
     }
   };
 
@@ -314,7 +325,18 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
         </div>
       )}
 
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={handleBack}
+          className={cn(
+            "flex items-center gap-2 px-4 py-2 rounded-lg",
+            "bg-black/20 border border-white/10 hover:bg-black/30",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            step === 1 && !onBack ? "invisible" : ""
+          )}
+        >
+          <ArrowLeft size={16} /> Back
+        </button>
         <button
           onClick={handleNext}
           disabled={
