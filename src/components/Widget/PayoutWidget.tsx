@@ -16,6 +16,7 @@ import MethodDetails from './PayoutSteps/MethodDetails';
 import Dashboard from './Dashboard/Dashboard';
 import LoginScreen from './LoginScreen';
 import RecipientWelcome from './RecipientWelcome';
+import RecipientConfig from './RecipientConfig';
 import { Check, ChevronRight, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ const PayoutWidget: React.FC = () => {
   const [advancedPaymentStage, setAdvancedPaymentStage] = useState(false);
   const [selectedAdvanceTier, setSelectedAdvanceTier] = useState<string | null>(null);
   const [prepaidCardEmail, setPrepaidCardEmail] = useState('');
+  const [showRecipientConfig, setShowRecipientConfig] = useState(false);
 
   useEffect(() => {
     console.log("PayoutWidget state updated:", { 
@@ -98,6 +100,11 @@ const PayoutWidget: React.FC = () => {
   const handleStartOnboarding = () => {
     setShowWelcomeScreen(false);
     setShowLoginScreen(false);
+    setShowRecipientConfig(true);
+  };
+  
+  const handleRecipientConfigComplete = () => {
+    setShowRecipientConfig(false);
     setActiveStep(0);
     setOnboardingCompleted(false);
     setShowDashboard(false);
@@ -128,11 +135,15 @@ const PayoutWidget: React.FC = () => {
 
   const renderStepContent = () => {
     if (showWelcomeScreen) {
-      return <RecipientWelcome />;
+      return <RecipientWelcome onStart={handleStartOnboarding} />;
     }
     
     if (showLoginScreen) {
       return <LoginScreen />;
+    }
+    
+    if (showRecipientConfig) {
+      return <RecipientConfig onComplete={handleRecipientConfigComplete} />;
     }
     
     if (showDashboard) {
@@ -343,15 +354,15 @@ const PayoutWidget: React.FC = () => {
       companyName: config.companyName || "Acme Inc.", 
     }}>
       <div className="widget-frame">
-        {!showWelcomeScreen && !showLoginScreen && renderHeader()}
+        {!showWelcomeScreen && !showLoginScreen && !showRecipientConfig && renderHeader()}
         
-        {!showWelcomeScreen && !showLoginScreen && renderStepCircles()}
+        {!showWelcomeScreen && !showLoginScreen && !showRecipientConfig && renderStepCircles()}
         
         <div className="widget-content">
           {renderStepContent()}
         </div>
         
-        {!showWelcomeScreen && !showLoginScreen && !showDashboard && renderFooter()}
+        {!showWelcomeScreen && !showLoginScreen && !showRecipientConfig && !showDashboard && renderFooter()}
       </div>
     </PayoutWidgetProvider>
   );

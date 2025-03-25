@@ -1,115 +1,56 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { usePayoutWidget } from '@/contexts/PayoutWidgetContext';
-import { useWidgetConfig } from '@/hooks/use-widget-config';
-import { ArrowRight, Wallet, Clock, CheckCircle, ToggleLeft, ToggleRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
-const RecipientWelcome: React.FC = () => {
-  const { handleLogin, handleStartOnboarding } = usePayoutWidget();
-  const { config } = useWidgetConfig();
-  const [showDemo, setShowDemo] = useState(false);
+interface RecipientWelcomeProps {
+  onStart?: () => void;
+}
+
+const RecipientWelcome: React.FC<RecipientWelcomeProps> = ({ onStart }) => {
+  const { handleStartOnboarding, handleLogin, companyName } = usePayoutWidget();
   
-  // Determine if we're in onboarding-only mode or payment mode
-  const hasPayoutAmount = showDemo ? false : !!config.payoutAmount;
-  
+  const startOnboarding = () => {
+    if (onStart) {
+      onStart();
+    } else {
+      handleStartOnboarding();
+    }
+  };
+
   return (
-    <div className="welcome-container">
-      {/* Demo toggle - only visible in development/demo mode */}
-      <div className="flex justify-end mb-2">
-        <button 
-          onClick={() => setShowDemo(!showDemo)} 
-          className="flex items-center gap-1.5 text-xs opacity-70 hover:opacity-100 transition-opacity bg-white/10 px-3 py-1.5 rounded-full"
-        >
-          {showDemo ? (
-            <>
-              <ToggleRight size={14} className="text-payouts-accent" />
-              Onboarding Mode
-            </>
-          ) : (
-            <>
-              <ToggleLeft size={14} />
-              Payment Mode
-            </>
-          )}
+    <div className="welcome-screen">
+      <div className="welcome-header">
+        <h1 className="welcome-title">Payment Ready</h1>
+        <p className="welcome-subtitle">{companyName} would like to pay you</p>
+        <div className="welcome-amount">$1,250.00</div>
+      </div>
+      
+      <div className="welcome-features">
+        <div className="welcome-feature">
+          <span className="welcome-feature-icon">⚡</span>
+          <span className="welcome-feature-text">Quick Payment</span>
+          <p className="welcome-feature-desc">Choose from multiple payout options</p>
+        </div>
+        
+        <div className="welcome-feature">
+          <span className="welcome-feature-icon">🚀</span>
+          <span className="welcome-feature-text">Fast Processing</span>
+          <p className="welcome-feature-desc">Receive your funds quickly and securely</p>
+        </div>
+        
+        <div className="welcome-feature">
+          <span className="welcome-feature-icon">🔒</span>
+          <span className="welcome-feature-text">Secure Platform</span>
+          <p className="welcome-feature-desc">Your information is protected</p>
+        </div>
+      </div>
+      
+      <div className="welcome-actions">
+        <button onClick={startOnboarding} className="welcome-button-primary">
+          Create Account <ArrowRight size={16} />
         </button>
-      </div>
-      
-      <div className="text-center mb-4">
-        <h2 className="text-xl font-semibold mb-2">
-          {hasPayoutAmount ? "Payment Ready" : "Onboarding Required"}
-        </h2>
-        <p className="text-sm opacity-80">
-          <span className="font-medium">{config.companyName || "Acme Inc."}</span> 
-          {hasPayoutAmount 
-            ? " would like to pay you" 
-            : " needs you to complete the onboarding process"
-          }
-        </p>
-        
-        {hasPayoutAmount && (
-          <div className="mt-4 py-3 px-6 bg-white/10 rounded-lg inline-block">
-            <span className="text-2xl font-bold" style={{ color: config.accentColor || '#9b87f5' }}>
-              {config.payoutAmount || "$1,250.00"}
-            </span>
-          </div>
-        )}
-      </div>
-      
-      <div className="space-y-4 mb-6">
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5">
-          <div className="p-2 rounded-full bg-white/10">
-            <Wallet size={18} className="text-green-400" />
-          </div>
-          <div>
-            <h3 className="text-sm font-medium">
-              {hasPayoutAmount ? "Quick Payment" : "Multiple Payment Methods"}
-            </h3>
-            <p className="text-xs opacity-70">Choose from multiple payout options</p>
-          </div>
-        </div>
-        
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5">
-          <div className="p-2 rounded-full bg-white/10">
-            <Clock size={18} className="text-blue-400" />
-          </div>
-          <div>
-            <h3 className="text-sm font-medium">Fast Processing</h3>
-            <p className="text-xs opacity-70">Receive your funds quickly and securely</p>
-          </div>
-        </div>
-        
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5">
-          <div className="p-2 rounded-full bg-white/10">
-            <CheckCircle size={18} className="text-purple-400" />
-          </div>
-          <div>
-            <h3 className="text-sm font-medium">Secure Platform</h3>
-            <p className="text-xs opacity-70">Your information is protected</p>
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex flex-col gap-3">
-        <button
-          onClick={handleStartOnboarding}
-          className="py-3 px-4 rounded-lg font-medium bg-payouts-accent text-payouts-dark hover:bg-payouts-accent/90 transition-colors flex justify-center items-center gap-2"
-        >
-          {hasPayoutAmount ? "Create Account" : "Start Onboarding"} <ArrowRight size={16} />
-        </button>
-        
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/10"></div>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-payouts-dark px-2 text-white/60">or</span>
-          </div>
-        </div>
-        
-        <button
-          onClick={handleLogin}
-          className="py-3 px-4 rounded-lg font-medium bg-white/10 hover:bg-white/20 transition-colors"
-        >
+        <button onClick={handleLogin} className="welcome-button-secondary">
           Sign In
         </button>
       </div>
