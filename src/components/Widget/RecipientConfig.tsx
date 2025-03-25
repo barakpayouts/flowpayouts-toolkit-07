@@ -4,6 +4,10 @@ import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { RecipientType } from '@/hooks/use-widget-config';
 import { cn } from "@/lib/utils";
 
+interface RecipientConfigProps {
+  onComplete: () => void;
+}
+
 interface OnboardingOption {
   id: string;
   title: string;
@@ -22,7 +26,7 @@ interface PortalOption {
   description: string;
 }
 
-const RecipientConfig: React.FC = () => {
+const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
   const { config, setRecipientType, updateConfig } = useWidgetConfig();
   const [step, setStep] = useState<number>(1);
   const [selectedType, setSelectedType] = useState<RecipientType | null>(config.recipientType || null);
@@ -103,7 +107,6 @@ const RecipientConfig: React.FC = () => {
       setStep(2);
     } else if (step === 2 && managementType) {
       if (managementType === 'independent') {
-        // Skip to data import step
         setStep(5);
       } else {
         setStep(3);
@@ -112,31 +115,25 @@ const RecipientConfig: React.FC = () => {
       setStep(4);
     } else if (step === 4 && portalType) {
       if (portalType === 'widget') {
-        // Complete setup and move to widget configuration
         completeSetup();
       } else {
-        // Move to completed step
         setStep(6);
       }
     } else if (step === 5) {
-      // Complete independent management setup
       completeSetup();
     }
   };
 
   const completeSetup = () => {
-    // Use the selected configuration to update widget config
     updateConfig({
       recipientType: selectedType || 'vendor'
     });
 
-    // For widget option, keep the default flow
     if (portalType === 'widget') {
-      // We'll let the parent component move to the next step
+      onComplete();
+    } else {
+      setStep(6);
     }
-    
-    // Notify parent that config is complete
-    setStep(6);
   };
 
   const handleOptionSelect = (optionId: string) => {
