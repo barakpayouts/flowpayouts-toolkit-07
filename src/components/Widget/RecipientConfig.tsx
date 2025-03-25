@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
 import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { RecipientType } from '@/hooks/use-widget-config';
 import { cn } from "@/lib/utils";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface RecipientConfigProps {
   onComplete: () => void;
@@ -163,7 +165,12 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
             {recipientTypes.map((item) => (
               <button
                 key={item.type + item.label}
-                onClick={() => setSelectedType(item.type)}
+                onClick={() => {
+                  // Clear any previous selections first
+                  setSelectedType(null);
+                  // Then set the new selection
+                  setTimeout(() => setSelectedType(item.type), 0);
+                }}
                 className={cn(
                   "p-4 rounded-lg border flex items-center gap-2 transition-all",
                   selectedType === item.type
@@ -187,26 +194,27 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
           <h2 className="text-xl font-semibold mb-2">Management Option</h2>
           <p className="text-sm mb-6 opacity-70">How would you like to onboard your {getRecipientLabel().toLowerCase()}s to Payouts.com?</p>
           
-          <div className="space-y-3">
+          <RadioGroup value={managementType || ""} onValueChange={setManagementType} className="space-y-3">
             {managementOptions.map((option) => (
-              <button
+              <div
                 key={option.id}
-                onClick={() => handleOptionSelect(option.id)}
                 className={cn(
-                  "w-full p-4 rounded-lg border text-left flex flex-col transition-all",
+                  "w-full p-4 rounded-lg border text-left flex items-start gap-3 transition-all",
                   managementType === option.id
                     ? "border-accent-foreground bg-accent-foreground/10"
                     : "border-border hover:bg-accent/10"
                 )}
               >
-                <span className="font-medium mb-1">{option.title}</span>
-                <span className="text-sm opacity-70">{option.description}</span>
-                {managementType === option.id && (
-                  <Check size={16} className="ml-auto text-green-500 self-end mt-2" />
-                )}
-              </button>
+                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                <div className="flex-1">
+                  <label htmlFor={option.id} className="font-medium block mb-1 cursor-pointer">
+                    {option.title}
+                  </label>
+                  <span className="text-sm opacity-70 block">{option.description}</span>
+                </div>
+              </div>
             ))}
-          </div>
+          </RadioGroup>
         </div>
       )}
 
@@ -215,26 +223,27 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
           <h2 className="text-xl font-semibold mb-2">Onboarding Process</h2>
           <p className="text-sm mb-6 opacity-70">How would you like to onboard your {getRecipientLabel().toLowerCase()}s to the portal?</p>
           
-          <div className="space-y-3">
+          <RadioGroup value={onboardingType || ""} onValueChange={setOnboardingType} className="space-y-3">
             {onboardingOptions.map((option) => (
-              <button
+              <div
                 key={option.id}
-                onClick={() => handleOptionSelect(option.id)}
                 className={cn(
-                  "w-full p-4 rounded-lg border text-left flex flex-col transition-all",
+                  "w-full p-4 rounded-lg border text-left flex items-start gap-3 transition-all",
                   onboardingType === option.id
                     ? "border-accent-foreground bg-accent-foreground/10"
                     : "border-border hover:bg-accent/10"
                 )}
               >
-                <span className="font-medium mb-1">{option.title}</span>
-                <span className="text-sm opacity-70">{option.description}</span>
-                {onboardingType === option.id && (
-                  <Check size={16} className="ml-auto text-green-500 self-end mt-2" />
-                )}
-              </button>
+                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                <div className="flex-1">
+                  <label htmlFor={option.id} className="font-medium block mb-1 cursor-pointer">
+                    {option.title}
+                  </label>
+                  <span className="text-sm opacity-70 block">{option.description}</span>
+                </div>
+              </div>
             ))}
-          </div>
+          </RadioGroup>
         </div>
       )}
 
@@ -243,26 +252,27 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
           <h2 className="text-xl font-semibold mb-2">Portal Type</h2>
           <p className="text-sm mb-6 opacity-70">Would you like to use a self-hosted portal or our widget?</p>
           
-          <div className="space-y-3">
+          <RadioGroup value={portalType || ""} onValueChange={setPortalType} className="space-y-3">
             {portalOptions.map((option) => (
-              <button
+              <div
                 key={option.id}
-                onClick={() => handleOptionSelect(option.id)}
                 className={cn(
-                  "w-full p-4 rounded-lg border text-left flex flex-col transition-all",
+                  "w-full p-4 rounded-lg border text-left flex items-start gap-3 transition-all",
                   portalType === option.id
                     ? "border-accent-foreground bg-accent-foreground/10"
                     : "border-border hover:bg-accent/10"
                 )}
               >
-                <span className="font-medium mb-1">{option.title}</span>
-                <span className="text-sm opacity-70">{option.description}</span>
-                {portalType === option.id && (
-                  <Check size={16} className="ml-auto text-green-500 self-end mt-2" />
-                )}
-              </button>
+                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                <div className="flex-1">
+                  <label htmlFor={option.id} className="font-medium block mb-1 cursor-pointer">
+                    {option.title}
+                  </label>
+                  <span className="text-sm opacity-70 block">{option.description}</span>
+                </div>
+              </div>
             ))}
-          </div>
+          </RadioGroup>
         </div>
       )}
 
@@ -273,17 +283,16 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
           
           <div className="space-y-3">
             {dataImportOptions.map((option) => (
-              <button
+              <div
                 key={option.id}
-                onClick={() => handleOptionSelect(option.id)}
                 className={cn(
-                  "w-full p-4 rounded-lg border text-left flex flex-col transition-all",
+                  "w-full p-4 rounded-lg border text-left transition-all",
                   "border-border hover:bg-accent/10"
                 )}
               >
-                <span className="font-medium mb-1">{option.title}</span>
-                <span className="text-sm opacity-70">{option.description}</span>
-              </button>
+                <div className="font-medium mb-1">{option.title}</div>
+                <div className="text-sm opacity-70">{option.description}</div>
+              </div>
             ))}
           </div>
         </div>
