@@ -4,6 +4,7 @@ import { useWidgetConfig } from '@/hooks/use-widget-config';
 import { RecipientType } from '@/hooks/use-widget-config';
 import { cn } from "@/lib/utils";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
 
 interface RecipientConfigProps {
   onComplete: () => void;
@@ -326,19 +327,18 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete, onBack })
       )}
 
       <div className="flex justify-between mt-6">
-        <button
+        <Button
           onClick={handleBack}
+          variant="dark"
           className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-lg",
-            "bg-black/20 border border-white/10 hover:bg-black/30",
-            "disabled:opacity-50 disabled:cursor-not-allowed",
             step === 1 && !onBack ? "invisible" : ""
           )}
         >
-          <ArrowLeft size={16} /> Back
-        </button>
-        <button
+          <ArrowLeft size={16} className="mr-2" /> Back
+        </Button>
+        <Button
           onClick={handleNext}
+          variant="accent"
           disabled={
             (step === 1 && !selectedType) ||
             (step === 2 && !managementType) ||
@@ -346,14 +346,9 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete, onBack })
             (step === 4 && !portalType) ||
             step === 6
           }
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-lg",
-            "bg-accent-foreground text-accent-foreground-foreground",
-            "disabled:opacity-50 disabled:cursor-not-allowed"
-          )}
         >
-          Next <ArrowRight size={16} />
-        </button>
+          Next <ArrowRight size={16} className="ml-2" />
+        </Button>
       </div>
     </div>
   );
