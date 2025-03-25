@@ -36,14 +36,15 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
   const [onboardingType, setOnboardingType] = useState<string | null>(null);
   const [portalType, setPortalType] = useState<string | null>(null);
 
+  // Updated recipient types to ensure each has a unique type
   const recipientTypes: { type: RecipientType; icon: string; label: string }[] = [
     { type: 'vendor', icon: '🏢', label: 'Vendor' },
     { type: 'insured', icon: '🛡️', label: 'Insured' },
     { type: 'individual', icon: '👤', label: 'Individual' },
     { type: 'business', icon: '💼', label: 'Business' },
     { type: 'contractor', icon: '🔧', label: 'Contractor' },
-    { type: 'vendor', icon: '👥', label: 'Client' },
-    { type: 'vendor', icon: '🔄', label: 'Other' },
+    { type: 'client', icon: '👥', label: 'Client' }, // Changed type to 'client'
+    { type: 'other', icon: '🔄', label: 'Other' },  // Changed type to 'other'
   ];
 
   const managementOptions: OnboardingOption[] = [
@@ -161,16 +162,14 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
           <h2 className="text-xl font-semibold mb-4">Recipient Type</h2>
           <p className="text-sm mb-6 opacity-70">What type of recipient is in this connector?</p>
           
-          <div className="grid grid-cols-2 gap-3">
+          <RadioGroup
+            value={selectedType || ""}
+            onValueChange={(value) => setSelectedType(value as RecipientType)}
+            className="grid grid-cols-2 gap-3"
+          >
             {recipientTypes.map((item) => (
-              <button
+              <div
                 key={item.type + item.label}
-                onClick={() => {
-                  // Clear any previous selections first
-                  setSelectedType(null);
-                  // Then set the new selection
-                  setTimeout(() => setSelectedType(item.type), 0);
-                }}
                 className={cn(
                   "p-4 rounded-lg border flex items-center gap-2 transition-all",
                   selectedType === item.type
@@ -178,14 +177,17 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete }) => {
                     : "border-border hover:bg-accent/10"
                 )}
               >
-                <span className="text-lg">{item.icon}</span>
-                <span className="text-sm font-medium">{item.label}</span>
+                <RadioGroupItem value={item.type} id={item.type} className="mt-1" />
+                <label htmlFor={item.type} className="flex-1 flex items-center gap-2 cursor-pointer">
+                  <span className="text-lg">{item.icon}</span>
+                  <span className="text-sm font-medium">{item.label}</span>
+                </label>
                 {selectedType === item.type && (
                   <Check size={16} className="ml-auto text-green-500" />
                 )}
-              </button>
+              </div>
             ))}
-          </div>
+          </RadioGroup>
         </div>
       )}
 
