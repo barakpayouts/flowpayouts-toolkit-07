@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 
-export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor';
+export type RecipientType = 'vendor' | 'insured' | 'individual' | 'business' | 'contractor' | 'client' | 'other';
 export type VerificationStep = 'profile' | 'bank' | 'tax' | 'kyc' | 'payout';
 export type PayoutMethod = 'bank' | 'crypto' | 'digital' | 'card' | 'prepaid' | 'gift' | 'advanced';
 export type ButtonStyle = 'rounded' | 'square' | 'pill';
