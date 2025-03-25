@@ -215,13 +215,24 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete, onBack })
                 className={cn(
                   "w-full p-4 rounded-lg border text-left flex items-start gap-3 transition-all",
                   managementType === option.id
-                    ? "border-accent-foreground bg-accent-foreground/10"
+                    ? "border-accent-foreground bg-accent-foreground/20 shadow-md"
                     : "border-border hover:bg-accent/10"
                 )}
+                onClick={() => setManagementType(option.id)}
               >
-                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                <div className={cn(
+                  "mt-1 flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center",
+                  managementType === option.id 
+                    ? "border-accent-foreground bg-accent-foreground" 
+                    : "border-muted-foreground"
+                )}>
+                  {managementType === option.id && <Check size={12} className="text-background" />}
+                </div>
                 <div className="flex-1">
-                  <label htmlFor={option.id} className="font-medium block mb-1 cursor-pointer">
+                  <label htmlFor={option.id} className={cn(
+                    "font-medium block mb-1 cursor-pointer",
+                    managementType === option.id && "text-accent-foreground"
+                  )}>
                     {option.title}
                   </label>
                   <span className="text-sm opacity-70 block">{option.description}</span>
@@ -244,13 +255,24 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete, onBack })
                 className={cn(
                   "w-full p-4 rounded-lg border text-left flex items-start gap-3 transition-all",
                   onboardingType === option.id
-                    ? "border-accent-foreground bg-accent-foreground/10"
+                    ? "border-accent-foreground bg-accent-foreground/20 shadow-md"
                     : "border-border hover:bg-accent/10"
                 )}
+                onClick={() => setOnboardingType(option.id)}
               >
-                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                <div className={cn(
+                  "mt-1 flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center",
+                  onboardingType === option.id 
+                    ? "border-accent-foreground bg-accent-foreground" 
+                    : "border-muted-foreground"
+                )}>
+                  {onboardingType === option.id && <Check size={12} className="text-background" />}
+                </div>
                 <div className="flex-1">
-                  <label htmlFor={option.id} className="font-medium block mb-1 cursor-pointer">
+                  <label htmlFor={option.id} className={cn(
+                    "font-medium block mb-1 cursor-pointer",
+                    onboardingType === option.id && "text-accent-foreground"
+                  )}>
                     {option.title}
                   </label>
                   <span className="text-sm opacity-70 block">{option.description}</span>
@@ -273,13 +295,24 @@ const RecipientConfig: React.FC<RecipientConfigProps> = ({ onComplete, onBack })
                 className={cn(
                   "w-full p-4 rounded-lg border text-left flex items-start gap-3 transition-all",
                   portalType === option.id
-                    ? "border-accent-foreground bg-accent-foreground/10"
+                    ? "border-accent-foreground bg-accent-foreground/20 shadow-md"
                     : "border-border hover:bg-accent/10"
                 )}
+                onClick={() => setPortalType(option.id)}
               >
-                <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
+                <div className={cn(
+                  "mt-1 flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center",
+                  portalType === option.id 
+                    ? "border-accent-foreground bg-accent-foreground" 
+                    : "border-muted-foreground"
+                )}>
+                  {portalType === option.id && <Check size={12} className="text-background" />}
+                </div>
                 <div className="flex-1">
-                  <label htmlFor={option.id} className="font-medium block mb-1 cursor-pointer">
+                  <label htmlFor={option.id} className={cn(
+                    "font-medium block mb-1 cursor-pointer",
+                    portalType === option.id && "text-accent-foreground"
+                  )}>
                     {option.title}
                   </label>
                   <span className="text-sm opacity-70 block">{option.description}</span>
